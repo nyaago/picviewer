@@ -1,0 +1,499 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1D3623260D0F684500981E51 /* PicasaViewerAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* PicasaViewerAppDelegate.m */; };
+		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
+		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
+		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
+		28860B770F44E54D00985440 /* PicasaViewer.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 28860B760F44E54D00985440 /* PicasaViewer.xcdatamodel */; };
+		28860BE50F44EE6400985440 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28860BE40F44EE6400985440 /* CoreData.framework */; };
+		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
+		2899E5600DE3E45000AC0155 /* RootViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E55F0DE3E45000AC0155 /* RootViewController.xib */; };
+		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
+		722D6D5011869787004F0F0D /* AlbumTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 722D6D4F11869787004F0F0D /* AlbumTableViewController.xib */; };
+		722D6DCB1186A0EE004F0F0D /* PhotoListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 722D6DC91186A0EE004F0F0D /* PhotoListViewController.m */; };
+		722D6DCC1186A0EE004F0F0D /* PhotoListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */; };
+		722D6DED1186C80E004F0F0D /* Photo.m in Sources */ = {isa = PBXBuildFile; fileRef = 722D6DEC1186C80E004F0F0D /* Photo.m */; };
+		7234EA44117E820800D7AC45 /* libGDataTouchStaticLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7234E9DA117E7C7F00D7AC45 /* libGDataTouchStaticLib.a */; };
+		7251549011851B2A00B136DF /* QueuedURLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 7251548F11851B2A00B136DF /* QueuedURLDownloader.m */; };
+		72582A841189B7B200A8A6FC /* PhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72582A821189B7B200A8A6FC /* PhotoViewController.m */; };
+		72582A851189B7B200A8A6FC /* PhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72582A831189B7B200A8A6FC /* PhotoViewController.xib */; };
+		72C4AC8F119AED2200F4B664 /* PhotoImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C4AC8E119AED2200F4B664 /* PhotoImage.m */; };
+		72C6183A118A6F52001FD7C7 /* DeviceRotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61839118A6F52001FD7C7 /* DeviceRotation.m */; };
+		72C61C32118AECF8001FD7C7 /* PageControlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */; };
+		72C61C33118AECF8001FD7C7 /* PageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61C31118AECF8001FD7C7 /* PageScrollView.m */; };
+		72D577881180357300F687DB /* PicasaFetchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577871180357300F687DB /* PicasaFetchController.m */; };
+		72D577E811804AAE00F687DB /* NewUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577E611804AAE00F687DB /* NewUserViewController.m */; };
+		72D577E911804AAE00F687DB /* NewUserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D577E711804AAE00F687DB /* NewUserViewController.xib */; };
+		72EA5A571181337800065915 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72EA5A561181337800065915 /* Localizable.strings */; };
+		72EA5A9E1181408700065915 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5A9D1181408700065915 /* User.m */; };
+		72EA5AA11181409300065915 /* Album.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5AA01181409300065915 /* Album.m */; };
+		72EA5B521181577500065915 /* URLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5B511181577500065915 /* URLDownload.m */; };
+		72EA5B5C11815C9A00065915 /* AlbumTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5B5A11815C9A00065915 /* AlbumTableViewController.m */; };
+		72FA3CB4117E9F4300AB7B1C /* libxml2.2.7.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72FA3CB3117E9F4300AB7B1C /* libxml2.2.7.3.dylib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7234E9D9117E7C7F00D7AC45 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7234E9CB117E7C7F00D7AC45 /* GData.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F1C6E0F1027B3CE00B46459;
+			remoteInfo = GDataTouchStaticLib;
+		};
+		7234E9DB117E7C7F00D7AC45 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7234E9CB117E7C7F00D7AC45 /* GData.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F14A9DD0B1276B70072EBB8;
+			remoteInfo = GDataUnitTests;
+		};
+		7234E9DD117E7C7F00D7AC45 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7234E9CB117E7C7F00D7AC45 /* GData.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F85E018103B83B700B4C418;
+			remoteInfo = GDataIPhoneUnitTests;
+		};
+		7234E9DF117E7C7F00D7AC45 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7234E9CB117E7C7F00D7AC45 /* GData.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 4F1AD9020B71603F00DC0485;
+			remoteInfo = DevelopmentTestTool;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1D3623240D0F684500981E51 /* PicasaViewerAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PicasaViewerAppDelegate.h; sourceTree = "<group>"; };
+		1D3623250D0F684500981E51 /* PicasaViewerAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasaViewerAppDelegate.m; sourceTree = "<group>"; };
+		1D6058910D05DD3D006BFB54 /* PicasaViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PicasaViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		28860B760F44E54D00985440 /* PicasaViewer.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = PicasaViewer.xcdatamodel; sourceTree = "<group>"; };
+		28860BE40F44EE6400985440 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		2899E55F0DE3E45000AC0155 /* RootViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = RootViewController.xib; sourceTree = "<group>"; };
+		28A0AAE50D9B0CCF005BE974 /* PicasaViewer_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PicasaViewer_Prefix.pch; sourceTree = "<group>"; };
+		28C286DF0D94DF7D0034E888 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		28C286E00D94DF7D0034E888 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		722D6D4F11869787004F0F0D /* AlbumTableViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumTableViewController.xib; sourceTree = "<group>"; };
+		722D6DC81186A0EE004F0F0D /* PhotoListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoListViewController.h; sourceTree = "<group>"; };
+		722D6DC91186A0EE004F0F0D /* PhotoListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoListViewController.m; sourceTree = "<group>"; };
+		722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhotoListViewController.xib; sourceTree = "<group>"; };
+		722D6DEB1186C80E004F0F0D /* Photo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Photo.h; sourceTree = "<group>"; };
+		722D6DEC1186C80E004F0F0D /* Photo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Photo.m; sourceTree = "<group>"; };
+		7234E9CB117E7C7F00D7AC45 /* GData.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GData.xcodeproj; path = "../gdata-objectivec-client/Source/GData.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		7251548E11851B2A00B136DF /* QueuedURLDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QueuedURLDownloader.h; sourceTree = "<group>"; };
+		7251548F11851B2A00B136DF /* QueuedURLDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QueuedURLDownloader.m; sourceTree = "<group>"; };
+		72582A811189B7B200A8A6FC /* PhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoViewController.h; sourceTree = "<group>"; };
+		72582A821189B7B200A8A6FC /* PhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoViewController.m; sourceTree = "<group>"; };
+		72582A831189B7B200A8A6FC /* PhotoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhotoViewController.xib; sourceTree = "<group>"; };
+		72C4AC8D119AED2200F4B664 /* PhotoImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoImage.h; sourceTree = "<group>"; };
+		72C4AC8E119AED2200F4B664 /* PhotoImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoImage.m; sourceTree = "<group>"; };
+		72C61838118A6F52001FD7C7 /* DeviceRotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceRotation.h; sourceTree = "<group>"; };
+		72C61839118A6F52001FD7C7 /* DeviceRotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceRotation.m; sourceTree = "<group>"; };
+		72C61C2E118AECF8001FD7C7 /* PageControlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PageControlViewController.h; sourceTree = "<group>"; };
+		72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageControlViewController.m; sourceTree = "<group>"; };
+		72C61C31118AECF8001FD7C7 /* PageScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageScrollView.m; sourceTree = "<group>"; };
+		72D577861180357300F687DB /* PicasaFetchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PicasaFetchController.h; sourceTree = "<group>"; };
+		72D577871180357300F687DB /* PicasaFetchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasaFetchController.m; sourceTree = "<group>"; };
+		72D577E511804AAE00F687DB /* NewUserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewUserViewController.h; sourceTree = "<group>"; };
+		72D577E611804AAE00F687DB /* NewUserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewUserViewController.m; sourceTree = "<group>"; };
+		72D577E711804AAE00F687DB /* NewUserViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewUserViewController.xib; sourceTree = "<group>"; };
+		72EA5A541181337000065915 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
+		72EA5A581181338900065915 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/Localizable.strings; sourceTree = "<group>"; };
+		72EA5A9C1181408700065915 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
+		72EA5A9D1181408700065915 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
+		72EA5A9F1181409300065915 /* Album.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Album.h; sourceTree = "<group>"; };
+		72EA5AA01181409300065915 /* Album.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Album.m; sourceTree = "<group>"; };
+		72EA5B501181577500065915 /* URLDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLDownload.h; sourceTree = "<group>"; };
+		72EA5B511181577500065915 /* URLDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLDownload.m; sourceTree = "<group>"; };
+		72EA5B5911815C9A00065915 /* AlbumTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumTableViewController.h; sourceTree = "<group>"; };
+		72EA5B5A11815C9A00065915 /* AlbumTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumTableViewController.m; sourceTree = "<group>"; };
+		72FA3CB3117E9F4300AB7B1C /* libxml2.2.7.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.7.3.dylib; path = usr/lib/libxml2.2.7.3.dylib; sourceTree = SDKROOT; };
+		8D1107310486CEB800E47090 /* PicasaViewer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "PicasaViewer-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1D60588F0D05DD3D006BFB54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
+				2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */,
+				28860BE50F44EE6400985440 /* CoreData.framework in Frameworks */,
+				7234EA44117E820800D7AC45 /* libGDataTouchStaticLib.a in Frameworks */,
+				72FA3CB4117E9F4300AB7B1C /* libxml2.2.7.3.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		080E96DDFE201D6D7F000001 /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				72C61C2E118AECF8001FD7C7 /* PageControlViewController.h */,
+				72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */,
+				72C61C31118AECF8001FD7C7 /* PageScrollView.m */,
+				72EA5B4A1181539400065915 /* Utils */,
+				72EA5A991181400D00065915 /* Models */,
+				28C286DF0D94DF7D0034E888 /* RootViewController.h */,
+				28C286E00D94DF7D0034E888 /* RootViewController.m */,
+				1D3623240D0F684500981E51 /* PicasaViewerAppDelegate.h */,
+				1D3623250D0F684500981E51 /* PicasaViewerAppDelegate.m */,
+				72D577861180357300F687DB /* PicasaFetchController.h */,
+				72D577871180357300F687DB /* PicasaFetchController.m */,
+				72D577E511804AAE00F687DB /* NewUserViewController.h */,
+				72D577E611804AAE00F687DB /* NewUserViewController.m */,
+				72EA5B5911815C9A00065915 /* AlbumTableViewController.h */,
+				72EA5B5A11815C9A00065915 /* AlbumTableViewController.m */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				722D6DC91186A0EE004F0F0D /* PhotoListViewController.m */,
+				72582A811189B7B200A8A6FC /* PhotoViewController.h */,
+				722D6DC81186A0EE004F0F0D /* PhotoListViewController.h */,
+				72582A821189B7B200A8A6FC /* PhotoViewController.m */,
+			);
+			path = Classes;
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1D6058910D05DD3D006BFB54 /* PicasaViewer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
+			isa = PBXGroup;
+			children = (
+				7234E9CA117E7C6400D7AC45 /* Library */,
+				080E96DDFE201D6D7F000001 /* Classes */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = CustomTemplate;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				28A0AAE50D9B0CCF005BE974 /* PicasaViewer_Prefix.pch */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			path = ..;
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				72582A831189B7B200A8A6FC /* PhotoViewController.xib */,
+				722D6D4F11869787004F0F0D /* AlbumTableViewController.xib */,
+				722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */,
+				72D577E711804AAE00F687DB /* NewUserViewController.xib */,
+				28860B760F44E54D00985440 /* PicasaViewer.xcdatamodel */,
+				2899E55F0DE3E45000AC0155 /* RootViewController.xib */,
+				8D1107310486CEB800E47090 /* PicasaViewer-Info.plist */,
+				72EA5A561181337800065915 /* Localizable.strings */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
+				1D30AB110D05D00D00671497 /* Foundation.framework */,
+				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
+				28860BE40F44EE6400985440 /* CoreData.framework */,
+				72FA3CB3117E9F4300AB7B1C /* libxml2.2.7.3.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7234E9CA117E7C6400D7AC45 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				7234E9CB117E7C7F00D7AC45 /* GData.xcodeproj */,
+			);
+			name = Library;
+			sourceTree = "<group>";
+		};
+		7234E9CC117E7C7F00D7AC45 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7234E9DA117E7C7F00D7AC45 /* libGDataTouchStaticLib.a */,
+				7234E9DC117E7C7F00D7AC45 /* GDataUnitTests.octest */,
+				7234E9DE117E7C7F00D7AC45 /* GDataTouchUnitTests.octest */,
+				7234E9E0117E7C7F00D7AC45 /* DevelopmentTestTool */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		72EA5A991181400D00065915 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				72EA5A9C1181408700065915 /* User.h */,
+				72EA5A9D1181408700065915 /* User.m */,
+				72EA5A9F1181409300065915 /* Album.h */,
+				72EA5AA01181409300065915 /* Album.m */,
+				722D6DEB1186C80E004F0F0D /* Photo.h */,
+				722D6DEC1186C80E004F0F0D /* Photo.m */,
+				72C4AC8D119AED2200F4B664 /* PhotoImage.h */,
+				72C4AC8E119AED2200F4B664 /* PhotoImage.m */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		72EA5B4A1181539400065915 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				72EA5B501181577500065915 /* URLDownload.h */,
+				72EA5B511181577500065915 /* URLDownload.m */,
+				7251548E11851B2A00B136DF /* QueuedURLDownloader.h */,
+				7251548F11851B2A00B136DF /* QueuedURLDownloader.m */,
+				72C61838118A6F52001FD7C7 /* DeviceRotation.h */,
+				72C61839118A6F52001FD7C7 /* DeviceRotation.m */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1D6058900D05DD3D006BFB54 /* PicasaViewer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "PicasaViewer" */;
+			buildPhases = (
+				1D60588D0D05DD3D006BFB54 /* Resources */,
+				1D60588E0D05DD3D006BFB54 /* Sources */,
+				1D60588F0D05DD3D006BFB54 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PicasaViewer;
+			productName = PicasaViewer;
+			productReference = 1D6058910D05DD3D006BFB54 /* PicasaViewer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "PicasaViewer" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+				en,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 7234E9CC117E7C7F00D7AC45 /* Products */;
+					ProjectRef = 7234E9CB117E7C7F00D7AC45 /* GData.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				1D6058900D05DD3D006BFB54 /* PicasaViewer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		7234E9DA117E7C7F00D7AC45 /* libGDataTouchStaticLib.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libGDataTouchStaticLib.a;
+			remoteRef = 7234E9D9117E7C7F00D7AC45 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		7234E9DC117E7C7F00D7AC45 /* GDataUnitTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = GDataUnitTests.octest;
+			remoteRef = 7234E9DB117E7C7F00D7AC45 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		7234E9DE117E7C7F00D7AC45 /* GDataTouchUnitTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = GDataTouchUnitTests.octest;
+			remoteRef = 7234E9DD117E7C7F00D7AC45 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		7234E9E0117E7C7F00D7AC45 /* DevelopmentTestTool */ = {
+			isa = PBXReferenceProxy;
+			fileType = "compiled.mach-o.executable";
+			path = DevelopmentTestTool;
+			remoteRef = 7234E9DF117E7C7F00D7AC45 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1D60588D0D05DD3D006BFB54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2899E5600DE3E45000AC0155 /* RootViewController.xib in Resources */,
+				72D577E911804AAE00F687DB /* NewUserViewController.xib in Resources */,
+				72EA5A571181337800065915 /* Localizable.strings in Resources */,
+				722D6D5011869787004F0F0D /* AlbumTableViewController.xib in Resources */,
+				722D6DCC1186A0EE004F0F0D /* PhotoListViewController.xib in Resources */,
+				72582A851189B7B200A8A6FC /* PhotoViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1D60588E0D05DD3D006BFB54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
+				1D3623260D0F684500981E51 /* PicasaViewerAppDelegate.m in Sources */,
+				28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */,
+				28860B770F44E54D00985440 /* PicasaViewer.xcdatamodel in Sources */,
+				72D577881180357300F687DB /* PicasaFetchController.m in Sources */,
+				72D577E811804AAE00F687DB /* NewUserViewController.m in Sources */,
+				72EA5A9E1181408700065915 /* User.m in Sources */,
+				72EA5AA11181409300065915 /* Album.m in Sources */,
+				72EA5B521181577500065915 /* URLDownload.m in Sources */,
+				72EA5B5C11815C9A00065915 /* AlbumTableViewController.m in Sources */,
+				7251549011851B2A00B136DF /* QueuedURLDownloader.m in Sources */,
+				722D6DCB1186A0EE004F0F0D /* PhotoListViewController.m in Sources */,
+				722D6DED1186C80E004F0F0D /* Photo.m in Sources */,
+				72582A841189B7B200A8A6FC /* PhotoViewController.m in Sources */,
+				72C6183A118A6F52001FD7C7 /* DeviceRotation.m in Sources */,
+				72C61C32118AECF8001FD7C7 /* PageControlViewController.m in Sources */,
+				72C61C33118AECF8001FD7C7 /* PageScrollView.m in Sources */,
+				72C4AC8F119AED2200F4B664 /* PhotoImage.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		72EA5A561181337800065915 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				72EA5A541181337000065915 /* English */,
+				72EA5A581181338900065915 /* Japanese */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1D6058940D05DD3E006BFB54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = PicasaViewer_Prefix.pch;
+				INFOPLIST_FILE = "PicasaViewer-Info.plist";
+				PRODUCT_NAME = PicasaViewer;
+			};
+			name = Debug;
+		};
+		1D6058950D05DD3E006BFB54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = PicasaViewer_Prefix.pch;
+				INFOPLIST_FILE = "PicasaViewer-Info.plist";
+				PRODUCT_NAME = PicasaViewer;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: katsuhiko kishino (3Q3CXNAW7D)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: katsuhiko kishino (3Q3CXNAW7D)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				OTHER_LDFLAGS = "-all_load";
+				PREBINDING = NO;
+				SDKROOT = iphonesimulator3.1.3;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: katsuhiko kishino (3Q3CXNAW7D)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: katsuhiko kishino (3Q3CXNAW7D)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				OTHER_LDFLAGS = "-all_load";
+				PREBINDING = NO;
+				SDKROOT = iphonesimulator3.1.3;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "PicasaViewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D6058940D05DD3E006BFB54 /* Debug */,
+				1D6058950D05DD3E006BFB54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "PicasaViewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}

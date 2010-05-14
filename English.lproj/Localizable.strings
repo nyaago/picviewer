@@ -1,0 +1,26 @@
+/* 
+   Localizable.strings
+   PicasaViewer
+
+   Created by nyaago on 10/04/23.
+   Copyright 2010 __MyCompanyName__. All rights reserved.
+ */
+
+"ERROR" = "Error";
+"RESULT" = "Result";
+
+"ACCOUNTS" = "Accounts";
+"ALBUMS" = "Albums";
+
+"ERROR_DELETE" = "An error occured in deleting the entry";
+"ERROR_INSERT" = "An error occured in addting the entry";
+"ERROR_INSERT_THUMB" = "An error occured in addting the thumbnail";
+"ERROR_FETCH" = "An error occured in fetching  entries";
+"ERROR_CON_SERVER" = "An error occured in connecting to google";
+"ERROR_DOWNLOAD_THUMB" = "An error occured in downloding thumbnails";
+"ERROR_DOWNLOAD_IMAGE" = "An error occured in downloding images";
+ 
+"WARN_NO_USER" = "The user not found.";
+"WARN_NO_ALBUM" = "The album not found.";
+
+

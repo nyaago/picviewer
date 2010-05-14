@@ -1,0 +1,25 @@
+/* 
+   Localizable.strings
+   PicasaViewer
+
+   Created by nyaago on 10/04/23.
+   Copyright 2010 __MyCompanyName__. All rights reserved.
+ */
+"ERROR" = "エラー";
+"RESULT" = "結果";
+
+"ACCOUNTS" = "アカウント";
+"ALBUMS" = "アルバム";
+
+"ERROR_DELETE" = "削除中にエラーが発生しました";
+"ERROR_INSERT" = "追加中にエラーが発生しました";
+"ERROR_INSERT_THUMB" = "サムネイルのキャッシュ登録中にエラーが発生しました";
+"ERROR_FETCH" = "一覧取得中にエラーが発生しました";
+"ERROR_CON_SERVER" = "Googleへの接続中にエラーが発生しました";
+"ERROR_DOWNLOAD_THUMB" = "サムネイルダウンロード中にエラーが発生しました";
+"ERROR_DOWNLOAD_IMAGE" = "画像ダウンロード中にエラーが発生しました";
+
+
+
+"WARN_NO_USER" = "ユーザがみつかりません.";
+"WARN_NO_ALBUM" = "アルバムがみつかりません.";
