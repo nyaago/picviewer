@@ -208,7 +208,15 @@ withListViewController:(PhotoListViewController *)controller {
   }
   else {
   }
-  
+  [self setToolbarItems: [self toolbarButtons] animated:YES];
+
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
+	self.toolbarItems = [self toolbarButtons];
+  self.navigationController.toolbar.translucent = YES;
+  self.navigationController.toolbarHidden = NO; 
 }
 
 /*!
@@ -226,6 +234,12 @@ withListViewController:(PhotoListViewController *)controller {
   [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackOpaque;
   NSLog(@"thumbnail count = %d", [thumbnails count]);
   self.wantsFullScreenLayout = YES;
+  self.navigationController.toolbarHidden = NO;
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbar.translucent = YES;
+  
+  
+  
   // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
   // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
   // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
@@ -316,6 +330,8 @@ withListViewController:(PhotoListViewController *)controller {
     [progressView release];
   if(backButton)
     [backButton release];
+  if(toolbarButtons)
+    [toolbarButtons release];
   if(album)
     [album release];
   if(managedObjectContext)
@@ -501,6 +517,48 @@ withListViewController:(PhotoListViewController *)controller {
 }
 
 
+- (NSArray *) toolbarButtons {
+  NSString *path;
+  if(!toolbarButtons) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    toolbarButtons = [[NSMutableArray alloc] init];
+    // Info
+    UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
+                                                             style:UIBarButtonItemStyleBordered 
+                                                            target:self
+                                                            action:nil];
+    path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
+    info.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:info];
+    [info release];
+    
+    // Space
+    UIBarButtonItem *spaceRight
+    = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                    target:self
+                                                    action:nil];
+    spaceRight.width = 30.0f;
+    [toolbarButtons addObject:spaceRight];
+    [spaceRight release];
+    
+    // Setting
+    UIBarButtonItem *settings = [[UIBarButtonItem alloc] initWithTitle:@"" 
+                                                             style:UIBarButtonItemStyleBordered 
+                                                            target:self
+                                                            action:nil];
+    path = [[NSBundle mainBundle] pathForResource:@"preferences" ofType:@"png"];
+    settings.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:settings];
+    [settings release];
+    
+    [pool drain];
+  }
+  return toolbarButtons;
+}
+
+
+
 #pragma mark -
 
 
@@ -661,7 +719,6 @@ withListViewController:(PhotoListViewController *)controller {
     NSLog(@"init PageControllerView retain count = %d",[pageController retainCount]);
     pageController.source = self;
     pageController.curPageNumber = index;
-    pageController.toolbarItems = [pageController toolbarButtons];
     NSLog(@"begore push PageControllerView retain count = %d",[pageController retainCount]);
     [self.navigationController pushViewController:pageController animated:YES];
     [pageController release];

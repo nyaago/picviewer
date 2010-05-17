@@ -99,6 +99,10 @@
 
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
+	self.toolbarItems = [self toolbarButtons];
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbar.translucent = NO;
+  self.navigationController.toolbarHidden = NO; 
 }
 
 
@@ -274,6 +278,7 @@
   PhotoListViewController *photoViewController = 
   [[PhotoListViewController alloc] initWithNibName:@"PhotoListViewController" bundle:nil];
   self.navigationItem.backBarButtonItem =  [photoViewController backButton];
+  
   NSManagedObject *selectedObject = 
   [[self fetchedAlbumsController] objectAtIndexPath:indexPath];
   photoViewController.managedObjectContext = self.managedObjectContext;
@@ -395,6 +400,8 @@
     [user release];
   if(backButton)
     [backButton release];
+  if(toolbarButtons) 
+    [toolbarButtons release];
   [super dealloc];
 }
 
@@ -478,6 +485,48 @@
   }
   return backButton;
 }
+
+- (NSArray *) toolbarButtons {
+  NSString *path;
+  
+  if(!toolbarButtons) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    toolbarButtons = [[NSMutableArray alloc] init];
+    // Info
+    UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
+                                                             style:UIBarButtonItemStyleBordered 
+                                                            target:self
+                                                            action:nil];
+    path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
+    info.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:info];
+    [info release];
+    
+    // Space
+    UIBarButtonItem *spaceRight
+    = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                                    target:self
+                                                    action:nil];
+    spaceRight.width = 30.0f;
+    [toolbarButtons addObject:spaceRight];
+    [spaceRight release];
+    
+    // Setting
+    UIBarButtonItem *settings = [[UIBarButtonItem alloc] initWithTitle:@"" 
+                                                                 style:UIBarButtonItemStyleBordered 
+                                                                target:self
+                                                                action:nil];
+    path = [[NSBundle mainBundle] pathForResource:@"preferences" ofType:@"png"];
+    settings.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:settings];
+    [settings release];
+    
+    [pool drain];
+  }
+  return toolbarButtons;
+}
+
 
 #pragma mark -
 

@@ -146,7 +146,12 @@
   DeviceRotation  *deviceRotation;
   UIDeviceOrientation orientation;
   NSUInteger statusBarHeight;
+  // toolbarのボタンの配列
   NSMutableArray *toolbarButtons;
+  // 次ページ表示ボタン
+  UIBarButtonItem *nextButton;
+  // 前ページ表示ボタン
+  UIBarButtonItem *prevButton;
 }
 
 @property (nonatomic, retain) UIViewController<PageControlViewControllerDataSource> *source;
@@ -171,6 +176,22 @@
 -(void) changeNavigationAndStatusBar;
 
 
+/*!
+ @method toNextPage
+ @discussion 次のページを現在ページへ
+ */
+- (void)toNextPage:(id)sender;
+
+/*!
+ @method toPrevPage
+ @discussion 前のページを現在ページへ
+ */
+- (void)toPrevPage:(id)sender;
+
+/*
+ @method toolBarButtons
+ @discussion toolbarに表示するButtonのArrayを返す
+ */
 - (NSArray *) toolbarButtons;
 
 @end
@@ -203,6 +224,8 @@
                 rotated:(UIDeviceOrientation)orientation;
 
 
+
+
 /*!
  @method setPageController
  
@@ -230,6 +253,7 @@
  @param n 0起点のページ番号
  */
 - (UIViewController<ScrolledPageViewDelegate> *) pageAt:(NSUInteger)n;
+
 
 @end
 

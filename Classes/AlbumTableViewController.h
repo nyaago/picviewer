@@ -26,6 +26,9 @@ QueuedURLDownloaderDelegate> {
   UIBarButtonItem *backButton;
   BOOL hasErrorInDownloading;
   BOOL hasErrorInInsertingThumbnail;
+  // toolbarに表示するButtonの配列
+  NSMutableArray *toolbarButtons;
+
 }
 
 /*!
@@ -57,5 +60,11 @@ QueuedURLDownloaderDelegate> {
  @discussion 戻るボタン返す
  */
 - (UIBarButtonItem *)backButton;
+
+/*
+ @method toolBarButtons
+ @discussion toolbarに表示するButtonのArrayを返す
+ */
+- (NSArray *) toolbarButtons;
 
 @end

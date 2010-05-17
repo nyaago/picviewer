@@ -44,6 +44,8 @@ QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
   NSLock *onAddingThumbnailsLock;
   // Thumbnail表示処理の中断が要求されている?
   BOOL stoppingToAddingThumbnailsRequred;
+  // toolbarに表示するButtonの配列
+  NSMutableArray *toolbarButtons;
 }
 
 /*!
@@ -127,6 +129,12 @@ QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
  @discussion 戻るボタン返す
  */
 - (UIBarButtonItem *)backButton;
+
+/*
+ @method toolBarButtons
+ @discussion toolbarに表示するButtonのArrayを返す
+ */
+- (NSArray *) toolbarButtons;
 
 /*!
  @method afterViewDidAppear:

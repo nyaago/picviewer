@@ -20,7 +20,9 @@
   NSManagedObjectContext *managedObjectContext;
   
   UIBarButtonItem *addButton;
-  
+  // toolbarに表示するButtonの配列
+  NSMutableArray *toolbarButtons;
+
 }
 
 /*!
@@ -33,6 +35,13 @@
  @discussion CoreDataのObject管理Context,永続化Storeのデータの管理
  */
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+
+/*
+ @method toolBarButtons
+ @discussion toolbarに表示するButtonのArrayを返す
+ */
+- (NSArray *) toolbarButtons;
+
 
 
 

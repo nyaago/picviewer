@@ -31,13 +31,18 @@
   CGRect bounds = [[UIScreen mainScreen] bounds];
   NSLog(@"window - x => %f,y => %f, width => %f, height => %f", 
         bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
-  
+  /*
   RootViewController *rootViewController = [[RootViewController alloc] 
                                             initWithNibName:@"RootViewController"
                                             bundle:nil];
+   */
+  RootViewController *rootViewController = [[RootViewController alloc] init];
+  
   navigationController = [[UINavigationController alloc] 
                           initWithRootViewController:rootViewController];
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbar.translucent = YES;
   bounds =navigationController.view.frame;
   NSLog(@"navigation - x => %f,y => %f, width => %f, height => %f", 
         bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
@@ -46,8 +51,13 @@
    RootViewController *rootViewController 
    = (RootViewController *)[navigationController topViewController];
    */
+//	rootViewController.toolbarItems = [rootViewController toolbarButtons];
   rootViewController.navigationController.navigationBarHidden = NO;
+  rootViewController.navigationController.toolbarHidden = NO;
   rootViewController.managedObjectContext = self.managedObjectContext;
+                                     
+                                
+  
   [window addSubview:[navigationController view]];
   bounds =rootViewController.view.frame;
   NSLog(@"root view - x => %f,y => %f, width => %f, height => %f", 

@@ -107,6 +107,7 @@
   UIViewController *popedView;
   tmp = curPage;
   curPage = nextPage;
+  curPage.view.hidden = NO;
   //[prevPage removeFromSuperview];
   popedView = prevPage;
   //  [prevPage release];
@@ -131,6 +132,7 @@
   UIViewController *popedView;
   tmp = curPage;
   curPage = prevPage;
+  curPage.view.hidden = NO;
   //[nextPage removeFromSuperview];
   popedView = nextPage;
   //  [nextPage release];

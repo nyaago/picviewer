@@ -12,6 +12,12 @@
 - (void)resetScrollOffsetAndInset:(id)arg;
 -(void) performChangeNavigationAndStatusBar;
 
+/*!
+ @method setToolbarStatus
+ @discussion Toolbarの状態の設定
+ */
+- (void)setToolbarStatus;
+
 @end
 
 /*!
@@ -62,6 +68,18 @@
   }
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
+	self.toolbarItems = [self toolbarButtons];
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbar.translucent = YES;
+  self.navigationController.toolbarHidden = NO; 
+  // 全画面表示
+  self.wantsFullScreenLayout = YES;
+
+}
+
+
 - (void)viewDidDisappear:(BOOL)animated {
   NSLog(@"PageControllerViewController view Did Disappear ratain count = %d",
         [self retainCount]);
@@ -98,17 +116,15 @@
   
   // Navigation Bar, Status Bar, ToolBarのスタイル(透明、黒）
   self.navigationController.navigationBar.barStyle 
-  	= UIBarStyleBlackTranslucent;
+  = UIBarStyleBlackTranslucent;
   [UIApplication sharedApplication].statusBarStyle 
-  	= UIStatusBarStyleBlackTranslucent;
+  = UIStatusBarStyleBlackTranslucent;
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = YES;
   // Navigation Bar, Status Bar, ToolBarを非表示に
-  [UIApplication sharedApplication].statusBarHidden = YES;
-  self.navigationController.navigationBar.hidden = YES;
-  self.navigationController.toolbarHidden = YES;
-  // 全画面表示
-  self.wantsFullScreenLayout = YES;
+  [UIApplication sharedApplication].statusBarHidden = NO;
+  self.navigationController.navigationBar.hidden = NO;
+  self.navigationController.toolbarHidden = NO;
   
   // UIViewControllerWrapperView(NavigationViewの親)-
   // FullScreenに(StatusBarの高さ分上へ)
@@ -124,7 +140,7 @@
     // 現在ページ
     if(curPageNumber < count) {
       UIViewController<ScrolledPageViewDelegate> *controller 
-      	= [source pageAt:curPageNumber];
+      = [source pageAt:curPageNumber];
       [controller setPageController:self];
       [scrollView setCurPage:controller withPageNumber:curPageNumber];
       [controller pageDidAddWithPageScrollViewController:self 
@@ -136,7 +152,7 @@
     // 次ページ
     if(curPageNumber + 1 < count) {
       UIViewController<ScrolledPageViewDelegate> *controller 
-      	= [source pageAt:curPageNumber + 1];
+      = [source pageAt:curPageNumber + 1];
       [scrollView setNextPage:controller];
       [controller pageDidAddWithPageScrollViewController:self
                                          withOrientation:UIDeviceOrientationPortrait];
@@ -147,7 +163,7 @@
     // 前ページ
     if(curPageNumber > 0) {
       UIViewController<ScrolledPageViewDelegate> *controller 
-      	= [source pageAt:curPageNumber - 1];
+      = [source pageAt:curPageNumber - 1];
       [scrollView setPrevPage:controller];
       [controller pageDidAddWithPageScrollViewController:self
                                          withOrientation:UIDeviceOrientationPortrait];
@@ -157,8 +173,7 @@
     }
   }
   [scrollView layoutViews];
-  
-  
+  [self setToolbarStatus];
   //  [scrollView toCurPage];
 }
 
@@ -203,7 +218,7 @@
       curPageNumber += 1;
       if(curPageNumber + 1 < [source pageCount]) {
         UIViewController<ScrolledPageViewDelegate> *controller 
-        	= [source pageAt:curPageNumber + 1];
+        = [source pageAt:curPageNumber + 1];
         [view setNextPage:controller];
         [controller pageDidAddWithPageScrollViewController:self
                                            withOrientation:orientation];
@@ -226,7 +241,7 @@
       curPageNumber -= 1;
       if(curPageNumber > 0) {
         UIViewController<ScrolledPageViewDelegate> *controller 
-        	= [source pageAt:curPageNumber - 1];
+        = [source pageAt:curPageNumber - 1];
         [view setPrevPage:controller];
         [controller pageDidAddWithPageScrollViewController:self withOrientation:orientation];
         [controller setPageController:self];
@@ -293,7 +308,11 @@
   NSLog(@"scrollView retain count = %d", [scrollView retainCount]);
   [ scrollView release ];
   if(source)
-    [ source release];
+    [source release];
+  if(prevButton)
+    [prevButton release];
+  if(nextButton) 
+    [nextButton release];
   if(toolbarButtons)
     [toolbarButtons release];
   [ super dealloc ];
@@ -346,6 +365,41 @@
 }
 
 
+- (void)toNextPage:(id)sender {
+  PageScrollView *scrollView = (PageScrollView *)self.view;
+	[scrollView toNextPage];  
+  curPageNumber += 1;
+  if(curPageNumber + 1 < [source pageCount]) {
+    UIViewController<ScrolledPageViewDelegate> *controller 
+    = [source pageAt:curPageNumber + 1];
+    [scrollView setNextPage:controller];
+    [controller pageDidAddWithPageScrollViewController:self
+                                       withOrientation:orientation];
+    [controller setPageController:self];
+    controller.view.hidden = YES;
+    [controller release];
+    //[controller viewDidAppear:YES];
+  }
+  [scrollView layoutViews];
+  [self setToolbarStatus];
+}
+
+- (void)toPrevPage:(id)sender {
+  PageScrollView *scrollView = (PageScrollView *)self.view;
+	[scrollView toPrevPage];  
+  curPageNumber -= 1;
+  if(curPageNumber > 0) {
+    UIViewController<ScrolledPageViewDelegate> *controller 
+    = [source pageAt:curPageNumber - 1];
+    [scrollView setPrevPage:controller];
+    [controller pageDidAddWithPageScrollViewController:self withOrientation:orientation];
+    [controller setPageController:self];
+    controller.view.hidden = YES;
+    [controller release];
+  }
+  [scrollView layoutViews];
+  [self setToolbarStatus];
+}
 
 
 - (void)resetScrollOffsetAndInset:(id)arg {
@@ -361,23 +415,93 @@
   scrollView.contentSize = size;
 }
 
+- (void)setToolbarStatus {
+  if(curPageNumber + 1 < [source pageCount]) {
+    nextButton.enabled = YES;
+	} 
+  else {
+    nextButton.enabled = NO;
+  }
+  if(curPageNumber > 0) {
+   	prevButton.enabled = YES;
+  }
+  else {
+    prevButton.enabled = NO;
+  }
+}
 
 - (NSArray *) toolbarButtons {
+  NSString *path;
+
   if(!toolbarButtons) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
     toolbarButtons = [[NSMutableArray alloc] init];
-    UIBarButtonItem *left = [[UIBarButtonItem alloc] initWithTitle:@"Left" 
-                                                             style:UIBarButtonItemStyleBordered 
-                                                            target:self
-                                                            action:nil];
-    [toolbarButtons addObject:left];
-    [left release];
-    UIBarButtonItem *right = [[UIBarButtonItem alloc] initWithTitle:@"Left" 
+    // Action
+    UIBarButtonItem *action
+    = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+                                                    target:self
+                                                    action:nil];
+    [toolbarButtons addObject:action];
+    [action release];
+
+    
+    // Space
+    UIBarButtonItem *spaceLeft
+    = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
+                                                    target:self
+                                                    action:nil];
+    spaceLeft.width = 30.0f;
+    [toolbarButtons addObject:spaceLeft];
+    [spaceLeft release];
+    
+    // Left
+    prevButton = [[UIBarButtonItem alloc] initWithTitle:@"" 
+                                                  style:UIBarButtonItemStyleBordered 
+                                                 target:self
+                                                 action:@selector(toPrevPage:)];
+    path = [[NSBundle mainBundle] pathForResource:@"arrowleft" ofType:@"png"];
+    prevButton.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:prevButton];
+
+    // Space
+    UIBarButtonItem *space 
+    = [[UIBarButtonItem alloc] 
+       initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+       target:self
+       action:nil];
+		[toolbarButtons addObject:space];    
+    [space release];
+    
+    // Right
+    nextButton = [[UIBarButtonItem alloc] initWithTitle:@"" 
+                                                  style:UIBarButtonItemStyleBordered 
+                                                 target:self
+                                                 action:@selector(toNextPage:)];
+    path = [[NSBundle mainBundle] pathForResource:@"arrowright" ofType:@"png"];
+    nextButton.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:nextButton];
+
+    // Space
+    UIBarButtonItem *spaceRight
+    = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace
+                                                    target:self
+                                                    action:nil];
+    spaceRight.width = 30.0f;
+    [toolbarButtons addObject:spaceRight];
+    [spaceRight release];
+
+    // Info
+    UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
                                                               style:UIBarButtonItemStyleBordered 
                                                              target:self
                                                              action:nil];
-    [toolbarButtons addObject:right];
-    [right release];
+    path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
+    info.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:info];
+    [info release];
     
+    [pool drain];
   }
   return toolbarButtons;
 }
