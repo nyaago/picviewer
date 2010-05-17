@@ -10,7 +10,6 @@
  (toolbarの表示/非表示を切り替えるとずれるため,この処理を行う)
  */
 - (void)resetScrollOffsetAndInset:(id)arg;
--(void) performChangeNavigationAndStatusBar;
 
 /*!
  @method setToolbarStatus
@@ -27,9 +26,10 @@
 
 @implementation PageControlViewController
 
-@synthesize curPageNumber;
 @synthesize source;
 //@synthesize scrollView;
+
+#pragma mark View lifecycle
 
 /*!
  @method loadView
@@ -59,6 +59,10 @@
   orientation = UIDeviceOrientationPortrait;
 }
 
+/*!
+ @method viewDidUnload
+ @discussion view Unload時の通知
+ */
 - (void)viewDidUnload {
   [super viewDidUnload];
   NSLog(@"PageControllerViewController view Did unload ratain count = %d", 
@@ -68,18 +72,24 @@
   }
 }
 
+/*!
+ @method viewWillAppear:
+ @discussion viewが表示される前の通知、toolbarの表示とViewの全画面表示の設定
+ */
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
 	self.toolbarItems = [self toolbarButtons];
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = YES;
-  self.navigationController.toolbarHidden = NO; 
+  self.navigationController.toolbarHidden = YES; 
   // 全画面表示
   self.wantsFullScreenLayout = YES;
-
 }
 
-
+/*!
+ @method viewDidDisappear:
+ @discussion viewが表示非表示になったときの通知.各ページのViewの削除
+ */
 - (void)viewDidDisappear:(BOOL)animated {
   NSLog(@"PageControllerViewController view Did Disappear ratain count = %d",
         [self retainCount]);
@@ -89,12 +99,9 @@
   }
   NSLog(@"scrollView retain count %d", [self.view retainCount]);
   PageScrollView *scrollView = (PageScrollView *)self.view;
-  if(scrollView.curPage)
-    [scrollView removeCurPage];
-  if(scrollView.nextPage)
-    [scrollView removeNextPage];
-  if(scrollView.prevPage)
-    [scrollView removePrevPage];
+  [scrollView removeCurPage];
+  [scrollView removeNextPage];
+  [scrollView removePrevPage];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -137,12 +144,12 @@
   if(source) {
     NSUInteger count = [source pageCount];
     [scrollView setPageCount:count];
-    // 現在ページ
-    if(curPageNumber < count) {
+    // 現在ページ追加
+    if(scrollView.curPageNumber < count) {
       UIViewController<ScrolledPageViewDelegate> *controller 
-      = [source pageAt:curPageNumber];
+      = [source pageAt:scrollView.curPageNumber];
       [controller setPageController:self];
-      [scrollView setCurPage:controller withPageNumber:curPageNumber];
+      [scrollView setCurPage:controller withPageNumber:scrollView.curPageNumber];
       [controller pageDidAddWithPageScrollViewController:self 
                                          withOrientation:UIDeviceOrientationPortrait];
       [controller release];
@@ -150,9 +157,9 @@
       //  [controller viewDidAppear:YES];
     }
     // 次ページ
-    if(curPageNumber + 1 < count) {
+    if(scrollView.curPageNumber + 1 < count) {
       UIViewController<ScrolledPageViewDelegate> *controller 
-      = [source pageAt:curPageNumber + 1];
+      = [source pageAt:scrollView.curPageNumber + 1];
       [scrollView setNextPage:controller];
       [controller pageDidAddWithPageScrollViewController:self
                                          withOrientation:UIDeviceOrientationPortrait];
@@ -161,9 +168,9 @@
       [controller release];
     }
     // 前ページ
-    if(curPageNumber > 0) {
+    if(scrollView.curPageNumber > 0) {
       UIViewController<ScrolledPageViewDelegate> *controller 
-      = [source pageAt:curPageNumber - 1];
+      = [source pageAt:scrollView.curPageNumber - 1];
       [scrollView setPrevPage:controller];
       [controller pageDidAddWithPageScrollViewController:self
                                          withOrientation:UIDeviceOrientationPortrait];
@@ -172,12 +179,16 @@
       [controller release];
     }
   }
+  // scrollview内のviewのLayout
   [scrollView layoutViews];
+  // Toolbarのボタンの状態設定
   [self setToolbarStatus];
   //  [scrollView toCurPage];
 }
 
-
+/*!
+ @method viewWillDisappear: 
+ */
 - (void)viewWillDisappear:(BOOL)animated {
   NSLog(@"PageControlView will disappear");
   [deviceRotation release];
@@ -185,89 +196,6 @@
   if(source) {
     NSLog(@"source retain count %d", [source retainCount]);
   }
-}
-
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-  NSLog(@"begin dragging");
-  PageScrollView *pageView = (PageScrollView *)self.view;
-  if(pageView.nextPage) {
-    pageView.nextPage.view.hidden = NO;
-  }
-  if(pageView.prevPage) {
-    pageView.prevPage.view.hidden = NO;
-  }
-}
-
-/*!
- @method scrollViewDidEndDecelerating:
- Scroll完了時の通知,
- 移動先が前ページ/次ページの場合、現在ページ番号(変数)の変更、
- 前後ページの作成、不要ページのかたづけを行う。
- */
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-  PageScrollView *view = (PageScrollView *)scrollView;
-  BOOL hidden = self.navigationController.toolbarHidden;
-  CGPoint point = scrollView.contentOffset;
-  // 次のページの移動
-  if(point.x > scrollView.bounds.size.width || 
-     curPageNumber == 0 && point.x >= scrollView.bounds.size.width)
-      {
-    NSLog(@"page count = %d", [source pageCount]);
-    if(curPageNumber + 1 < [source pageCount] ) {
-      [view toNextPage];
-      curPageNumber += 1;
-      if(curPageNumber + 1 < [source pageCount]) {
-        UIViewController<ScrolledPageViewDelegate> *controller 
-        = [source pageAt:curPageNumber + 1];
-        [view setNextPage:controller];
-        [controller pageDidAddWithPageScrollViewController:self
-                                           withOrientation:orientation];
-        [controller setPageController:self];
-        controller.view.hidden = YES;
-        [controller release];
-        [view layoutViews];
-        //[controller viewDidAppear:YES];
-      }
-      else {
-        [view layoutViews];
-        
-      }
-    }
-      }
-  // 前のページへの移動
-  else if(point.x < scrollView.bounds.size.width) {
-    if(curPageNumber > 0) {
-      [view toPrevPage];
-      curPageNumber -= 1;
-      if(curPageNumber > 0) {
-        UIViewController<ScrolledPageViewDelegate> *controller 
-        = [source pageAt:curPageNumber - 1];
-        [view setPrevPage:controller];
-        [controller pageDidAddWithPageScrollViewController:self withOrientation:orientation];
-        [controller setPageController:self];
-        controller.view.hidden = YES;
-        [controller release];
-        [view layoutViews];
-      }
-      else {
-        [view layoutViews];
-      }
-    }
-    [view toCurPage];
-    
-  }
-  PageScrollView *pageView = (PageScrollView *)self.view;
-  if(pageView.nextPage) {
-    pageView.nextPage.view.hidden = YES;
-  }
-  if(pageView.prevPage) {
-    pageView.prevPage.view.hidden = YES;
-  }
-  [view layoutViews];
-  [self performSelectorOnMainThread:@selector(resetScrollOffsetAndInset:) 
-                         withObject:[NSNumber numberWithBool:hidden]
-                      waitUntilDone:NO];
-  
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:
@@ -318,6 +246,97 @@
   [ super dealloc ];
 }
 
+
+#pragma mark Responding to Scrolling and Dragging
+
+/*!
+ @method scrollViewWillBeginDragging:
+ @discussion Scroll開始の通知、前後ページのViewを非表示から表示の状態にする
+ */
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+  NSLog(@"begin dragging");
+  PageScrollView *pageView = (PageScrollView *)self.view;
+  if(pageView.nextPage) {
+    pageView.nextPage.view.hidden = NO;
+  }
+  if(pageView.prevPage) {
+    pageView.prevPage.view.hidden = NO;
+  }
+}
+
+/*!
+ @method scrollViewDidEndDecelerating:
+ Scroll完了時の通知,
+ 移動先が前ページ/次ページの場合、現在ページ番号(変数)の変更、
+ 前後ページの作成、不要ページのかたづけを行う。
+ */
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+  PageScrollView *view = (PageScrollView *)scrollView;
+  BOOL hidden = self.navigationController.toolbarHidden;
+  CGPoint point = scrollView.contentOffset;
+  // 次のページの移動
+  if(point.x > scrollView.bounds.size.width || 
+     view.curPageNumber == 0 && point.x >= scrollView.bounds.size.width)
+      {
+    NSLog(@"page count = %d", [source pageCount]);
+    if(view.curPageNumber + 1 < [source pageCount] ) {
+      [view toNextPage];
+      if(view.curPageNumber + 1 < [source pageCount]) {
+        UIViewController<ScrolledPageViewDelegate> *controller 
+        = [source pageAt:view.curPageNumber + 1];
+        [view setNextPage:controller];
+        [controller pageDidAddWithPageScrollViewController:self
+                                           withOrientation:orientation];
+        [controller setPageController:self];
+        controller.view.hidden = YES;
+        [controller release];
+        [view layoutViews];
+        //[controller viewDidAppear:YES];
+      }
+      else {
+        [view layoutViews];
+        
+      }
+    }
+      }
+  // 前のページへの移動
+  else if(point.x < scrollView.bounds.size.width) {
+    if(view.curPageNumber > 0) {
+      [view toPrevPage];
+      if(view.curPageNumber > 0) {
+        UIViewController<ScrolledPageViewDelegate> *controller 
+        = [source pageAt:view.curPageNumber - 1];
+        [view setPrevPage:controller];
+        [controller pageDidAddWithPageScrollViewController:self withOrientation:orientation];
+        [controller setPageController:self];
+        controller.view.hidden = YES;
+        [controller release];
+        [view layoutViews];
+      }
+      else {
+        [view layoutViews];
+      }
+    }
+//    [view toCurPage];
+    
+  }
+  PageScrollView *pageView = (PageScrollView *)self.view;
+  if(pageView.nextPage) {
+    pageView.nextPage.view.hidden = YES;
+  }
+  if(pageView.prevPage) {
+    pageView.prevPage.view.hidden = YES;
+  }
+  [view layoutViews];
+  // scrollViewのcontentのinsetとoffsetを調整(1回、描画処理に戻ってから呼ばれるようにする)
+  [self performSelectorOnMainThread:@selector(resetScrollOffsetAndInset:) 
+                         withObject:[NSNumber numberWithBool:hidden]
+                      waitUntilDone:NO];
+  
+}
+
+#pragma mark Public 
+
 -(void) pageScrollViewDidChangeCurrentPage:(PageScrollView *)pageScrollView 
                                currentPage:(int)currentPage {
   NSLog(@"現在表示中のページ %d\n", currentPage);
@@ -358,7 +377,7 @@
    v = v.superview;
    }
    */
-  // scrollViewのcontentのoffsetとinsetを元の状態に戻す
+  // scrollViewのcontentのinsetとoffsetを調整(1回、描画処理に戻ってから呼ばれるようにする)
   [self performSelectorOnMainThread:@selector(resetScrollOffsetAndInset:) 
                          withObject:[NSNumber numberWithBool:hidden]
                       waitUntilDone:NO];
@@ -368,10 +387,9 @@
 - (void)toNextPage:(id)sender {
   PageScrollView *scrollView = (PageScrollView *)self.view;
 	[scrollView toNextPage];  
-  curPageNumber += 1;
-  if(curPageNumber + 1 < [source pageCount]) {
+  if(scrollView.curPageNumber + 1 < [source pageCount]) {
     UIViewController<ScrolledPageViewDelegate> *controller 
-    = [source pageAt:curPageNumber + 1];
+    = [source pageAt:scrollView.curPageNumber + 1];
     [scrollView setNextPage:controller];
     [controller pageDidAddWithPageScrollViewController:self
                                        withOrientation:orientation];
@@ -387,10 +405,9 @@
 - (void)toPrevPage:(id)sender {
   PageScrollView *scrollView = (PageScrollView *)self.view;
 	[scrollView toPrevPage];  
-  curPageNumber -= 1;
-  if(curPageNumber > 0) {
+  if(scrollView.curPageNumber > 0) {
     UIViewController<ScrolledPageViewDelegate> *controller 
-    = [source pageAt:curPageNumber - 1];
+    = [source pageAt:scrollView.curPageNumber - 1];
     [scrollView setPrevPage:controller];
     [controller pageDidAddWithPageScrollViewController:self withOrientation:orientation];
     [controller setPageController:self];
@@ -401,6 +418,7 @@
   [self setToolbarStatus];
 }
 
+#pragma mark Private Method
 
 - (void)resetScrollOffsetAndInset:(id)arg {
   PageScrollView *scrollView = (PageScrollView *)self.view;
@@ -416,13 +434,14 @@
 }
 
 - (void)setToolbarStatus {
-  if(curPageNumber + 1 < [source pageCount]) {
+  PageScrollView *scrollView = (PageScrollView *)self.view;
+  if(scrollView.curPageNumber + 1 < [source pageCount]) {
     nextButton.enabled = YES;
 	} 
   else {
     nextButton.enabled = NO;
   }
-  if(curPageNumber > 0) {
+  if(scrollView.curPageNumber > 0) {
    	prevButton.enabled = YES;
   }
   else {
@@ -506,6 +525,17 @@
   return toolbarButtons;
 }
 
+- (void) setCurPageNumber:(NSUInteger)n {
+  PageScrollView *view = (PageScrollView *)self.view;
+  view.curPageNumber = n;
+}
+
+
+- (NSUInteger) curPageNumber {
+  PageScrollView *view = (PageScrollView *)self.view;
+	return view.curPageNumber;
+}
+
 
 #pragma mark DeviceRotationDelegate
 
@@ -544,7 +574,7 @@
     [scrollView setPageCount:count];
   }	
   // Page View のLayout
-  [scrollView toCurPage];
+//  [scrollView toCurPage];
   [scrollView layoutViews];
   // Page要素への通知
   if(scrollView.curPage) {
@@ -563,9 +593,6 @@
                       waitUntilDone:NO];
   
 }
-
-
-
 
 
 @end

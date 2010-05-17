@@ -4,6 +4,7 @@
 
 //@synthesize delegate;
 @synthesize prevPage,curPage, nextPage;
+@synthesize curPageNumber;
 
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
@@ -93,6 +94,7 @@
   [self addSubview:prevPage.view];
 }
 
+/*
 - (void)toCurPage {
   // scrollで移動して..
   NSLog(@"to cur page start");
@@ -100,6 +102,7 @@
   [self setContentOffset:CGPointMake(left, 0.0f) animated:YES];
   NSLog(@"to cur page end");
 }
+ */
 
 - (UIViewController *)toNextPage {
   // page入れ替え
@@ -206,6 +209,7 @@
   if(curPage){
     [curPage.view removeFromSuperview];
     [curPage release];
+    curPage = nil;
   }
 }
 
@@ -213,6 +217,7 @@
   if(nextPage) {
     [nextPage.view removeFromSuperview];
     [nextPage release];
+    nextPage = nil;
   }
 }
 
@@ -220,6 +225,7 @@
   if(prevPage) {
     [prevPage.view removeFromSuperview];
     [prevPage release];
+    prevPage = nil;
   }
 }
 
@@ -244,8 +250,9 @@
    NSLog(@"nextPage retain count = %d", [nextPage retainCount]);
    }
    */
-  // prevPage, NextPage, curPageは、Viewから取り除かれるときに
-  // retain されるので、ここでのretainは不要
+  [self removeCurPage];
+  [self removePrevPage];
+  [self removeNextPage];
   [super dealloc];
 }
 

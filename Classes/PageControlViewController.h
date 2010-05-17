@@ -2,7 +2,6 @@
 
 #import "DeviceRotation.h"
 
-@protocol PageScrollViewDelegate;
 @protocol ScrolledPageViewDelegate;
 
 
@@ -13,16 +12,17 @@
  @TODO Privateにするか..
  */
 @interface PageScrollView : UIScrollView <UIScrollViewDelegate> {
+  @private
+  // ページ数
   NSUInteger   pageCount;
+  // 現在のページ番号
   NSUInteger   curPageNumber;
-  
+  // 現在ページのViewのController
   UIViewController<ScrolledPageViewDelegate>	   *curPage;
+  // 次のページのViewのController
   UIViewController<ScrolledPageViewDelegate>	   *nextPage;
+  // 前のページのViewのController
   UIViewController<ScrolledPageViewDelegate>	   *prevPage;
-  
-  
-  //  id<PageScrollViewDelegate, UIScrollViewDelegate> delegate;
-  
 }
 
 /*!
@@ -40,7 +40,12 @@
  @discussion 前のページ
  */
 @property (nonatomic, retain) UIViewController<ScrolledPageViewDelegate> *prevPage;
-//@property (nonatomic, retain) id<PageScrollViewDelegate, UIScrollViewDelegate> delegate;
+
+/*!
+ @property curPageNumber
+ @discussion 現在ページ番号(0基点)
+ */
+@property (nonatomic) NSUInteger curPageNumber;
 
 /*!
  @method setPageCount:
@@ -81,7 +86,7 @@
  @method toCurPage
  @discussion 現在ページを表示
  */
-- (void)toCurPage;
+//- (void)toCurPage;
 
 /*!
  @method toNextPage
@@ -101,7 +106,6 @@
  */
 - (void)layoutViews;
 
-//- (void)setDelegate:(id<PageScrollViewDelegate, UIScrollViewDelegate>)newDelegate;
 
 /*!
  @method removeCurPage
@@ -123,15 +127,6 @@
 
 @end
 
-@protocol PageScrollViewDelegate<NSObject>
-
-
-@end
-
-
-
-
-
 
 /*!
  @class PageScrollView
@@ -139,12 +134,18 @@
  */
 @protocol PageControlViewControllerDataSource;
 @interface PageControlViewController : UIViewController 
-<PageScrollViewDelegate, UIScrollViewDelegate, DeviceRotationDelegate> {
-  //  PageScrollView *scrollView;
+< UIScrollViewDelegate, DeviceRotationDelegate> {
+  
+  @private
+  // ページに表示するViewを提供するソースオブジェクト
   UIViewController<PageControlViewControllerDataSource> *source;
-  NSUInteger curPageNumber;
+  // 現在ページ - @TODO - Viewから取得する..
+ // NSUInteger curPageNumber;
+  // 機器回転通知の管理オブジェクト
   DeviceRotation  *deviceRotation;
+  // 現在の機器の向き
   UIDeviceOrientation orientation;
+  // Statusbarの高さ
   NSUInteger statusBarHeight;
   // toolbarのボタンの配列
   NSMutableArray *toolbarButtons;
@@ -154,6 +155,10 @@
   UIBarButtonItem *prevButton;
 }
 
+/*!
+ @property source
+ @discussion ページに表示するViewを提供するソースオブジェクト
+ */
 @property (nonatomic, retain) UIViewController<PageControlViewControllerDataSource> *source;
 
 /*!
@@ -193,6 +198,20 @@
  @discussion toolbarに表示するButtonのArrayを返す
  */
 - (NSArray *) toolbarButtons;
+
+/*!
+ @method setCurPageNumber
+ @discussion 現在ページの設定
+ */
+- (void) setCurPageNumber:(NSUInteger)n;
+
+/*!
+ @method curPageNumber
+ @discussion 現在ページ
+ */
+- (NSUInteger) curPageNumber;
+
+
 
 @end
 
