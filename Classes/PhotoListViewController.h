@@ -46,6 +46,8 @@ QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
   BOOL stoppingToAddingThumbnailsRequred;
   // toolbarに表示するButtonの配列
   NSMutableArray *toolbarButtons;
+  // Picasaデータ取得コントローラー
+  PicasaFetchController *picasaFetchController;
 }
 
 /*!

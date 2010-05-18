@@ -505,18 +505,20 @@
     
     // Space
     UIBarButtonItem *spaceRight
-    = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                    target:self
-                                                    action:nil];
+    = [[UIBarButtonItem alloc] 
+       initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+       target:self
+       action:nil];
     spaceRight.width = 30.0f;
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
     
     // Setting
-    UIBarButtonItem *settings = [[UIBarButtonItem alloc] initWithTitle:@"" 
-                                                                 style:UIBarButtonItemStyleBordered 
-                                                                target:self
-                                                                action:nil];
+    UIBarButtonItem *settings = [[UIBarButtonItem alloc] 
+                                 initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                                 target:self
+                                 action:nil];
+                                 
     path = [[NSBundle mainBundle] pathForResource:@"preferences" ofType:@"png"];
     settings.image = [[UIImage alloc] initWithContentsOfFile:path];
     [toolbarButtons addObject:settings];

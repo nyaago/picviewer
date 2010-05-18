@@ -108,8 +108,27 @@ withListViewController:(PhotoListViewController *)controller {
  */
 - (void)setContentSizeWithImageCount:(id)n;
 
-@end
+/*!
+ @method refreshAction:
+ @discussion albumのリフレッシュ、全写真データを削除してから再ロードを行う.
+ */
+- (void) refreshAction:(id)sender;
 
+/*!
+ @method refreshPhotos
+ @discussion Photoデータを1回削除後、再ロード(Picasaへの問い合わせ+Thumbnail - download)
+ */
+- (void) refreshPhotos;
+
+/*!
+ @method removePhotos
+ @discussion 現在のAlbumのPhotoデータを全て削除
+ */
+- (void)removePhotos;
+
+
+@end
+  
 
 
 
@@ -199,9 +218,9 @@ withListViewController:(PhotoListViewController *)controller {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     [fetchedPhotosController release];
     fetchedPhotosController = nil;
-    PicasaFetchController *controller = [[PicasaFetchController alloc] init];
-    controller.delegate = self;
-    [controller queryAlbumAndPhotos:self.album.albumId 
+    picasaFetchController = [[PicasaFetchController alloc] init];
+    picasaFetchController.delegate = self;
+    [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
                                user:[self.album.user valueForKey:@"userId"] ];
     downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
     downloader.delegate = self;
@@ -339,6 +358,9 @@ withListViewController:(PhotoListViewController *)controller {
   if(fetchedPhotosController) {
     [fetchedPhotosController release];
     fetchedPhotosController = nil;
+  }
+  if(picasaFetchController) {
+    [picasaFetchController release];
   }
   if(lockSave)
     [lockSave release];
@@ -543,14 +565,13 @@ withListViewController:(PhotoListViewController *)controller {
     [spaceRight release];
     
     // Setting
-    UIBarButtonItem *settings = [[UIBarButtonItem alloc] initWithTitle:@"" 
-                                                             style:UIBarButtonItemStyleBordered 
-                                                            target:self
-                                                            action:nil];
-    path = [[NSBundle mainBundle] pathForResource:@"preferences" ofType:@"png"];
-    settings.image = [[UIImage alloc] initWithContentsOfFile:path];
-    [toolbarButtons addObject:settings];
-    [settings release];
+    // Setting
+    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] 
+                                 initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                                 target:self
+                                 action:@selector(refreshAction:)];
+    [toolbarButtons addObject:refresh];
+    [refresh release];
     
     [pool drain];
   }
@@ -612,6 +633,7 @@ withListViewController:(PhotoListViewController *)controller {
   // Photo一覧のFetched Controllerを生成
   if (![[self fetchedPhotosController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+    
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"ERROR","Error")
                               message:NSLocalizedString(@"ERROR_FETCH", @"Error in ng")
@@ -642,6 +664,8 @@ withListViewController:(PhotoListViewController *)controller {
   [downloader start];
   [downloader finishQueuing];
   [pool drain];
+  [picasaFetchController release];
+  picasaFetchController = nil;
 }
 
 #pragma mark -
@@ -696,6 +720,34 @@ withListViewController:(PhotoListViewController *)controller {
   return fetchedPhotosController;
 }    
 
+- (void)removePhotos {
+  // Create the fetch request for the entity.
+  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+  // Edit the entity name as appropriate.
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
+                                            inManagedObjectContext:managedObjectContext];
+  [fetchRequest setEntity:entity];
+  NSPredicate *predicate 
+  = [NSPredicate predicateWithFormat:@"%K = %@", @"album.albumId", album.albumId];
+  [fetchRequest setPredicate:predicate];
+
+  NSError *error;
+  // データの削除、親(album)からの関連の削除 + (albumに含まれる)全Photoデータの削除
+  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+	NSSet *set = [NSSet setWithArray:items];
+  [album removePhoto:set];
+  for (NSManagedObject *managedObject in items) {
+    [managedObjectContext deleteObject:managedObject];
+    NSLog(@" object deleted");
+  }
+  //
+  if (![managedObjectContext save:&error]) {
+    NSLog(@"Error deleting- error:%@",error);
+  }
+  [fetchRequest release];
+	//[items release];  
+  return;
+}    
 
 
 #pragma mark Touch
@@ -801,6 +853,17 @@ withListViewController:(PhotoListViewController *)controller {
     // 
     [lockSave unlock];
     NSLog(@"Unresolved error %@", error);
+    NSLog(@"Failed to save to data store: %@", [error localizedDescription]);
+		NSArray* detailedErrors = [[error userInfo] objectForKey:NSDetailedErrorsKey];
+		if(detailedErrors != nil && [detailedErrors count] > 0) {
+			for(NSError* detailedError in detailedErrors) {
+				NSLog(@"  DetailedError: %@", [detailedError userInfo]);
+			}
+		}
+		else {
+			NSLog(@"  %@", [error userInfo]);
+		}
+    
     [pool drain];
     return nil;	
   }
@@ -883,6 +946,26 @@ withListViewController:(PhotoListViewController *)controller {
   return backButton;
 }
 
+- (void) refreshPhotos {
+  //
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSLog(@"fetchedPhotosController retain count =  %d", [fetchedPhotosController retainCount]);
+  [fetchedPhotosController release];
+  fetchedPhotosController = nil;
+  // 削除
+  [self removePhotos];
+  //  NSArray *objects = [fetchedPhotosController fetchedObjects];
+  // 再ロード
+  picasaFetchController = [[PicasaFetchController alloc] init];
+  picasaFetchController.delegate = self;
+  [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
+                                        user:[self.album.user valueForKey:@"userId"] ];
+  downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
+  downloader.delegate = self;
+  [pool drain];
+  
+}
+
 
 
 #pragma mark - 
@@ -946,12 +1029,32 @@ withListViewController:(PhotoListViewController *)controller {
   }
   
   [progressView removeFromSuperview];
+  [downloader release];
+  downloader = nil;
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:) 
                            toTarget:self 
                          withObject:nil];
 }
 
+
+#pragma mark Action
+
+- (void) refreshAction:(id)sender {
+
+  progressView.frame = CGRectMake(50.0f, 20.0f, 
+                                  self.view.bounds.size.width - 100.0f, 
+                                  25.0f);
+  progressView.progress = 0.0f;
+  [self discardTumbnails];
+  [self.view addSubview:progressView];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+	[self performSelectorOnMainThread:@selector(refreshPhotos) 
+                         withObject:nil 
+                      waitUntilDone:NO];
+  
+  
+}  
 
 #pragma mark -
 
