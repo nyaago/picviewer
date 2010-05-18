@@ -165,8 +165,8 @@
 				72EA5B5A11815C9A00065915 /* AlbumTableViewController.m */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				722D6DC91186A0EE004F0F0D /* PhotoListViewController.m */,
-				72582A811189B7B200A8A6FC /* PhotoViewController.h */,
 				722D6DC81186A0EE004F0F0D /* PhotoListViewController.h */,
+				72582A811189B7B200A8A6FC /* PhotoViewController.h */,
 				72582A821189B7B200A8A6FC /* PhotoViewController.m */,
 			);
 			path = Classes;

@@ -54,6 +54,12 @@
   NSInteger thumbSize;
   NSInteger imageSize;
   NSObject  <PicasaFetchControllerDelegate> *delegate;
+	// 処理が完了している  
+  BOOL completed;
+  // 停止が要求されている?
+  BOOL stoppingRequired;
+  // ステタースの設定、取得のさいのLockオブジェクト
+  NSLock *lock;
 }
 
 @property (nonatomic, retain) NSObject <PicasaFetchControllerDelegate> *delegate;
@@ -82,6 +88,18 @@
  @param userId
  */
 - (void) queryPhoto:(NSString *)photo album:(NSString *)albumId user:(NSString *)userId;
+
+/*!
+ @method requireStopping
+ @discussion 処理停止の要求
+ */
+- (void)requireStopping;
+
+/*!
+ @method waitCompleted
+ @discussion 処理が完了するまで待つ,まだ開始されていない場合は、すぐに返る。
+ */
+- (void) waitCompleted;
 
 @end
 

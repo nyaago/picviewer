@@ -13,10 +13,35 @@
 @interface AlbumTableViewController(Private)
 
 /*!
- @method insertAlbum
+ @method insertAlbum:withUser;
  @discussion Album情報をローカルDBに登録する.
  */
 - (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)user;
+
+/*!
+ @method updateAlbum:withGDataAlbum:withUser
+ @discussion Album情報をローカルDBに変更登録する.
+ */
+- (Album *)updateAlbum:(Album *)albumObject 
+        withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)user;
+
+/*!
+ @method deleteAlbum:
+ @discussion Album情報をローカルDBに登録する.
+ */
+- (void)deleteAlbum:(Album *)albumObject;
+
+
+- (void)deleteAlbumsWithUserFeed:(GDataFeedPhotoUser *)album withUser:(User *)user;
+
+
+/*!
+ @method selectAlbum
+ @discussion AlbumのManagedObjectを取得する
+ */
+- (Album *)selectAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)user hasError:(BOOL *)f;
+
+
 /*!
  @method updateThumbnail:forAlbum
  @discussion アルバムのThumbnailをローカルDBに更新登録する.
@@ -30,6 +55,18 @@
  */
 - (void) downloadThumbnail:(GDataEntryPhotoAlbum *)album withAlbumModel:(Album *)model;
 
+/*!
+ @method refreshAction:
+ @discussion album一覧のリフレッシュおこなうアクション
+ */
+- (void) refreshAction:(id)sender;
+
+/*!
+ @method refreshAlbum
+ @discussion album一覧のリフレッシュ、一覧のalbumについて、新規作成、変更、削除の
+ いずれを行い、再表示を行う。
+ */
+- (void) refreshAlbums;
 
 
 @end
@@ -55,7 +92,7 @@
 - (void)loadView {
   [super loadView];
   NSLog(@"title = %@", self.navigationItem.backBarButtonItem.title);
-  
+  onLoadLock = [[NSLock alloc] init];
 }
 
 
@@ -86,9 +123,9 @@
     //if([[fetchedAlbumsController sections] count] == 0) {
     [fetchedAlbumsController release];
     fetchedAlbumsController = nil;
-    PicasaFetchController *controller = [[PicasaFetchController alloc] init];
-    controller.delegate = self;
-    [controller queryUserAndAlbums:self.user.userId];
+    picasaFetchController = [[PicasaFetchController alloc] init];
+    picasaFetchController.delegate = self;
+    [picasaFetchController queryUserAndAlbums:self.user.userId];
     downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:3];
     downloader.delegate = self;
   }
@@ -140,6 +177,7 @@
 - (void)viewDidUnload {
 	// Release any retained subviews of the main view.
 	// e.g. self.myOutlet = nil;
+  
 }
 
 #pragma mark -
@@ -177,12 +215,27 @@
   NSArray *entries = [feed entries];
   if ([entries count] > 0) {
     NSLog(@"the user has %d alblums", [[feed entries] count]);
+		// 削除
+    [self deleteAlbumsWithUserFeed:feed withUser:user];
+    // 更新、新規
     for (int i = 0; i < [entries count]; ++i) {
       GDataEntryPhotoAlbum *album = [entries objectAtIndex:i];
       NSLog(@"album - title = %@, ident=%@, feedlink=%@",
             [[album title] contentStringValue], [album GPhotoID], [album feedLink]);
       //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
-      Album *albumModel =  [self insertAlbum:album withUser:user];
+      BOOL hasError;
+      Album *albumModel = [self selectAlbum:album withUser:user hasError:&hasError];
+      if(hasError) {
+        hasErrorInInserting = YES;
+        continue;
+      }
+      if(albumModel) {
+        albumModel = [self updateAlbum:albumModel 
+                        withGDataAlbum:album withUser:user];
+      }
+      else {
+	      albumModel =  [self insertAlbum:album withUser:user];
+      }
       if(albumModel) {
         [self downloadThumbnail:album withAlbumModel:albumModel];
       }
@@ -191,6 +244,7 @@
       }
     }
   }	
+  
   // Album一覧のFetched Controllerを生成
   if(hasErrorInInserting) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -216,11 +270,17 @@
     [pool drain];
     return;
   }
-  // 表示をリフレッシュ
+  // table の再表示
   [(UITableView *)self.view reloadData];
+  // Load中フラグをOffに
+  [onLoadLock lock];
+  onLoad = NO;
+  [onLoadLock unlock];
   //
   [downloader start];
   [downloader finishQueuing];
+  // そうじ
+  [picasaFetchController release];
   [pool drain];
 }
 
@@ -256,9 +316,9 @@
   if (cell == nil) {
     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault 
                                    reuseIdentifier:CellIdentifier] autorelease];
-    Album *managedObject = (Album *)[fetchedAlbumsController objectAtIndexPath:indexPath];
-    cell.textLabel.text = [[managedObject valueForKey:@"title"] description];
   }
+  Album *managedObject = (Album *)[fetchedAlbumsController objectAtIndexPath:indexPath];
+  cell.textLabel.text = [[managedObject valueForKey:@"title"] description];
   if(!cell.imageView.image) {
     // Configure the cell.
     Album *managedObject = (Album *)[fetchedAlbumsController objectAtIndexPath:indexPath];
@@ -275,6 +335,14 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   
+  // 一覧Load中であれば何もしない
+  [onLoadLock lock];
+  if(onLoad ) {
+    [onLoadLock unlock];
+    return;
+  }
+  [onLoadLock unlock];
+  // 選択行のAlbumのPhoto一覧へ
   PhotoListViewController *photoViewController = 
   [[PhotoListViewController alloc] initWithNibName:@"PhotoListViewController" bundle:nil];
   self.navigationItem.backBarButtonItem =  [photoViewController backButton];
@@ -392,6 +460,23 @@
   NSLog(@"fetchedAlbumsController retain count = %d",[fetchedAlbumsController retainCount]);
   NSLog(@"user retain count = %d",[user retainCount]);
   NSLog(@"backButton retain count = %d",[backButton retainCount]);
+
+  // 一覧ロード中であれば、停止要求をして、停止するまで待つ
+  if(picasaFetchController) {
+    [picasaFetchController requireStopping];
+    [picasaFetchController waitCompleted];
+    [picasaFetchController release];
+    picasaFetchController = nil;
+  }
+  
+  // ダウンロード中であれば、ダウンロード停止要求をして、停止するまで待つ
+  if(downloader) {
+    [downloader requireStopping];
+    [downloader waitCompleted];
+    [downloader release];
+    downloader = nil;
+  }
+  
   if(fetchedAlbumsController)
     [fetchedAlbumsController release];
   if(managedObjectContext)
@@ -402,6 +487,8 @@
     [backButton release];
   if(toolbarButtons) 
     [toolbarButtons release];
+  if(onLoadLock)
+    [onLoadLock release];
   [super dealloc];
 }
 
@@ -444,6 +531,117 @@
   return (Album *)newManagedObject;
 }
 
+- (Album *)updateAlbum:(Album *)albumObject 
+        withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)user {
+  NSString *title = [[album title] contentStringValue];
+  NSString *urlForThumbnail = nil;
+  if([[[album mediaGroup] mediaThumbnails] count] > 0) {
+    GDataMediaThumbnail *thumbnail = [[[album mediaGroup] mediaThumbnails]  
+                                      objectAtIndex:0];
+    NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
+    urlForThumbnail = [thumbnail URLString];
+  }
+  
+  // 値を設定（If appropriate, configure the new managed object.）
+  [albumObject setValue:title forKey:@"title"];
+  if(urlForThumbnail) {
+    [albumObject setValue:urlForThumbnail forKey:@"urlForThumbnail"];
+  }
+  [albumObject setValue:[NSDate date] forKey:@"timeStamp"];
+  // Save the context.
+  NSError *error = nil;
+  if (![managedObjectContext save:&error]) {
+    // 
+    return nil;	
+  }
+  return albumObject;
+}
+
+- (void)deleteAlbum:(Album *)albumObject {
+  [managedObjectContext deleteObject:(NSManagedObject *)albumObject];
+  // Save the context.
+  NSError *error = nil;
+  if (![managedObjectContext save:&error]) {
+    // 
+    return;
+  }
+  return;
+}
+
+
+- (Album *)selectAlbum:(GDataEntryPhotoAlbum *)album   
+              withUser:(User *)user  hasError:(BOOL *)f{
+  *f = NO;
+  // Create the fetch request for the entity.
+  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+  // Edit the entity name as appropriate.
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Album"
+                                            inManagedObjectContext:managedObjectContext];
+  [fetchRequest setEntity:entity];
+  NSPredicate *predicate 
+  = [NSPredicate predicateWithFormat:@"%K = %@ AND %K = %@", 
+     @"albumId", [album GPhotoID],
+     @"user.userId", user.userId ];
+  [fetchRequest setPredicate:predicate];
+  
+  NSError *error;
+  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+  if(!items) {
+    NSLog(@"Unresolved error %@", error);
+    hasErrorInInsertingThumbnail = YES;
+    *f = YES;
+    return nil;
+  }
+  if([items count] >= 1) {
+    return (Album *)[items objectAtIndex:0];
+  }
+  
+  return nil;
+}
+
+
+- (void)deleteAlbumsWithUserFeed:(GDataFeedPhotoUser *)album withUser:(User *)user {
+  // Create the fetch request for the entity.
+  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+  // Edit the entity name as appropriate.
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Album"
+                                            inManagedObjectContext:managedObjectContext];
+  [fetchRequest setEntity:entity];
+  NSPredicate *predicate 
+  = [NSPredicate predicateWithFormat:@"%K = %@ ", 
+     @"user.userId", user.userId ];
+  [fetchRequest setPredicate:predicate];
+  
+  
+  NSError *error;
+  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+  if(!items) {
+    NSLog(@"Unresolved error %@", error);
+    hasErrorInInsertingThumbnail = YES;
+//    *f = YES;
+    return;
+  }
+  
+  
+  NSArray *entries = [album entries];
+	
+  for(Album *albumObject in items) {
+    BOOL found = NO;
+    for(GDataEntryPhotoAlbum *albumEntry in entries) {
+      NSLog(@"compare %@ with %@", albumObject.albumId, [albumEntry GPhotoID]);
+      if ([albumObject.albumId isEqualToString:[albumEntry GPhotoID]]) {
+        found = YES;
+      }
+    }
+    if(found == NO) {
+	    [self deleteAlbum:albumObject];
+    }
+  }
+}
+
+
+
+
 - (Album *)updateThumbnail:(NSData *)thumbnailData forAlbum:(Album *)album {
   if(!album)
     return nil;
@@ -473,6 +671,20 @@
   }
   [pool drain];
 }
+
+
+- (void) refreshAlbums {
+  // Album一覧のロード処理を起動
+  [fetchedAlbumsController release];
+  fetchedAlbumsController = nil;
+  picasaFetchController = [[PicasaFetchController alloc] init];
+  picasaFetchController.delegate = self;
+  [picasaFetchController queryUserAndAlbums:self.user.userId];
+  // Downloaderの準備
+  downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:3];
+  downloader.delegate = self;
+}
+
 
 - (UIBarButtonItem *)backButton {
   if(!backButton) {
@@ -513,16 +725,13 @@
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
     
-    // Setting
-    UIBarButtonItem *settings = [[UIBarButtonItem alloc] 
-                                 initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
-                                 target:self
-                                 action:nil];
-                                 
-    path = [[NSBundle mainBundle] pathForResource:@"preferences" ofType:@"png"];
-    settings.image = [[UIImage alloc] initWithContentsOfFile:path];
-    [toolbarButtons addObject:settings];
-    [settings release];
+    // Refresh
+    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] 
+                                initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                                target:self
+                                action:@selector(refreshAction:)];
+    [toolbarButtons addObject:refresh];
+    [refresh release];
     
     [pool drain];
   }
@@ -587,7 +796,18 @@
   // 表示をリフレッシュ
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   [(UITableView *)self.view reloadData];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // downloaderのそうじ
+  [downloader release];
+  downloader = nil;
   [pool drain];
+}
+
+/*!
+ ダウンロードキャンセル時の通知
+ */
+- (void)dowloadCanceled {
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
 
@@ -598,6 +818,31 @@
 - (void) backAction:(id)sender {
   [self.navigationController popViewControllerAnimated:YES]; 
 }
+
+- (void) refreshAction:(id)sender {
+  // Load中フラグをOnに
+  [onLoadLock lock];
+  onLoad = YES;
+  [onLoadLock unlock];
+  
+  // thumbnailをクリアしておく
+  NSUInteger indexes[] = {0, 0};
+  for(int i = 0; i < [self.tableView numberOfRowsInSection:0 ]  ; ++i) {
+    indexes[1] = i;
+    UITableViewCell *cell =  [self.tableView cellForRowAtIndexPath:[NSIndexPath 
+                                                                    indexPathWithIndexes:indexes length:2]];
+    if(cell.imageView.image) {
+      [cell.imageView setImage:nil];
+    }
+  }
+  
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+	[self performSelectorOnMainThread:@selector(refreshAlbums) 
+                         withObject:nil 
+                      waitUntilDone:NO];
+  
+  
+}  
 
 
 #pragma mark -

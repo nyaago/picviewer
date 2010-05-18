@@ -28,7 +28,12 @@ QueuedURLDownloaderDelegate> {
   BOOL hasErrorInInsertingThumbnail;
   // toolbarに表示するButtonの配列
   NSMutableArray *toolbarButtons;
-
+  // Picasaデータ取得コントローラー
+  PicasaFetchController *picasaFetchController;
+	// データロード中 
+  BOOL onLoad;
+  // データロード中のロック
+  NSLock *onLoadLock;
 }
 
 /*!

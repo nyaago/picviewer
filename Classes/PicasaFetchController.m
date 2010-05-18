@@ -26,7 +26,22 @@
 
 @synthesize delegate;
 
+- (id) init {
+  self = [super init];
+  if(self) {
+    lock = [[NSLock alloc] init];
+    completed = YES;
+  }
+  return self;
+}
+
+- (void) dealloc {
+  [lock release];
+	[super dealloc];
+}
+
 - (void) queryUserAndAlbums:(NSString *)user {
+  completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   // アカウント設定
   //  [service setUserCredentialsWithUsername:@"nyaago69" password:@"********"];
@@ -50,6 +65,7 @@
 }
 
 - (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)userId {
+  completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   
   // アカウント設定
@@ -74,6 +90,7 @@
 }
 
 - (void) queryPhoto:(NSString *)photo album:(NSString *)albumId user:(NSString *)userId {
+  completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   
   // アカウント設定
@@ -105,6 +122,13 @@
   if (error != nil) {  
     NSLog(@"fetch error: %@", error);
   }
+  // 停止要求されていれば、処理中断
+  [lock lock];
+  if(stoppingRequired) {
+    completed = YES;
+    [lock unlock];
+    return;
+  }
   if(delegate && 
      [delegate 
       respondsToSelector:@selector(userAndAlbumsWithTicket:finishedWithUserFeed:error:)] ) {
@@ -119,6 +143,13 @@
                            error:(NSError *)error {
   if (error != nil) {  
     NSLog(@"fetch error: %@", error);
+  }
+  // 停止要求されていれば、処理中断
+  [lock lock];
+  if(stoppingRequired) {
+    completed = YES;
+    [lock unlock];
+    return;
   }
   if(delegate &&
      [delegate
@@ -136,11 +167,39 @@
   if (error != nil) {  
     NSLog(@"fetch error: %@", error);
   }
+  // 停止要求されていれば、処理中断
+  [lock lock];
+  if(stoppingRequired) {
+    completed = YES;
+    [lock unlock];
+    return;
+  }
+  [lock unlock];
   if(delegate &&
      [delegate respondsToSelector:@selector(photoWithTicket:finishedWithPhotoFeed:error:)]) {
     [delegate photoWithTicket:ticket 
         finishedWithPhotoFeed:feed 
                         error:error];
+  }
+}
+
+
+- (void)requireStopping {
+  [lock lock];
+  stoppingRequired = YES;
+  [lock unlock];
+}
+
+- (void) waitCompleted {
+  BOOL ret = NO;
+  while (YES) {
+    [lock lock];
+    ret = completed;
+    [lock unlock];
+    if(ret == YES) {
+      break;
+    }
+    [NSThread sleepForTimeInterval:0.01f];
   }
 }
 

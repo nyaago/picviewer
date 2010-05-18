@@ -260,6 +260,10 @@ didReceiveResponse:(NSURLResponse *)response {
     ret = completed || !started;
     [lock unlock];
     if(ret == YES) {
+      if(stoppingRequired && started && 
+         [delegate respondsToSelector:@selector(dowloadCanceled)] ) {
+        [delegate dowloadCanceled];
+      }
       break;
     }
     [NSThread sleepForTimeInterval:0.01f];

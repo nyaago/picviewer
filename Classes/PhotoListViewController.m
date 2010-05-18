@@ -339,6 +339,14 @@ withListViewController:(PhotoListViewController *)controller {
           [fetchedPhotosController retainCount]);
   NSLog(@"thumbnails count = %d", [thumbnails count]);
   NSLog(@"thumbnails retain count = %d", [thumbnails retainCount]);
+  // 一覧ロード中であれば、停止要求をして、停止するまで待つ
+  if(picasaFetchController) {
+    [picasaFetchController requireStopping];
+    [picasaFetchController waitCompleted];
+    picasaFetchController = nil;
+  }
+  
+  // ダウンロード中であれば、ダウンロード停止要求をして、停止するまで待つ
   if(downloader) {
     [downloader requireStopping];
     [downloader waitCompleted];
@@ -564,7 +572,6 @@ withListViewController:(PhotoListViewController *)controller {
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
     
-    // Setting
     // Setting
     UIBarButtonItem *refresh = [[UIBarButtonItem alloc] 
                                  initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
@@ -1036,6 +1043,14 @@ withListViewController:(PhotoListViewController *)controller {
                            toTarget:self 
                          withObject:nil];
 }
+
+/*!
+ ダウンロードキャンセル時の通知
+ */
+- (void)dowloadCanceled {
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+}
+
 
 
 #pragma mark Action

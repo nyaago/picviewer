@@ -200,6 +200,12 @@
  */
 - (void)didAllCompleted;
 
+/*!
+ @method dowloadCanceled
+ @discussion ダウンロードがキャンセルされたときの通知
+ */
+- (void)dowloadCanceled;
+
 @end
 
 
