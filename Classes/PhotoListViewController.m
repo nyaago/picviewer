@@ -675,6 +675,78 @@ withListViewController:(PhotoListViewController *)controller {
   picasaFetchController = nil;
 }
 
+
+// Googleへの問い合わせの結果、認証エラーとなった場合の通知
+- (void) PicasaFetchWasAuthError:(NSError *)error {
+  NSLog(@"auth error");
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *title = NSLocalizedString(@"ERROR","Error");
+  NSString *message = NSLocalizedString(@"ERROR_AUTH","AUTH ERROR");
+  UIAlertView *alertView = [[UIAlertView alloc] 
+                            initWithTitle:title
+                            message:message
+                            delegate:nil
+                            cancelButtonTitle:@"OK" 
+                            otherButtonTitles:nil];
+  [alertView show];
+  [alertView release];
+  [pool drain];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // Google接続コントローラーをclean
+  [picasaFetchController release];
+  picasaFetchController = nil;
+  // 
+  [progressView removeFromSuperview];
+}
+
+// Googleへの問い合わせの結果、指定ユーザがなかった場合の通知
+- (void) PicasaFetchNoUser:(NSError *)error {
+  NSLog(@"no user");
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *title = NSLocalizedString(@"WARN","WARN");
+  NSString *message = NSLocalizedString(@"WARN_NO_USER","NO USER");
+  UIAlertView *alertView = [[UIAlertView alloc] 
+                            initWithTitle:title
+                            message:message
+                            delegate:nil
+                            cancelButtonTitle:@"OK" 
+                            otherButtonTitles:nil];
+  [alertView show];
+  [alertView release];
+  [pool drain];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // Google接続コントローラーをclean
+  [picasaFetchController release];
+  picasaFetchController = nil;
+  // 
+  [progressView removeFromSuperview];
+}
+
+// Googleへの問い合わせの結果、エラーとなった場合の通知
+- (void) PicasaFetchWasError:(NSError *)error {
+  NSLog(@"connection error");
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *title = NSLocalizedString(@"ERROR","Error");
+  NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Connection ERROR");
+  UIAlertView *alertView = [[UIAlertView alloc] 
+                            initWithTitle:title
+                            message:message
+                            delegate:nil
+                            cancelButtonTitle:@"OK" 
+                            otherButtonTitles:nil];
+  [alertView show];
+  [alertView release];
+  [pool drain];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // Google接続コントローラーをclean
+  [picasaFetchController release];
+  picasaFetchController = nil;
+  // 
+  [progressView removeFromSuperview];
+}
+
+
+
 #pragma mark -
 
 #pragma mark Fetched results controller

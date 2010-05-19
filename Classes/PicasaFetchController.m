@@ -19,12 +19,16 @@
   finishedWithPhotoFeed:(GDataFeedPhoto *)feed
                   error:(NSError *)error;
 
+- (void) handleError:(NSError *)error;
+
 @end
 
 
 @implementation PicasaFetchController
 
 @synthesize delegate;
+@synthesize userId;
+@synthesize password;
 
 - (id) init {
   self = [super init];
@@ -44,8 +48,10 @@
   completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   // アカウント設定
-  //  [service setUserCredentialsWithUsername:@"nyaago69" password:@"********"];
-  
+  if(userId && password) {
+    NSLog(@"user = %@, password = %@", userId, password);
+	  [service setUserCredentialsWithUsername:userId password:password];
+  }
   NSURL *feedURL = [GDataServiceGooglePhotos photoFeedURLForUserID:user 
                                                            albumID:nil
                                                          albumName:nil
@@ -69,8 +75,9 @@
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   
   // アカウント設定
-  //  [service setUserCredentialsWithUsername:@"nyaago69" password:@"********"];
-  
+  if(userId && password) {
+	  [service setUserCredentialsWithUsername:userId password:password];
+  }
   NSURL *feedURL = [GDataServiceGooglePhotos photoFeedURLForUserID:userId
                                                            albumID:albumId
                                                          albumName:nil
@@ -94,8 +101,9 @@
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   
   // アカウント設定
-  //  [service setUserCredentialsWithUsername:@"nyaago69" password:@"********"];
-  
+  if(userId && password) {
+	  [service setUserCredentialsWithUsername:userId password:password];
+  }
   NSURL *feedURL = [GDataServiceGooglePhotos photoFeedURLForUserID:userId
                                                            albumID:albumId
                                                          albumName:nil
@@ -121,7 +129,11 @@
                           error:(NSError *)error {
   if (error != nil) {  
     NSLog(@"fetch error: %@", error);
+    [self handleError:error];
+    return;
   }
+  
+  NSLog(@"ticket = %@", ticket);
   // 停止要求されていれば、処理中断
   [lock lock];
   if(stoppingRequired) {
@@ -143,6 +155,8 @@
                            error:(NSError *)error {
   if (error != nil) {  
     NSLog(@"fetch error: %@", error);
+    [self handleError:error];
+    return;
   }
   // 停止要求されていれば、処理中断
   [lock lock];
@@ -166,6 +180,8 @@
                   error:(NSError *)error {
   if (error != nil) {  
     NSLog(@"fetch error: %@", error);
+    [self handleError:error];
+    return;
   }
   // 停止要求されていれば、処理中断
   [lock lock];
@@ -203,6 +219,30 @@
   }
 }
 
+
+- (void) handleError:(NSError *)error {
+  if(!error)
+    return;
+  if([error code] == 404) {	// ユーザなし
+    if( delegate && 
+     [delegate respondsToSelector:@selector(PicasaFetchNoUser:)] ) {
+      [delegate PicasaFetchNoUser:error];
+    }
+  }
+  else if([error code] == 403) { // 認証エラー
+    if( delegate && 
+       [delegate respondsToSelector:@selector(PicasaFetchWasAuthError:)] ) {
+      [delegate PicasaFetchWasError:error];
+    }
+  }
+  else {
+    if( delegate && 
+       [delegate respondsToSelector:@selector(PicasaFetchWasError:)] ) {
+      [delegate PicasaFetchWasError:error];
+    }
+  }
+  
+}
 
 
 @end

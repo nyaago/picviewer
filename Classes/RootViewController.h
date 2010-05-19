@@ -42,7 +42,11 @@
  */
 - (NSArray *) toolbarButtons;
 
-
+/*!
+ @method settingsAction:
+ @discussion 設定ボタンのアクション、設定Viewの表示
+ */
+- (void) settingsAction:(id)sender;
 
 
 @end

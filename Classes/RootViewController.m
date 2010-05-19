@@ -9,6 +9,7 @@
 #import "RootViewController.h"
 #import "AlbumTableViewController.h"
 #import "NewUserViewController.h"
+#import "SettingsViewController.h"
 #import "GDataPhotos.h"
 #import "User.h"
 #import "Album.h"
@@ -390,6 +391,77 @@
   [self dismissModalViewControllerAnimated:YES];
 }
 
+// Googleへの問い合わせの結果、認証エラーとなった場合の通知
+- (void) PicasaFetchWasAuthError:(NSError *)error {
+  NSLog(@"auth error");
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *title = NSLocalizedString(@"ERROR","Error");
+  NSString *message = NSLocalizedString(@"ERROR_AUTH","AUTH ERROR");
+  UIAlertView *alertView = [[UIAlertView alloc] 
+                            initWithTitle:title
+                            message:message
+                            delegate:nil
+                            cancelButtonTitle:@"OK" 
+                            otherButtonTitles:nil];
+  [alertView show];
+  [alertView release];
+  [pool drain];
+  [self dismissModalViewControllerAnimated:YES];
+}
+
+// Googleへの問い合わせの結果、指定ユーザがなかった場合の通知
+- (void) PicasaFetchNoUser:(NSError *)error {
+  NSLog(@"no user");
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *title = NSLocalizedString(@"WARN","WARN");
+  NSString *message = NSLocalizedString(@"WARN_NO_USER","NO USER");
+  UIAlertView *alertView = [[UIAlertView alloc] 
+                            initWithTitle:title
+                            message:message
+                            delegate:nil
+                            cancelButtonTitle:@"OK" 
+                            otherButtonTitles:nil];
+  [alertView show];
+  [alertView release];
+  [pool drain];
+  [self dismissModalViewControllerAnimated:YES];
+}
+
+// Googleへの問い合わせの結果、エラーとなった場合の通知
+- (void) PicasaFetchWasError:(NSError *)error {
+  NSLog(@"connection error");
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *title = NSLocalizedString(@"ERROR","Error");
+  NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Connection ERROR");
+  UIAlertView *alertView = [[UIAlertView alloc] 
+                            initWithTitle:title
+                            message:message
+                            delegate:nil
+                            cancelButtonTitle:@"OK" 
+                            otherButtonTitles:nil];
+  [alertView show];
+  [alertView release];
+  [pool drain];
+  [self dismissModalViewControllerAnimated:YES];
+}
+
+
+#pragma mark Action
+
+- (void) settingsAction:(id)sender {
+  SettingsViewController *viewController = [[SettingsViewController alloc] 
+                                           initWithNibName:@"SettingsViewController" 
+                                           bundle:nil];
+  UINavigationController *navigationController  = 
+  [[UINavigationController alloc] initWithRootViewController:viewController];
+  [self.view.window bringSubviewToFront:self.view];
+  [self presentModalViewController:navigationController animated:YES];
+}
+
+
+
+#pragma mark -
+
 - (NSArray *) toolbarButtons {
   NSString *path;
   
@@ -408,19 +480,20 @@
     [info release];
     
     // Space
-    UIBarButtonItem *spaceRight
-    = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                    target:self
-                                                    action:nil];
+    UIBarButtonItem *spaceRight = [[UIBarButtonItem alloc] 
+                                   initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                   target:self
+                                   action:nil];
     spaceRight.width = 30.0f;
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
     
     // Setting
-    UIBarButtonItem *settings = [[UIBarButtonItem alloc] initWithTitle:@"" 
-                                                             style:UIBarButtonItemStyleBordered 
-                                                            target:self
-                                                            action:nil];
+    UIBarButtonItem *settings = [[UIBarButtonItem alloc] 
+                                 initWithTitle:@"" 
+                                 style:UIBarButtonItemStyleBordered 
+                                 target:self
+                                 action:@selector(settingsAction:)];
     path = [[NSBundle mainBundle] pathForResource:@"preferences" ofType:@"png"];
     settings.image = [[UIImage alloc] initWithContentsOfFile:path];
     [toolbarButtons addObject:settings];

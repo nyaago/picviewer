@@ -15,6 +15,9 @@
 		28860BE50F44EE6400985440 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28860BE40F44EE6400985440 /* CoreData.framework */; };
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
+		721C217611A2C85700D05256 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 721C217411A2C85700D05256 /* SettingsViewController.m */; };
+		721C217711A2C85700D05256 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 721C217511A2C85700D05256 /* SettingsViewController.xib */; };
+		721C21D711A3762400D05256 /* SettingsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 721C21D611A3762400D05256 /* SettingsManager.m */; };
 		722D6D5011869787004F0F0D /* AlbumTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 722D6D4F11869787004F0F0D /* AlbumTableViewController.xib */; };
 		722D6DCB1186A0EE004F0F0D /* PhotoListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 722D6DC91186A0EE004F0F0D /* PhotoListViewController.m */; };
 		722D6DCC1186A0EE004F0F0D /* PhotoListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */; };
@@ -86,6 +89,11 @@
 		28C286DF0D94DF7D0034E888 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		28C286E00D94DF7D0034E888 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		721C217311A2C85700D05256 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
+		721C217411A2C85700D05256 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
+		721C217511A2C85700D05256 /* SettingsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsViewController.xib; sourceTree = "<group>"; };
+		721C21D511A3762400D05256 /* SettingsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsManager.h; sourceTree = "<group>"; };
+		721C21D611A3762400D05256 /* SettingsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsManager.m; sourceTree = "<group>"; };
 		722D6D4F11869787004F0F0D /* AlbumTableViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumTableViewController.xib; sourceTree = "<group>"; };
 		722D6DC81186A0EE004F0F0D /* PhotoListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoListViewController.h; sourceTree = "<group>"; };
 		722D6DC91186A0EE004F0F0D /* PhotoListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoListViewController.m; sourceTree = "<group>"; };
@@ -168,6 +176,10 @@
 				722D6DC81186A0EE004F0F0D /* PhotoListViewController.h */,
 				72582A811189B7B200A8A6FC /* PhotoViewController.h */,
 				72582A821189B7B200A8A6FC /* PhotoViewController.m */,
+				721C217311A2C85700D05256 /* SettingsViewController.h */,
+				721C217411A2C85700D05256 /* SettingsViewController.m */,
+				721C21D511A3762400D05256 /* SettingsManager.h */,
+				721C21D611A3762400D05256 /* SettingsManager.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -205,6 +217,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				721C217511A2C85700D05256 /* SettingsViewController.xib */,
 				72A7A85F11A14267001E0080 /* preferences.png */,
 				72A7A5C211A11B39001E0080 /* arrowleft.png */,
 				72A7A5C311A11B39001E0080 /* arrowright.png */,
@@ -374,6 +387,7 @@
 				72A7A5C611A11B39001E0080 /* arrowright.png in Resources */,
 				72A7A5C711A11B39001E0080 /* newspaper.png in Resources */,
 				72A7A86011A14267001E0080 /* preferences.png in Resources */,
+				721C217711A2C85700D05256 /* SettingsViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -402,6 +416,8 @@
 				72C61C32118AECF8001FD7C7 /* PageControlViewController.m in Sources */,
 				72C61C33118AECF8001FD7C7 /* PageScrollView.m in Sources */,
 				72C4AC8F119AED2200F4B664 /* PhotoImage.m in Sources */,
+				721C217611A2C85700D05256 /* SettingsViewController.m in Sources */,
+				721C21D711A3762400D05256 /* SettingsManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

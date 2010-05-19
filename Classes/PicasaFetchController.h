@@ -41,6 +41,27 @@
   finishedWithPhotoFeed:(GDataFeedPhoto *)feed
                   error:(NSError *)error;
 
+/*!
+ @method PicasaFetchWasError:
+ @discussion 認証エラーの場合の通知メソッド
+ */
+- (void) PicasaFetchWasError:(NSError *)error;
+
+
+/*!
+ @method PicasaFetchNoUser:
+ @discussion 検索対象のユーザがいなかった場合の通知メソッド
+ */
+- (void) PicasaFetchNoUser:(NSError *)error;
+
+/*!
+ @method PicasaFetchWasError:
+ @discussion 認証、ユーザなし以外のエラーの場合の通知メソッド
+ */
+- (void) PicasaFetchWasError:(NSError *)error;
+
+
+
 @end
 
 
@@ -60,9 +81,25 @@
   BOOL stoppingRequired;
   // ステタースの設定、取得のさいのLockオブジェクト
   NSLock *lock;
+  // Google User Id
+  NSString *userId;
+  // Google Password
+  NSString *password;
+  
 }
 
 @property (nonatomic, retain) NSObject <PicasaFetchControllerDelegate> *delegate;
+
+/*!
+ @property userId
+ @discussion Google User Id
+ */
+@property (nonatomic, retain) NSString *userId;
+/*!
+ @property password
+ @discussion Google Password
+ */
+@property (nonatomic, retain) NSString *password;
 
 /*!
  @method queryUserAndAlbums

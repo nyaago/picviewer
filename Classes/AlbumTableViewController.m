@@ -9,6 +9,7 @@
 #import "AlbumTableViewController.h"
 #import "PhotoListViewController.h"
 #import "Album.h"
+#import "SettingsManager.h"
 
 @interface AlbumTableViewController(Private)
 
@@ -121,13 +122,18 @@
                                                   objectAtIndex:0];
   if([sectionInfo numberOfObjects] == 0) {
     //if([[fetchedAlbumsController sections] count] == 0) {
+    SettingsManager *settings = [[SettingsManager alloc] init];
     [fetchedAlbumsController release];
     fetchedAlbumsController = nil;
     picasaFetchController = [[PicasaFetchController alloc] init];
     picasaFetchController.delegate = self;
+    picasaFetchController.userId = settings.userId;
+    picasaFetchController.password = settings.password;
+    [settings release];
     [picasaFetchController queryUserAndAlbums:self.user.userId];
     downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:3];
     downloader.delegate = self;
+    
   }
 }
 
@@ -284,6 +290,80 @@
   [pool drain];
 }
 
+// Googleへの問い合わせの結果、認証エラーとなった場合の通知
+- (void) PicasaFetchWasAuthError:(NSError *)error {
+  NSLog(@"auth error");
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *title = NSLocalizedString(@"ERROR","Error");
+  NSString *message = NSLocalizedString(@"ERROR_AUTH","AUTH ERROR");
+  UIAlertView *alertView = [[UIAlertView alloc] 
+                            initWithTitle:title
+                            message:message
+                            delegate:nil
+                            cancelButtonTitle:@"OK" 
+                            otherButtonTitles:nil];
+  [alertView show];
+  [alertView release];
+  [pool drain];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // Load中フラグをOff
+	[onLoadLock lock];
+  onLoad = NO;
+  [onLoadLock unlock];
+  // Google接続コントローラーをclean
+  [picasaFetchController release];
+  picasaFetchController = nil;
+}
+
+// Googleへの問い合わせの結果、指定ユーザがなかった場合の通知
+- (void) PicasaFetchNoUser:(NSError *)error {
+  NSLog(@"no user");
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *title = NSLocalizedString(@"WARN","WARN");
+  NSString *message = NSLocalizedString(@"WARN_NO_USER","NO USER");
+  UIAlertView *alertView = [[UIAlertView alloc] 
+                            initWithTitle:title
+                            message:message
+                            delegate:nil
+                            cancelButtonTitle:@"OK" 
+                            otherButtonTitles:nil];
+  [alertView show];
+  [alertView release];
+  [pool drain];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // Load中フラグをOff
+	[onLoadLock lock];
+  onLoad = NO;
+  [onLoadLock unlock];
+  // Google接続コントローラーをclean
+  [picasaFetchController release];
+  picasaFetchController = nil;
+}
+
+// Googleへの問い合わせの結果、エラーとなった場合の通知
+- (void) PicasaFetchWasError:(NSError *)error {
+  NSLog(@"connection error");
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSString *title = NSLocalizedString(@"ERROR","Error");
+  NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Connection ERROR");
+  UIAlertView *alertView = [[UIAlertView alloc] 
+                            initWithTitle:title
+                            message:message
+                            delegate:nil
+                            cancelButtonTitle:@"OK" 
+                            otherButtonTitles:nil];
+  [alertView show];
+  [alertView release];
+  [pool drain];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // Load中フラグをOff
+	[onLoadLock lock];
+  onLoad = NO;
+  [onLoadLock unlock];
+  // Google接続コントローラーをclean
+  [picasaFetchController release];
+  picasaFetchController = nil;
+}
 
 
 #pragma mark Table view methods
@@ -677,8 +757,12 @@
   // Album一覧のロード処理を起動
   [fetchedAlbumsController release];
   fetchedAlbumsController = nil;
+  SettingsManager *settings = [[SettingsManager alloc] init];
   picasaFetchController = [[PicasaFetchController alloc] init];
   picasaFetchController.delegate = self;
+  picasaFetchController.userId = settings.userId;
+  picasaFetchController.password = settings.password;
+  [settings release];
   [picasaFetchController queryUserAndAlbums:self.user.userId];
   // Downloaderの準備
   downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:3];
