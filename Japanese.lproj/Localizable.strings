@@ -10,6 +10,15 @@
 
 "ACCOUNTS" = "アカウント";
 "ALBUMS" = "アルバム";
+"PHOTOS" = "写真一覧";
+"SETTINGS" = "設定";
+
+// 設定View
+"SECTION_ACCOUNT" = "アカウント";
+"CAPTION_USER" = "ユーザ名";
+"CAPTION_PASSWORD" = "パスワード";
+
+
 
 "ERROR_DELETE" = "削除中にエラーが発生しました";
 "ERROR_INSERT" = "追加中にエラーが発生しました";
@@ -18,7 +27,7 @@
 "ERROR_CON_SERVER" = "Googleへの接続中にエラーが発生しました";
 "ERROR_DOWNLOAD_THUMB" = "サムネイルダウンロード中にエラーが発生しました";
 "ERROR_DOWNLOAD_IMAGE" = "画像ダウンロード中にエラーが発生しました";
-
+"ERROR_AUTH" = "認証エラーです。ユーザID、パスワードを確認してください";
 
 
 "WARN_NO_USER" = "ユーザがみつかりません.";

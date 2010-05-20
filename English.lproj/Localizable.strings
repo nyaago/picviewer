@@ -11,6 +11,13 @@
 
 "ACCOUNTS" = "Accounts";
 "ALBUMS" = "Albums";
+"PHOTOS" = "Photos";
+"SETTINGS" = "Settings";
+
+// 設定View
+"SECTION_ACCOUNT" = "ACCOUNT";
+"CAPTION_USER" = "USER";
+"CAPTION_PASSWORD" = "PASSWORD";
 
 "ERROR_DELETE" = "An error occured in deleting the entry";
 "ERROR_INSERT" = "An error occured in addting the entry";
@@ -19,6 +26,8 @@
 "ERROR_CON_SERVER" = "An error occured in connecting to google";
 "ERROR_DOWNLOAD_THUMB" = "An error occured in downloding thumbnails";
 "ERROR_DOWNLOAD_IMAGE" = "An error occured in downloding images";
+"ERROR_AUTH" = "Authorization was failed.";
+
  
 "WARN_NO_USER" = "The user not found.";
 "WARN_NO_ALBUM" = "The album not found.";

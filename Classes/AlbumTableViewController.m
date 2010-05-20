@@ -17,30 +17,38 @@
  @method insertAlbum:withUser;
  @discussion Album情報をローカルDBに登録する.
  */
-- (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)user;
+- (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject;
 
 /*!
  @method updateAlbum:withGDataAlbum:withUser
  @discussion Album情報をローカルDBに変更登録する.
  */
 - (Album *)updateAlbum:(Album *)albumObject 
-        withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)user;
+        withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject;
 
 /*!
  @method deleteAlbum:
  @discussion Album情報をローカルDBに登録する.
+ @param albumObject 削除対象のAlbum
+ @param user 参照元のUser
  */
-- (void)deleteAlbum:(Album *)albumObject;
+- (void)deleteAlbum:(Album *)albumObject withUser:(User *)userObject;
 
 
-- (void)deleteAlbumsWithUserFeed:(GDataFeedPhotoUser *)album withUser:(User *)user;
+- (void)deleteAlbumsWithUserFeed:(GDataFeedPhotoUser *)album 
+                        withUser:(User *)userObject
+                        hasError:(BOOL *)f;
+
+- (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)album 
+                                withUser:(User *)userObject
+                                hasError:(BOOL *)f;
 
 
 /*!
  @method selectAlbum
  @discussion AlbumのManagedObjectを取得する
  */
-- (Album *)selectAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)user hasError:(BOOL *)f;
+- (Album *)selectAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject hasError:(BOOL *)f;
 
 
 /*!
@@ -198,70 +206,40 @@
                           error:(NSError *)error {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   BOOL hasErrorInInserting = NO;
+  BOOL hasErrorDeleting = NO;
   if(error) {
-    // Error
-    NSString *title = NSLocalizedString(@"ERROR","Error");
-    NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Error");
-    if ([error code] == 404) {   // ユーザがいない
-      title = NSLocalizedString(@"RESULT",@"Result");
-      message = NSLocalizedString(@"WARN_NO_USER", @"No user");
-    }
-    //	NSLog(@" error %@, %@", error, [error userInfo]);
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:title
-                              message:message
-                              delegate:nil
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
-    
   }
-  // ローカルDBへの保存
-  NSArray *entries = [feed entries];
-  if ([entries count] > 0) {
+  else {
+    // ローカルDBへの保存
     NSLog(@"the user has %d alblums", [[feed entries] count]);
-		// 削除
-    [self deleteAlbumsWithUserFeed:feed withUser:user];
-    // 更新、新規
-    for (int i = 0; i < [entries count]; ++i) {
-      GDataEntryPhotoAlbum *album = [entries objectAtIndex:i];
-      NSLog(@"album - title = %@, ident=%@, feedlink=%@",
-            [[album title] contentStringValue], [album GPhotoID], [album feedLink]);
-      //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
-      BOOL hasError;
-      Album *albumModel = [self selectAlbum:album withUser:user hasError:&hasError];
-      if(hasError) {
-        hasErrorInInserting = YES;
-        continue;
-      }
-      if(albumModel) {
-        albumModel = [self updateAlbum:albumModel 
-                        withGDataAlbum:album withUser:user];
-      }
-      else {
-	      albumModel =  [self insertAlbum:album withUser:user];
-      }
-      if(albumModel) {
-        [self downloadThumbnail:album withAlbumModel:albumModel];
-      }
-      else {
-        hasErrorInInserting = YES;
-      }
+    // --  削除
+    [self deleteAlbumsWithUserFeed:feed 
+                          withUser:user 
+                          hasError:&hasErrorDeleting];
+    // -- 更新、新規
+    if(hasErrorDeleting == NO) {
+      [self insertOrUpdateAlbumsWithUserFeed:feed 
+                                    withUser:user 
+                                    hasError:&hasErrorInInserting];
     }
-  }	
-  
-  // Album一覧のFetched Controllerを生成
-  if(hasErrorInInserting) {
-    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR", @"Error")
-                              message:NSLocalizedString(@"ERROR_INSERT", @"Error IN Saving")
-                              delegate:self 
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
+    // Album一覧のFetched Controllerを生成
+    if(hasErrorInInserting || hasErrorDeleting) {
+      NSString *message = nil;
+      if(hasErrorDeleting) {
+        message = NSLocalizedString(@"ERROR_DELETE", @"Error IN Deleting");
+      }
+      else {
+        message = NSLocalizedString(@"ERROR_INSERT", @"Error IN Saving");
+      }
+      UIAlertView *alertView = [[UIAlertView alloc] 
+                                initWithTitle:NSLocalizedString(@"ERROR", @"Error")
+                                message:message
+                                delegate:self 
+                                cancelButtonTitle:@"OK" 
+                                otherButtonTitles:nil];
+      [alertView show];
+      [alertView release];
+    }
   }
   if (![[self fetchedAlbumsController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -573,7 +551,7 @@
 }
 
 #pragma mark Private
-- (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)user{
+- (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject{
   NSString *albumId = [album GPhotoID];
   NSString *title = [[album title] contentStringValue];
   NSString *urlForThumbnail = nil;
@@ -612,7 +590,7 @@
 }
 
 - (Album *)updateAlbum:(Album *)albumObject 
-        withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)user {
+        withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject {
   NSString *title = [[album title] contentStringValue];
   NSString *urlForThumbnail = nil;
   if([[[album mediaGroup] mediaThumbnails] count] > 0) {
@@ -637,20 +615,27 @@
   return albumObject;
 }
 
-- (void)deleteAlbum:(Album *)albumObject {
+- (void)deleteAlbum:(Album *)albumObject withUser:(User *)userObject {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSSet *set = [NSSet setWithObject:albumObject];
+  // 参照元User削除
+  [userObject removeAlbum:set];
+  // Album削除
   [managedObjectContext deleteObject:(NSManagedObject *)albumObject];
   // Save the context.
   NSError *error = nil;
   if (![managedObjectContext save:&error]) {
-    // 
+    NSLog(@"error Occured in remveing Album - %@", error);
+    [pool drain];
     return;
   }
+  [pool drain];
   return;
 }
 
 
 - (Album *)selectAlbum:(GDataEntryPhotoAlbum *)album   
-              withUser:(User *)user  hasError:(BOOL *)f{
+              withUser:(User *)userObject  hasError:(BOOL *)f{
   *f = NO;
   // Create the fetch request for the entity.
   NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
@@ -661,7 +646,7 @@
   NSPredicate *predicate 
   = [NSPredicate predicateWithFormat:@"%K = %@ AND %K = %@", 
      @"albumId", [album GPhotoID],
-     @"user.userId", user.userId ];
+     @"user.userId", userObject.userId ];
   [fetchRequest setPredicate:predicate];
   
   NSError *error;
@@ -679,8 +664,47 @@
   return nil;
 }
 
+- (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)feed 
+                                withUser:(User *)userObject 
+                                hasError:(BOOL *)f {
 
-- (void)deleteAlbumsWithUserFeed:(GDataFeedPhotoUser *)album withUser:(User *)user {
+  BOOL hasErrorInInserting = NO;
+
+  NSArray *entries = [feed entries];
+  for (int i = 0; i < [entries count]; ++i) {
+    GDataEntryPhotoAlbum *album = [entries objectAtIndex:i];
+    NSLog(@"album - title = %@, ident=%@, feedlink=%@",
+          [[album title] contentStringValue], [album GPhotoID], [album feedLink]);
+    //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
+    BOOL hasError;
+    Album *albumModel = [self selectAlbum:album withUser:userObject hasError:&hasError];
+    if(hasError) {
+      hasErrorInInserting = YES;
+      continue;
+    }
+    if(albumModel) {
+      albumModel = [self updateAlbum:albumModel 
+                      withGDataAlbum:album withUser:userObject];
+    }
+    else {
+      albumModel =  [self insertAlbum:album withUser:userObject];
+    }
+    if(albumModel) {
+      [self downloadThumbnail:album withAlbumModel:albumModel];
+    }
+    else {
+      hasErrorInInserting = YES;
+    }
+  }
+	*f = hasErrorInInserting;
+}	
+
+
+
+- (void)deleteAlbumsWithUserFeed:(GDataFeedPhotoUser *)feed 
+                        withUser:(User *)userObject 
+                        hasError:(BOOL *)f {
+
   // Create the fetch request for the entity.
   NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
   // Edit the entity name as appropriate.
@@ -689,7 +713,7 @@
   [fetchRequest setEntity:entity];
   NSPredicate *predicate 
   = [NSPredicate predicateWithFormat:@"%K = %@ ", 
-     @"user.userId", user.userId ];
+     @"user.userId", userObject.userId ];
   [fetchRequest setPredicate:predicate];
   
   
@@ -698,12 +722,12 @@
   if(!items) {
     NSLog(@"Unresolved error %@", error);
     hasErrorInInsertingThumbnail = YES;
-//    *f = YES;
+    *f = YES;
     return;
   }
   
   
-  NSArray *entries = [album entries];
+  NSArray *entries = [feed entries];
 	
   for(Album *albumObject in items) {
     BOOL found = NO;
@@ -714,7 +738,7 @@
       }
     }
     if(found == NO) {
-	    [self deleteAlbum:albumObject];
+	    [self deleteAlbum:albumObject withUser:userObject];
     }
   }
 }
@@ -913,8 +937,8 @@
   NSUInteger indexes[] = {0, 0};
   for(int i = 0; i < [self.tableView numberOfRowsInSection:0 ]  ; ++i) {
     indexes[1] = i;
-    UITableViewCell *cell =  [self.tableView cellForRowAtIndexPath:[NSIndexPath 
-                                                                    indexPathWithIndexes:indexes length:2]];
+    UITableViewCell *cell =  [self.tableView 
+                              cellForRowAtIndexPath:[NSIndexPath                                                                  indexPathWithIndexes:indexes length:2]];
     if(cell.imageView.image) {
       [cell.imageView setImage:nil];
     }
