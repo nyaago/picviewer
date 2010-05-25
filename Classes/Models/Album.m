@@ -11,7 +11,7 @@
 
 @implementation Album
 
-@dynamic albumId,timeStamp, thumbnail, title, urlForThumbnail;
+@dynamic albumId,timeStamp, thumbnail, title, urlForThumbnail, description;
 @dynamic photo, user;
 
 @end

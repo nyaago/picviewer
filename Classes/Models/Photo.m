@@ -12,7 +12,7 @@
 @implementation Photo
 
 @dynamic albumId, photoId, height, timeStamp, title, description, width;
-@dynamic thumbnail, urlForContent, urlForThumbnail;
+@dynamic thumbnail, urlForContent, urlForThumbnail, location;
 @dynamic photoImage;
 
 @end

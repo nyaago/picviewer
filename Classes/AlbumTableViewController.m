@@ -16,15 +16,33 @@
 /*!
  @method insertAlbum:withUser;
  @discussion Album情報をローカルDBに登録する.
+ @param album - GoogleDataのAlbumEntry
+ @param withUser - CoreDataのuser Object
+ @return 更新結果のCoreDataのAlbumObject
  */
 - (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject;
 
 /*!
  @method updateAlbum:withGDataAlbum:withUser
  @discussion Album情報をローカルDBに変更登録する.
+ @param album - GoogleDataのAlbumEntry
+ @param withUser - CoreDataのuser Object
+ @return 更新結果のCoreDataのAlbumObject
  */
 - (Album *)updateAlbum:(Album *)albumObject 
         withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject;
+
+/*!
+ @method fillAlbumObject:withGDataEntry:withUser
+ @discussion GoogleのPhotoAlbumのEntryよりCoreDataのAlbum Objectへ値を設定
+ @param albumObject - 設定対象のAlbum Object
+ @param album - GoogleDataのAlbumEntry
+ @param withUser - CoreDataのuser Object
+ @return CoreDataのAlbumObject
+ */
+- (Album *)fillAlbumObject:(Album *)albumObject
+            withGDataEntry:(GDataEntryPhotoAlbum *)album 
+                  withUser:(User *)userObject;
 
 /*!
  @method deleteAlbum:
@@ -552,31 +570,19 @@
 
 #pragma mark Private
 - (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject{
-  NSString *albumId = [album GPhotoID];
-  NSString *title = [[album title] contentStringValue];
-  NSString *urlForThumbnail = nil;
-  if([[[album mediaGroup] mediaThumbnails] count] > 0) {
-    GDataMediaThumbnail *thumbnail = [[[album mediaGroup] mediaThumbnails]  
-                                      objectAtIndex:0];
-    NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
-    urlForThumbnail = [thumbnail URLString];
-  }
-  
-  NSData *thumbnail = nil;
+
   // 新しい永続化オブジェクトを作って
   NSManagedObject *newManagedObject 
   = [NSEntityDescription insertNewObjectForEntityForName:@"Album"
                                   inManagedObjectContext:managedObjectContext];
-  // 値を設定（If appropriate, configure the new managed object.）
-  [newManagedObject setValue:albumId forKey:@"albumId"];
-  [newManagedObject setValue:title forKey:@"title"];
-  if(urlForThumbnail) {
-    [newManagedObject setValue:urlForThumbnail forKey:@"urlForThumbnail"];
-  }
-  if(thumbnail) {
-    [newManagedObject setValue:thumbnail forKey:@"thumbnail"];
-  }
-  [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
+  
+  // 値を設定
+  [newManagedObject setValue:[album GPhotoID] forKey:@"albumId"];
+  [self fillAlbumObject:(Album *)newManagedObject 
+         withGDataEntry:album 
+               withUser:userObject];
+  
+  
   // Save the context.
   NSError *error = nil;
   if ([self.user respondsToSelector:@selector(addAlbumObject:) ] ) {
@@ -591,21 +597,12 @@
 
 - (Album *)updateAlbum:(Album *)albumObject 
         withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject {
-  NSString *title = [[album title] contentStringValue];
-  NSString *urlForThumbnail = nil;
-  if([[[album mediaGroup] mediaThumbnails] count] > 0) {
-    GDataMediaThumbnail *thumbnail = [[[album mediaGroup] mediaThumbnails]  
-                                      objectAtIndex:0];
-    NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
-    urlForThumbnail = [thumbnail URLString];
-  }
   
-  // 値を設定（If appropriate, configure the new managed object.）
-  [albumObject setValue:title forKey:@"title"];
-  if(urlForThumbnail) {
-    [albumObject setValue:urlForThumbnail forKey:@"urlForThumbnail"];
-  }
-  [albumObject setValue:[NSDate date] forKey:@"timeStamp"];
+  // 値を設定
+  [self fillAlbumObject:albumObject 
+         withGDataEntry:album 
+               withUser:userObject];
+  
   // Save the context.
   NSError *error = nil;
   if (![managedObjectContext save:&error]) {
@@ -614,6 +611,27 @@
   }
   return albumObject;
 }
+
+- (Album *)fillAlbumObject:(Album *)albumObject
+            withGDataEntry:(GDataEntryPhotoAlbum *)album 
+                  withUser:(User *)userObject {
+  // 各値を設定（If appropriate, configure the new managed object.）
+  [albumObject setValue:[[album title] contentStringValue] forKey:@"title"];
+  [albumObject setValue:[[album timestamp] dateValue] forKey:@"timeStamp"];
+  if([album description]) {
+		[albumObject setValue:[album description] forKey:@"description"];
+  }
+
+  // thumbnailのurl
+  if([[[album mediaGroup] mediaThumbnails] count] > 0) {
+    GDataMediaThumbnail *thumbnail = [[[album mediaGroup] mediaThumbnails]  
+                                      objectAtIndex:0];
+    NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
+    [albumObject setValue:[thumbnail URLString] forKey:@"urlForThumbnail"];
+  }
+  return albumObject;
+}
+
 
 - (void)deleteAlbum:(Album *)albumObject withUser:(User *)userObject {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];

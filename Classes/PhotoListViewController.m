@@ -874,54 +874,43 @@ withListViewController:(PhotoListViewController *)controller {
 
 - (Photo *)insertPhoto:(GDataEntryPhoto *)photo   withAlbum:(Album *)album {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
   NSString *photoId = [photo GPhotoID];
-  NSString *title = [[photo title] contentStringValue];
-  NSString *urlForThumbnail = nil;
-  NSString *urlForContent = nil;
-  // NSString *description = [photo description];
-  NSNumber *width = [photo width];
-  NSNumber *height = [photo height];
+  // 新しい永続化オブジェクトを作って
+  Photo *photoObject 
+  = (Photo *)[NSEntityDescription insertNewObjectForEntityForName:@"Photo"
+                                           inManagedObjectContext:managedObjectContext];
+  // 値を設定
+  [photoObject setValue:photoId forKey:@"photoId"];
+  [photoObject setValue:[[photo title] contentStringValue] forKey:@"title"];
+  [photoObject setValue:[[photo timestamp] dateValue] forKey:@"timeStamp"];
+  if([photo geoLocation]) {
+	  [photoObject setValue:[[photo geoLocation] coordinateString] forKey:@"location"];
+  }
+  if([photo description] ) {
+		[photoObject setValue:[photo description] forKey:@"description"];
+  }
+  if([photo width] ) {
+    [photoObject setValue:[photo width] forKey:@"width"];
+  }
+  if([photo height] ) {
+    [photoObject setValue:[photo height] forKey:@"height"];
+  }
   
+  // 画像url
   if([[[photo mediaGroup] mediaThumbnails] count] > 0) {
     GDataMediaThumbnail *thumbnail = [[[photo mediaGroup] mediaThumbnails]  
                                       objectAtIndex:0];
     NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
-    urlForThumbnail = [thumbnail URLString];
+    [photoObject setValue:[thumbnail URLString] forKey:@"urlForThumbnail"];
   }
   if([[[photo mediaGroup] mediaContents] count] > 0) {
     GDataMediaContent *content = [[[photo mediaGroup] mediaContents]  
                                   objectAtIndex:0];
     NSLog(@"URL for the photo - %@", [content URLString] );
-    urlForContent = [content URLString];
+    [photoObject setValue:[content URLString] forKey:@"urlForContent"];
   }
-  
-  // 新しい永続化オブジェクトを作って
-  Photo *photoObject 
-  = (Photo *)[NSEntityDescription insertNewObjectForEntityForName:@"Photo"
-                                           inManagedObjectContext:managedObjectContext];
-  // 値を設定（If appropriate, configure the new managed object.）
-  [photoObject setValue:photoId forKey:@"photoId"];
-  [photoObject setValue:title forKey:@"title"];
-  if(urlForThumbnail) {
-    [photoObject setValue:urlForThumbnail forKey:@"urlForThumbnail"];
-  }
-  //  [photoObject setValue:nil forKey:@"thumbnail"];
-  if(urlForContent) {
-    [photoObject setValue:urlForContent forKey:@"urlForContent"];
-  }
-  //  [photoObject setValue:nil forKey:@"content"];
-  [photoObject setValue:[NSDate date] forKey:@"timeStamp"];
-  //  [photoObject setValue:nil forKey:@"description"];
-  //  if(description) {
-  //	[photoObject setValue:description forKey:@"description"];
-  //  }
-  if(width) {
-    [photoObject setValue:width forKey:@"width"];
-  }
-  if(height) {
-    [photoObject setValue:height forKey:@"height"];
-  }
-  //  [photoObject setValue:nil forKey:@"height"];
+
   // Save the context.
   NSError *error = nil;
   if ([self.album respondsToSelector:@selector(addPhotoObject:) ] ) {

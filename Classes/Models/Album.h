@@ -18,6 +18,7 @@
 @property (retain) NSString *title;
 @property (retain) NSString *urlForThumbnail;
 @property (retain) NSDate *timeStamp;
+@property (retain) NSString *description;
 @property (nonatomic, retain) NSData *thumbnail;
 
 @property (nonatomic, retain) NSSet* photo;

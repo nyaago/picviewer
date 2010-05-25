@@ -26,6 +26,7 @@
 @property (nonatomic, retain) NSString * urlForThumbnail;
 @property (nonatomic, retain) NSNumber * width;
 @property (nonatomic, retain) NSString * description;
+@property (nonatomic, retain) NSString * location;
 
 
 @end
