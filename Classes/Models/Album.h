@@ -17,9 +17,11 @@
 @property (retain) NSString *albumId;
 @property (retain) NSString *title;
 @property (retain) NSString *urlForThumbnail;
+@property (retain) NSString *access;
 @property (retain) NSDate *timeStamp;
 @property (retain) NSString *description;
 @property (nonatomic, retain) NSData *thumbnail;
+@property (nonatomic, retain) NSNumber *photosUsed;
 
 @property (nonatomic, retain) NSSet* photo;
 @property (nonatomic, retain) NSManagedObject * user;

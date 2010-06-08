@@ -18,6 +18,12 @@
 "CAPTION_USER" = "ユーザ名";
 "CAPTION_PASSWORD" = "パスワード";
 
+// ボタンキャプション
+"Completed" = "完了";
+
+// Album詳細
+"AlbumInfo.PhotosUsed" = "写真 %d 枚";
+
 
 
 "ERROR_DELETE" = "削除中にエラーが発生しました";

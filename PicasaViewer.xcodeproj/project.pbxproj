@@ -43,6 +43,8 @@
 		72EA5B521181577500065915 /* URLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5B511181577500065915 /* URLDownload.m */; };
 		72EA5B5C11815C9A00065915 /* AlbumTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5B5A11815C9A00065915 /* AlbumTableViewController.m */; };
 		72FA3CB4117E9F4300AB7B1C /* libxml2.2.7.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72FA3CB3117E9F4300AB7B1C /* libxml2.2.7.3.dylib */; };
+		72FFBD1611ABA46700E16BA4 /* AlbumInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72FFBD1411ABA46700E16BA4 /* AlbumInfoViewController.m */; };
+		72FFBD1711ABA46700E16BA4 /* AlbumInfoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72FFBD1511ABA46700E16BA4 /* AlbumInfoViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -133,6 +135,9 @@
 		72EA5B5911815C9A00065915 /* AlbumTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumTableViewController.h; sourceTree = "<group>"; };
 		72EA5B5A11815C9A00065915 /* AlbumTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumTableViewController.m; sourceTree = "<group>"; };
 		72FA3CB3117E9F4300AB7B1C /* libxml2.2.7.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.7.3.dylib; path = usr/lib/libxml2.2.7.3.dylib; sourceTree = SDKROOT; };
+		72FFBD1311ABA46700E16BA4 /* AlbumInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumInfoViewController.h; sourceTree = "<group>"; };
+		72FFBD1411ABA46700E16BA4 /* AlbumInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumInfoViewController.m; sourceTree = "<group>"; };
+		72FFBD1511ABA46700E16BA4 /* AlbumInfoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumInfoViewController.xib; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* PicasaViewer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "PicasaViewer-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -180,6 +185,8 @@
 				721C217411A2C85700D05256 /* SettingsViewController.m */,
 				721C21D511A3762400D05256 /* SettingsManager.h */,
 				721C21D611A3762400D05256 /* SettingsManager.m */,
+				72FFBD1311ABA46700E16BA4 /* AlbumInfoViewController.h */,
+				72FFBD1411ABA46700E16BA4 /* AlbumInfoViewController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -217,6 +224,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72FFBD1511ABA46700E16BA4 /* AlbumInfoViewController.xib */,
 				721C217511A2C85700D05256 /* SettingsViewController.xib */,
 				72A7A85F11A14267001E0080 /* preferences.png */,
 				72A7A5C211A11B39001E0080 /* arrowleft.png */,
@@ -258,7 +266,7 @@
 			children = (
 				7234E9DA117E7C7F00D7AC45 /* libGDataTouchStaticLib.a */,
 				7234E9DC117E7C7F00D7AC45 /* GDataUnitTests.octest */,
-				7234E9DE117E7C7F00D7AC45 /* GDataTouchUnitTests.octest */,
+				7234E9DE117E7C7F00D7AC45 /* GDataIPhoneUnitTests.octest */,
 				7234E9E0117E7C7F00D7AC45 /* DevelopmentTestTool */,
 			);
 			name = Products;
@@ -357,10 +365,10 @@
 			remoteRef = 7234E9DB117E7C7F00D7AC45 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		7234E9DE117E7C7F00D7AC45 /* GDataTouchUnitTests.octest */ = {
+		7234E9DE117E7C7F00D7AC45 /* GDataIPhoneUnitTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GDataTouchUnitTests.octest;
+			path = GDataIPhoneUnitTests.octest;
 			remoteRef = 7234E9DD117E7C7F00D7AC45 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
@@ -388,6 +396,7 @@
 				72A7A5C711A11B39001E0080 /* newspaper.png in Resources */,
 				72A7A86011A14267001E0080 /* preferences.png in Resources */,
 				721C217711A2C85700D05256 /* SettingsViewController.xib in Resources */,
+				72FFBD1711ABA46700E16BA4 /* AlbumInfoViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -418,6 +427,7 @@
 				72C4AC8F119AED2200F4B664 /* PhotoImage.m in Sources */,
 				721C217611A2C85700D05256 /* SettingsViewController.m in Sources */,
 				721C21D711A3762400D05256 /* SettingsManager.m in Sources */,
+				72FFBD1611ABA46700E16BA4 /* AlbumInfoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -473,9 +483,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
 				OTHER_LDFLAGS = "-all_load";
 				PREBINDING = NO;
-				SDKROOT = iphonesimulator3.1.3;
+				SDKROOT = iphoneos3.2;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
 			};
@@ -494,7 +505,7 @@
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
 				OTHER_LDFLAGS = "-all_load";
 				PREBINDING = NO;
-				SDKROOT = iphonesimulator3.1.3;
+				SDKROOT = iphonesimulator3.2;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
 			};

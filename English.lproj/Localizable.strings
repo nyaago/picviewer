@@ -19,6 +19,13 @@
 "CAPTION_USER" = "USER";
 "CAPTION_PASSWORD" = "PASSWORD";
 
+// Caption For BUtton
+"Completed" = "完了";
+
+// Album DETAIL
+"AlbumInfo.PhotosUsed" = "PHOTO %d";
+
+
 "ERROR_DELETE" = "An error occured in deleting the entry";
 "ERROR_INSERT" = "An error occured in addting the entry";
 "ERROR_INSERT_THUMB" = "An error occured in addting the thumbnail";

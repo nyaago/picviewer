@@ -11,6 +11,7 @@
 #import "Photo.h"
 #import "Album.h"
 #import "PageControlViewController.h"
+#import "AlbumInfoViewController.h"
 
 @interface PhotoImageView : UIImageView
 {
@@ -113,6 +114,15 @@ withListViewController:(PhotoListViewController *)controller {
  @discussion albumのリフレッシュ、全写真データを削除してから再ロードを行う.
  */
 - (void) refreshAction:(id)sender;
+
+/*!
+ @method infoAction:
+ @discussion Infoボタンのアクション、Album情報のViewを表示
+ */
+- (void) infoAction:(id)sender;
+
+
+
 
 /*!
  @method refreshPhotos
@@ -557,7 +567,7 @@ withListViewController:(PhotoListViewController *)controller {
     UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
                                                              style:UIBarButtonItemStyleBordered 
                                                             target:self
-                                                            action:nil];
+                                                            action:@selector(infoAction:)];
     path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
     info.image = [[UIImage alloc] initWithContentsOfFile:path];
     [toolbarButtons addObject:info];
@@ -1130,7 +1140,23 @@ withListViewController:(PhotoListViewController *)controller {
                       waitUntilDone:NO];
   
   
-}  
+} 
+
+- (void) infoAction:(id)sender {
+
+  AlbumInfoViewController *viewController = [[AlbumInfoViewController alloc]
+                                         initWithNibName:@"AlbumInfoViewController" 
+                                         bundle:nil];
+  UINavigationController *navigationController  = 
+  [[UINavigationController alloc] initWithRootViewController:viewController];
+  
+  viewController.album = self.album;
+  [self.view.window bringSubviewToFront:self.view];
+  [[self parentViewController] presentModalViewController:navigationController animated:YES];
+	[viewController release];
+  [navigationController release];
+}
+
 
 #pragma mark -
 

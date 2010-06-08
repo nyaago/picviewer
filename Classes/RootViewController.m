@@ -456,6 +456,8 @@
   [[UINavigationController alloc] initWithRootViewController:viewController];
   [self.view.window bringSubviewToFront:self.view];
   [self presentModalViewController:navigationController animated:YES];
+  [viewController release];
+  [navigationController release];
 }
 
 

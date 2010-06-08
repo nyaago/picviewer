@@ -621,7 +621,9 @@
   if([album description]) {
 		[albumObject setValue:[album description] forKey:@"description"];
   }
-
+	[albumObject setValue:[album access] forKey:@"access"];
+  [albumObject setValue:[album photosUsed] forKey:@"photosUsed"];
+  
   // thumbnailのurl
   if([[[album mediaGroup] mediaThumbnails] count] > 0) {
     GDataMediaThumbnail *thumbnail = [[[album mediaGroup] mediaThumbnails]  
