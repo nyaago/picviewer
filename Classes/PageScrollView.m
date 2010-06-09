@@ -19,7 +19,7 @@
     self.bounces = NO;
     self.showsHorizontalScrollIndicator = NO;  
     self.showsVerticalScrollIndicator = NO;  
-    self.backgroundColor = UIColor.blackColor;
+    self.backgroundColor = [UIColor blackColor];
   }
   return self;
 }
@@ -47,9 +47,10 @@
 - (void)setCurPage:(UIViewController *)newView withPageNumber:(NSUInteger)n {
   curPageNumber = n;
   NSUInteger left = curPageNumber == 0 ? 0 : self.frame.size.width;
-  CGRect pageRegion = CGRectMake(left, self.frame.origin.y, 
+  left += 2.0f;
+  CGRect pageRegion = CGRectMake(left, 0.0f, 
                                  self.frame.size.width, 
-                                 self.frame.size.height);
+                                 self.frame.size.height - 4.0f);
   newView.view.frame = pageRegion;
   if(curPage) {
     NSLog(@"curPage retain %d,and release", [curPage retainCount]);
@@ -65,9 +66,10 @@
 
 - (void)setNextPage:(UIViewController *)newView {
   NSUInteger left = 
-  	curPageNumber == 0 ? self.frame.size.width : self.frame.size.width * 2;
-  CGRect pageRegion = CGRectMake(left, self.frame.origin.y, 
-                                 self.frame.size.width, 
+  	curPageNumber == 0 ? self.frame.size.width : self.frame.size.width * 2 ;
+  left += 2.0f;
+  CGRect pageRegion = CGRectMake(left, 0.0f, 
+                                 self.frame.size.width - 4.0f, 
                                  self.frame.size.height);
   if(nextPage) {
     [nextPage release];
@@ -80,9 +82,9 @@
 }
 
 - (void)setPrevPage:(UIViewController *)newView {
-  NSUInteger left =  0;
-  CGRect pageRegion = CGRectMake(left, self.frame.origin.y, 
-                                 self.frame.size.width, 
+  NSUInteger left =  0 + 2.0f;
+  CGRect pageRegion = CGRectMake(left, 0.0f, 
+                                 self.frame.size.width - 4.0f, 
                                  self.frame.size.height);
   if(prevPage) {
     [prevPage release];

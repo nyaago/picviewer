@@ -115,6 +115,8 @@ static NSLock *lockFetchedResultsController;
   scrollView.bounces = NO;
   scrollView.backgroundColor = [UIColor blackColor];
   scrollView.multipleTouchEnabled = YES;
+//	self.view  = scrollView;
+  self.view.backgroundColor = [UIColor blackColor];
   [self.view addSubview:scrollView];
   self.wantsFullScreenLayout = YES;
   // デバイス回転の管理
@@ -360,6 +362,9 @@ static NSLock *lockFetchedResultsController;
   }
   [lockFetchedResultsController unlock];
   imageView = [self photoImageAt:indexForPhoto];
+//  self.scrollView.contentOffset  = CGPointMake(0.0f, 
+//                                               (scrollView.bounds.size.height - 
+//                                               imageView.bounds.size.height) / 2);
   [self.scrollView addSubview:imageView];
   [downloader release];
   downloader = nil;
@@ -390,6 +395,7 @@ static NSLock *lockFetchedResultsController;
     float height = size.height * rate;
     rect = CGRectMake(0.0f, 
                       (viewRect.size.height - height) / 2, 
+//                      0.0f,
                       viewRect.size.width, 
                       height);
   }
@@ -448,6 +454,9 @@ static NSLock *lockFetchedResultsController;
    bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
    */
   scrollView.contentSize = imageView.frame.size;
+//  self.scrollView.contentOffset  = CGPointMake(0.0f, 
+//                                                (scrollView.bounds.size.height - 
+//                                                imageView.bounds.size.height) / 2);
   [self.scrollView addSubview:imageView];
   /*
    bounds = scrollView.frame;
@@ -568,6 +577,31 @@ static NSLock *lockFetchedResultsController;
 
 
 #pragma mark -
+
+/*!
+ @method scrollViewDidEndZooming:withView:atScale
+ @discussion Zooming時の通知。
+ imageViewの縦の配置調整を行う。
+ */
+- (void)scrollViewDidEndZooming:(UIScrollView *)zoomingScrollView 
+                       withView:(UIView *)view 
+                        atScale:(float)scale {
+  NSLog(@"scrollViewDidEndZooming:");
+  float rate = (zoomingScrollView.bounds.size.height / view.bounds.size.height);
+
+  
+  CGRect frame = view.frame;
+  if (scale > rate ) {	// imageViewがscrollViewより高い場合
+  	frame.origin.y = 0;	// 
+  }
+  else {								// センタリング
+    float height = view.frame.size.height * rate * scale;
+    frame.origin.y = (zoomingScrollView.frame.size.height - height) / 2;
+  }
+  view.frame = frame;
+  
+}
+
 
 
 @end

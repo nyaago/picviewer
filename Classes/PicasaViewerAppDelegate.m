@@ -24,7 +24,7 @@
   // Override point for customization after app launch    
   // xibを使わない..
   window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds] ];
-  
+  window.backgroundColor = UIColor.blackColor;
   //
   
   //

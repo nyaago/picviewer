@@ -171,6 +171,7 @@ withListViewController:(PhotoListViewController *)controller {
   self.scrollView.scrollEnabled = YES;
   self.scrollView.userInteractionEnabled = YES;
   self.scrollView.frame = self.view.bounds;
+  self.scrollView.backgroundColor = [UIColor blackColor];
   NSLog(@"load viee");
   if(thumbnails == nil) {
     thumbnails = [[NSMutableDictionary alloc] init];

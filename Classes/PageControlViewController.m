@@ -360,8 +360,11 @@
   
   // 表示/非表示の反転
   BOOL hidden = !self.navigationController.navigationBar.hidden;
-  self.navigationController.navigationBar.hidden = hidden;
   [[UIApplication sharedApplication] setStatusBarHidden:hidden animated:YES];
+  self.navigationController.navigationBar.hidden = hidden;
+  CGRect frame = self.navigationController.navigationBar.frame;
+  frame.origin.y = statusBarHeight;
+  self.navigationController.navigationBar.frame = frame;
   [self.navigationController setToolbarHidden:hidden];
   // View階層のConsole出力
   /*
