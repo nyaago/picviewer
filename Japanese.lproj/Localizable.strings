@@ -20,9 +20,16 @@
 
 // ボタンキャプション
 "Completed" = "完了";
+"Cancel" = "取消";
+"Email" = "EMailで送信";
+"SaveToLibrary" = "Photoライブラリへ保存";
+"OK" = "OK";
 
 // Album詳細
 "AlbumInfo.PhotosUsed" = "写真 %d 枚";
+
+// 写真View
+"Photo.Action" = "操作を選択してくだいさい";
 
 
 
@@ -34,6 +41,8 @@
 "ERROR_DOWNLOAD_THUMB" = "サムネイルダウンロード中にエラーが発生しました";
 "ERROR_DOWNLOAD_IMAGE" = "画像ダウンロード中にエラーが発生しました";
 "ERROR_AUTH" = "認証エラーです。ユーザID、パスワードを確認してください";
+"Error.EMail" = "EMailの送信に失敗しました";
+"Error.SaveToLibrary" = "Photoライブラリーへの保存に失敗しました";
 
 
 "WARN_NO_USER" = "ユーザがみつかりません.";

@@ -10,6 +10,7 @@
 #import "Photo.h"
 #import "PhotoImage.h"
 #import "PhotoInfoViewController.h"
+#import "PhotoActionDelegate.h"
 
 @interface PhotoViewController(Private)
 
@@ -600,7 +601,30 @@ static NSLock *lockFetchedResultsController;
 }
 
 
+/*!
+ @method doAction:
+ @discssion Actionボタンのアクション.写真情報表示Viewを表示する.
+ */
+- (void) doAction:(PageControlViewController *)pageController  {
+//  UIActionSheet *actionSheet
+  // 送信方法を選択するシートを表示. 選択時の処理は、Delegateに委譲
+  Photo *photo = [self photoAt:indexForPhoto];
+  PhotoActionDelegate *delegate = [[PhotoActionDelegate alloc] initWithPhotoObject:photo 
+                                                          withParentViewController:self];
+  UIActionSheet *sheet = [[UIActionSheet alloc] 
+                          initWithTitle:NSLocalizedString(@"Photo.Action",@"Select!") 
+                          delegate:delegate 
+                          cancelButtonTitle:NSLocalizedString(@"Cancel",@"Cancel") 
+                          destructiveButtonTitle:nil
+                          otherButtonTitles:NSLocalizedString(@"Email",@"by email"),
+                          NSLocalizedString(@"SaveToLibrary",@"to album"),
+                          nil];
+  [sheet showInView:pageController.view];                        
+}
+
 #pragma mark -
+
+#pragma mark UIScrollViewDelegate
 
 /*!
  @method scrollViewDidEndZooming:withView:atScale
@@ -625,6 +649,7 @@ static NSLock *lockFetchedResultsController;
   view.frame = frame;
   
 }
+
 
 
 

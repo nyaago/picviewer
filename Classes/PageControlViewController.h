@@ -259,6 +259,12 @@
  */
 - (void) viewInfoAction:(PageControlViewController *)sender;
 
+/*!
+ @method viewInfoAction:
+ @discussion Actionボタンのアクション
+ */
+- (void) doAction:(PageControlViewController *)sender;
+
 @end
 
 

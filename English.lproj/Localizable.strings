@@ -20,10 +20,18 @@
 "CAPTION_PASSWORD" = "PASSWORD";
 
 // Caption For BUtton
-"Completed" = "完了";
+"Completed" = "Completed";
+"Cancel" = "Cancel";
+"Email" = "Send By EMail";
+"SaveToLibrary" = "Save To Photo Library";
+"OK" = "OK";
+
 
 // Album DETAIL
 "AlbumInfo.PhotosUsed" = "Photo Count - %d";
+
+// 写真View
+"Photo.Action" = "Select The Action";
 
 
 "ERROR_DELETE" = "An error occured in deleting the entry";
@@ -34,6 +42,8 @@
 "ERROR_DOWNLOAD_THUMB" = "An error occured in downloding thumbnails";
 "ERROR_DOWNLOAD_IMAGE" = "An error occured in downloding images";
 "ERROR_AUTH" = "Authorization was failed.";
+"Error.EMail" = "An error occured in sending email.";
+"Error.SaveToLibrary" = "An error occured in saving to photo library.";
 
  
 "WARN_NO_USER" = "The user not found.";

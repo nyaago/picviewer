@@ -26,6 +26,8 @@
 		7251549011851B2A00B136DF /* QueuedURLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 7251548F11851B2A00B136DF /* QueuedURLDownloader.m */; };
 		72582A841189B7B200A8A6FC /* PhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72582A821189B7B200A8A6FC /* PhotoViewController.m */; };
 		72582A851189B7B200A8A6FC /* PhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72582A831189B7B200A8A6FC /* PhotoViewController.xib */; };
+		728A5BC211C0C2790058811E /* PhotoActionDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 728A5BC111C0C2790058811E /* PhotoActionDelegate.m */; };
+		728A5BE711C0D4CF0058811E /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 728A5BE611C0D4CF0058811E /* MessageUI.framework */; };
 		72A7A5C511A11B39001E0080 /* arrowleft.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A7A5C211A11B39001E0080 /* arrowleft.png */; };
 		72A7A5C611A11B39001E0080 /* arrowright.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A7A5C311A11B39001E0080 /* arrowright.png */; };
 		72A7A5C711A11B39001E0080 /* newspaper.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A7A5C411A11B39001E0080 /* newspaper.png */; };
@@ -110,6 +112,9 @@
 		72582A811189B7B200A8A6FC /* PhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoViewController.h; sourceTree = "<group>"; };
 		72582A821189B7B200A8A6FC /* PhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoViewController.m; sourceTree = "<group>"; };
 		72582A831189B7B200A8A6FC /* PhotoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhotoViewController.xib; sourceTree = "<group>"; };
+		728A5BC011C0C2790058811E /* PhotoActionDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoActionDelegate.h; sourceTree = "<group>"; };
+		728A5BC111C0C2790058811E /* PhotoActionDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoActionDelegate.m; sourceTree = "<group>"; };
+		728A5BE611C0D4CF0058811E /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		72A7A5C211A11B39001E0080 /* arrowleft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = arrowleft.png; path = Resources/arrowleft.png; sourceTree = "<group>"; };
 		72A7A5C311A11B39001E0080 /* arrowright.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = arrowright.png; path = Resources/arrowright.png; sourceTree = "<group>"; wrapsLines = 0; };
 		72A7A5C411A11B39001E0080 /* newspaper.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = newspaper.png; path = Resources/newspaper.png; sourceTree = "<group>"; };
@@ -157,6 +162,7 @@
 				28860BE50F44EE6400985440 /* CoreData.framework in Frameworks */,
 				7234EA44117E820800D7AC45 /* libGDataTouchStaticLib.a in Frameworks */,
 				72FA3CB4117E9F4300AB7B1C /* libxml2.2.7.3.dylib in Frameworks */,
+				728A5BE711C0D4CF0058811E /* MessageUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -194,6 +200,8 @@
 				72FFBD1411ABA46700E16BA4 /* AlbumInfoViewController.m */,
 				72D7E7CD11BF5643001685AF /* PhotoInfoViewController.h */,
 				72D7E7CE11BF5643001685AF /* PhotoInfoViewController.m */,
+				728A5BC011C0C2790058811E /* PhotoActionDelegate.h */,
+				728A5BC111C0C2790058811E /* PhotoActionDelegate.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -257,6 +265,7 @@
 				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
 				28860BE40F44EE6400985440 /* CoreData.framework */,
 				72FA3CB3117E9F4300AB7B1C /* libxml2.2.7.3.dylib */,
+				728A5BE611C0D4CF0058811E /* MessageUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -438,6 +447,7 @@
 				721C21D711A3762400D05256 /* SettingsManager.m in Sources */,
 				72FFBD1611ABA46700E16BA4 /* AlbumInfoViewController.m in Sources */,
 				72D7E7D011BF5643001685AF /* PhotoInfoViewController.m in Sources */,
+				728A5BC211C0C2790058811E /* PhotoActionDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

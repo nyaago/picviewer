@@ -17,6 +17,21 @@
  */
 - (void)setToolbarStatus;
 
+/*!
+ @method doAction:
+ @discussion 情報ボタンを押したさいのAction
+ Delegate Methodへの委譲を行う.
+ */
+- (void)infoAction:(id)sender;
+
+/*!
+ @method doAction:
+ @discussion actionボタンを押したさいのAction
+ Delegate Methodへの委譲を行う.
+ */
+- (void)doAction:(id)sender;
+
+
 @end
 
 /*!
@@ -428,6 +443,14 @@
   }
 }
 
+- (void)doAction:(id)sender {
+  PageScrollView *scrollView = (PageScrollView *)self.view;
+  if([scrollView.curPage respondsToSelector:@selector(doAction:)]) {
+    [scrollView.curPage doAction:self];
+  }
+}
+
+
 #pragma mark Private Method
 
 - (void)resetScrollOffsetAndInset:(id)arg {
@@ -470,7 +493,7 @@
     UIBarButtonItem *action
     = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction
                                                     target:self
-                                                    action:nil];
+                                                    action:@selector(doAction:)];
     [toolbarButtons addObject:action];
     [action release];
 
