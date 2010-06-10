@@ -148,18 +148,19 @@
                                                   objectAtIndex:0];
   if([sectionInfo numberOfObjects] == 0) {
     //if([[fetchedAlbumsController sections] count] == 0) {
-    SettingsManager *settings = [[SettingsManager alloc] init];
+    // clear fetchedController
     [fetchedAlbumsController release];
     fetchedAlbumsController = nil;
+    // reload
+    SettingsManager *settings = [[SettingsManager alloc] init];
     picasaFetchController = [[PicasaFetchController alloc] init];
     picasaFetchController.delegate = self;
     picasaFetchController.userId = settings.userId;
     picasaFetchController.password = settings.password;
-    [settings release];
     [picasaFetchController queryUserAndAlbums:self.user.userId];
     downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:3];
     downloader.delegate = self;
-    
+    [settings release];
   }
 }
 
@@ -619,7 +620,7 @@
   [albumObject setValue:[[album title] contentStringValue] forKey:@"title"];
   [albumObject setValue:[[album timestamp] dateValue] forKey:@"timeStamp"];
   if([album description]) {
-		[albumObject setValue:[album description] forKey:@"description"];
+		[albumObject setValue:[album description] forKey:@"descript"];
   }
 	[albumObject setValue:[album access] forKey:@"access"];
   [albumObject setValue:[album photosUsed] forKey:@"photosUsed"];
@@ -799,18 +800,20 @@
 
 - (void) refreshAlbums {
   // Album一覧のロード処理を起動
+  // clear fetchedController
   [fetchedAlbumsController release];
   fetchedAlbumsController = nil;
+  // clear fetchedController
   SettingsManager *settings = [[SettingsManager alloc] init];
   picasaFetchController = [[PicasaFetchController alloc] init];
   picasaFetchController.delegate = self;
   picasaFetchController.userId = settings.userId;
   picasaFetchController.password = settings.password;
-  [settings release];
   [picasaFetchController queryUserAndAlbums:self.user.userId];
   // Downloaderの準備
   downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:3];
   downloader.delegate = self;
+  [settings release];
 }
 
 
@@ -827,21 +830,20 @@
 }
 
 - (NSArray *) toolbarButtons {
-  NSString *path;
+  //NSString *path;
   
   if(!toolbarButtons) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     toolbarButtons = [[NSMutableArray alloc] init];
-    // Info
-    UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
-                                                             style:UIBarButtonItemStyleBordered 
-                                                            target:self
-                                                            action:nil];
-    path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
-    info.image = [[UIImage alloc] initWithContentsOfFile:path];
-    [toolbarButtons addObject:info];
-    [info release];
+    // Refresh
+    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] 
+                                initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                                target:self
+                                action:@selector(refreshAction:)];
+    [toolbarButtons addObject:refresh];
+    [refresh release];
+    
     
     // Space
     UIBarButtonItem *spaceRight
@@ -852,15 +854,17 @@
     spaceRight.width = 30.0f;
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
-    
-    // Refresh
-    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] 
-                                initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
-                                target:self
-                                action:@selector(refreshAction:)];
-    [toolbarButtons addObject:refresh];
-    [refresh release];
-    
+  	/*  
+     // Info
+     UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
+     style:UIBarButtonItemStyleBordered 
+     target:self
+     action:nil];
+     path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
+    info.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:info];
+    [info release];
+    */
     [pool drain];
   }
   return toolbarButtons;
@@ -974,6 +978,19 @@
 
 
 #pragma mark -
+
+- (void)setUser:(User *)newUser {
+
+  if(user != newUser) {
+	  user = newUser;
+    [user retain];
+  }
+  SettingsManager *settings = [[SettingsManager alloc] init];
+  [settings setCurrentUser:user.userId];
+  [settings release];
+  
+}
+
 
 @end
 

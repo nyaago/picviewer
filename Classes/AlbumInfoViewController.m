@@ -145,7 +145,7 @@
             cell.textLabel.text = self.album.title;
             break;
           case(1) :
-            cell.textLabel.text = self.album.access;
+            cell.textLabel.text = NSLocalizedString(self.album.access, @"?");
             break;
           case(2) :
             fmt = NSLocalizedString(@"AlbumInfo.PhotosUsed", @"cnt");

@@ -13,6 +13,7 @@
 #import "GDataPhotos.h"
 #import "User.h"
 #import "Album.h"
+#import "SettingsManager.h"
 
 @interface RootViewController(Private)
 
@@ -31,6 +32,9 @@
  */
 - (User *)insertNewUser:(NSString *)user;
 
+
+- (User *)userWithUserId:(NSString *)uid;
+
 @end
 
 
@@ -44,7 +48,7 @@
 // Navigation Bar のボタンの追加とUserデータのFetched Controllerの生成.
 - (void)viewDidLoad {
   [super viewDidLoad];
-  self.view.backgroundColor = [UIColor blackColor];
+//  self.view.backgroundColor = [UIColor blackColor];
   // Set up the edit and add buttons.
   self.navigationItem.leftBarButtonItem = self.editButtonItem;
   self.navigationItem.rightBarButtonItem = [self addButton];
@@ -61,6 +65,25 @@
     [alertView show];
     [alertView release];
   }
+  SettingsManager *settings = [[SettingsManager alloc] init];
+  NSString *userId = [settings currentUser];
+  if(userId) {
+    //	  User *user = [self selectUser:userId];
+    User *user = [self userWithUserId:userId];
+    AlbumTableViewController *albumViewController = 
+    [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" bundle:nil];
+    //  AlbumTableViewController *albumViewController = 
+    //  [[AlbumTableViewController alloc] init];
+    self.navigationItem.backBarButtonItem =  [albumViewController backButton];
+    albumViewController.managedObjectContext = self.managedObjectContext;
+    albumViewController.user = user;
+    // Pass the selected object to the new view controller.
+    [self.navigationController pushViewController:albumViewController animated:YES];
+    [albumViewController release];
+    
+  }
+  [settings setCurrentUser:nil];
+  [settings release];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -68,6 +91,7 @@
   self.toolbarItems = [self toolbarButtons];
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbarHidden = NO; 
+  
 }
 
 
@@ -88,6 +112,10 @@
 - (void)viewDidUnload {
   // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
   // For example: self.myOutlet = nil;
+  SettingsManager *settings = [[SettingsManager alloc] init];
+  [settings setCurrentUser:nil];
+  [settings release];
+
 }
 
 /*
@@ -304,6 +332,28 @@
  */
 
 
+
+- (User *)userWithUserId:(NSString *)uid {
+  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedUsersController sections] 
+                                                  objectAtIndex:0];
+  NSInteger n =  [sectionInfo numberOfObjects];
+
+  NSUInteger indexes[2];
+  indexes[0] = 0;
+  indexes[1] = 0;
+  for(int i = 0; i < n; ++i) {
+    indexes[1] = i;
+    NSManagedObject *object = [fetchedUsersController objectAtIndexPath:[NSIndexPath 
+                                                                          indexPathWithIndexes:indexes length:2]];
+    User *user = (User *)object;
+    if([user.userId isEqual:uid] ) {
+      return user;
+    }
+    return nil;
+  }    
+}
+
+
 #pragma mark -
 #pragma mark Memory management
 
@@ -472,6 +522,7 @@
     
     toolbarButtons = [[NSMutableArray alloc] init];
     // Info
+    /*
     UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
                                                              style:UIBarButtonItemStyleBordered 
                                                             target:self
@@ -480,7 +531,7 @@
     info.image = [[UIImage alloc] initWithContentsOfFile:path];
     [toolbarButtons addObject:info];
     [info release];
-    
+    */
     // Space
     UIBarButtonItem *spaceRight = [[UIBarButtonItem alloc] 
                                    initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace

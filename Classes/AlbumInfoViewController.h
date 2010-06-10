@@ -9,6 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "Album.h"
 
+/*!
+ @class AlbumInfoViewController
+ @discussion アルバムの情報を表示するViewのController
+ */
 @interface AlbumInfoViewController : UITableViewController {
 	Album *album;
 }

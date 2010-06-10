@@ -50,4 +50,30 @@
  */
 - (NSString *) password;
 
+
+/*!
+ @method setCurrentUser:
+ @discussion 現在表示対象になっているユーザを設定
+ */
+- (void) setCurrentUser:(NSString *)user;
+
+/*!
+ @method currentUser
+ @discussion 現在表示対象になっているユーザを返す
+ */
+- (NSString *)currentUser;
+
+
+/*!
+ @method setCurrentAlbum:
+ @discussion 現在表示対象になっているアルバムを設定
+ */
+- (void) setCurrentAlbum:(NSString *)albumId;
+
+/*!
+ @method currentUser
+ @discussion 現在表示対象になっているアルバムを返す
+ */
+- (NSString *)currentAlbum;
+
 @end

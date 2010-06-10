@@ -19,7 +19,7 @@
 @property (retain) NSString *urlForThumbnail;
 @property (retain) NSString *access;
 @property (retain) NSDate *timeStamp;
-@property (retain) NSString *description;
+@property (retain) NSString *descript;
 @property (nonatomic, retain) NSData *thumbnail;
 @property (nonatomic, retain) NSNumber *photosUsed;
 

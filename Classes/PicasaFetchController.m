@@ -232,7 +232,7 @@
   else if([error code] == 403) { // 認証エラー
     if( delegate && 
        [delegate respondsToSelector:@selector(PicasaFetchWasAuthError:)] ) {
-      [delegate PicasaFetchWasError:error];
+      [delegate PicasaFetchWasAuthError:error];
     }
   }
   else {

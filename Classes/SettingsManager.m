@@ -44,6 +44,24 @@
 }
 
 
+- (void) setCurrentUser:(NSString *)user {
+  [self setObject:user forKey:@"currentUser"];
+}
+
+- (NSString *)currentUser {
+ return [self stringForKey:@"currentUser" withDefault:nil];
+}
+
+- (void) setCurrentAlbum:(NSString *)albumId {
+  [self setObject:albumId forKey:@"currentAlbum"];
+}
+
+- (NSString *)currentAlbum {
+ return  [self stringForKey:@"currentAlbum" withDefault:nil];
+}
+
+
+
 #pragma mark Private
 
 - (NSString *)stringForKey:(NSString *)key withDefault:(NSString *)defaultValue {

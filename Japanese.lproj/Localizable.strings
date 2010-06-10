@@ -38,3 +38,9 @@
 
 "WARN_NO_USER" = "ユーザがみつかりません.";
 "WARN_NO_ALBUM" = "アルバムがみつかりません.";
+
+
+"Width" = "幅";
+"Height" = "高さ";
+"public" = "公開";
+"private" = "非公開";

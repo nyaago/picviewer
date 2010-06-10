@@ -23,7 +23,7 @@
 "Completed" = "完了";
 
 // Album DETAIL
-"AlbumInfo.PhotosUsed" = "PHOTO %d";
+"AlbumInfo.PhotosUsed" = "Photo Count - %d";
 
 
 "ERROR_DELETE" = "An error occured in deleting the entry";
@@ -38,5 +38,11 @@
  
 "WARN_NO_USER" = "The user not found.";
 "WARN_NO_ALBUM" = "The album not found.";
+
+
+"Width" = "Width";
+"Height" = "Height";
+"Public" = "Public";
+"Private" = "Private";
 
 

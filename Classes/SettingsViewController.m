@@ -152,17 +152,18 @@
             break;
           case (1):
             cell.textLabel.text = NSLocalizedString(@"CAPTION_PASSWORD",@"Password");
-            frame =  CGRectMake(120.0f, 1.0f, 
+            frame =  CGRectMake(120.0f, 10.0f, 
                                 cell.frame.size.width - 120.0f , 
                                 cell.frame.size.height - 20.0f);
             passwordTextField = [[UITextField alloc] initWithFrame:frame];
+            [passwordTextField setSecureTextEntry:YES];
             [passwordTextField addTarget:self 
                          action:@selector(passwordDidEndEditing:) 
                forControlEvents:UIControlEventEditingDidEndOnExit];
             passwordTextField.text = settings.password;
             [cell addSubview:passwordTextField];
             break;
-        }
+       }
     }
   }
   

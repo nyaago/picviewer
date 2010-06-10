@@ -37,6 +37,8 @@
 		72D577881180357300F687DB /* PicasaFetchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577871180357300F687DB /* PicasaFetchController.m */; };
 		72D577E811804AAE00F687DB /* NewUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577E611804AAE00F687DB /* NewUserViewController.m */; };
 		72D577E911804AAE00F687DB /* NewUserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D577E711804AAE00F687DB /* NewUserViewController.xib */; };
+		72D7E7D011BF5643001685AF /* PhotoInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D7E7CE11BF5643001685AF /* PhotoInfoViewController.m */; };
+		72D7E7D111BF5643001685AF /* PhotoInfoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D7E7CF11BF5643001685AF /* PhotoInfoViewController.xib */; };
 		72EA5A571181337800065915 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72EA5A561181337800065915 /* Localizable.strings */; };
 		72EA5A9E1181408700065915 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5A9D1181408700065915 /* User.m */; };
 		72EA5AA11181409300065915 /* Album.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5AA01181409300065915 /* Album.m */; };
@@ -124,6 +126,9 @@
 		72D577E511804AAE00F687DB /* NewUserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewUserViewController.h; sourceTree = "<group>"; };
 		72D577E611804AAE00F687DB /* NewUserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewUserViewController.m; sourceTree = "<group>"; };
 		72D577E711804AAE00F687DB /* NewUserViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NewUserViewController.xib; sourceTree = "<group>"; };
+		72D7E7CD11BF5643001685AF /* PhotoInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoInfoViewController.h; sourceTree = "<group>"; };
+		72D7E7CE11BF5643001685AF /* PhotoInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoInfoViewController.m; sourceTree = "<group>"; };
+		72D7E7CF11BF5643001685AF /* PhotoInfoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhotoInfoViewController.xib; sourceTree = "<group>"; };
 		72EA5A541181337000065915 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		72EA5A581181338900065915 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/Localizable.strings; sourceTree = "<group>"; };
 		72EA5A9C1181408700065915 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
@@ -187,6 +192,8 @@
 				721C21D611A3762400D05256 /* SettingsManager.m */,
 				72FFBD1311ABA46700E16BA4 /* AlbumInfoViewController.h */,
 				72FFBD1411ABA46700E16BA4 /* AlbumInfoViewController.m */,
+				72D7E7CD11BF5643001685AF /* PhotoInfoViewController.h */,
+				72D7E7CE11BF5643001685AF /* PhotoInfoViewController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -224,6 +231,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72D7E7CF11BF5643001685AF /* PhotoInfoViewController.xib */,
 				72FFBD1511ABA46700E16BA4 /* AlbumInfoViewController.xib */,
 				721C217511A2C85700D05256 /* SettingsViewController.xib */,
 				72A7A85F11A14267001E0080 /* preferences.png */,
@@ -397,6 +405,7 @@
 				72A7A86011A14267001E0080 /* preferences.png in Resources */,
 				721C217711A2C85700D05256 /* SettingsViewController.xib in Resources */,
 				72FFBD1711ABA46700E16BA4 /* AlbumInfoViewController.xib in Resources */,
+				72D7E7D111BF5643001685AF /* PhotoInfoViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -428,6 +437,7 @@
 				721C217611A2C85700D05256 /* SettingsViewController.m in Sources */,
 				721C21D711A3762400D05256 /* SettingsManager.m in Sources */,
 				72FFBD1611ABA46700E16BA4 /* AlbumInfoViewController.m in Sources */,
+				72D7E7D011BF5643001685AF /* PhotoInfoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -486,7 +496,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
 				OTHER_LDFLAGS = "-all_load";
 				PREBINDING = NO;
-				SDKROOT = iphoneos3.2;
+				SDKROOT = iphoneos3.1.3;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
 			};
@@ -503,9 +513,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
 				OTHER_LDFLAGS = "-all_load";
 				PREBINDING = NO;
-				SDKROOT = iphonesimulator3.2;
+				SDKROOT = iphoneos3.1.3;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
 			};

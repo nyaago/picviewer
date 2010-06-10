@@ -250,6 +250,15 @@
  
  */
 - (void) setPageController:(PageControlViewController *)controller;
+
+@optional
+
+/*!
+	@method viewInfoAction:
+ 	@discussion 情報表示のボタンのアクション
+ */
+- (void) viewInfoAction:(PageControlViewController *)sender;
+
 @end
 
 

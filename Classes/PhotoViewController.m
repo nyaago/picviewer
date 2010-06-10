@@ -9,6 +9,7 @@
 #import "PhotoViewController.h"
 #import "Photo.h"
 #import "PhotoImage.h"
+#import "PhotoInfoViewController.h"
 
 @interface PhotoViewController(Private)
 
@@ -519,8 +520,12 @@ static NSLock *lockFetchedResultsController;
   return self.imageView;
 }
 
-#pragma mark -
+#pragma mark ScrolledPageViewDelegate protocol
 
+/*!
+ @method pageDidAddWithPageScrollViewController:withOrientation
+ @discussion このViewがPagingScrollViewに追加されたときの通知
+ */
 - (void)pageDidAddWithPageScrollViewController:(PageControlViewController *)controller 
                                withOrientation:(UIDeviceOrientation)orientation{
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -573,6 +578,25 @@ static NSLock *lockFetchedResultsController;
   }
   pageController = controller;
   [pageController retain];
+}
+
+/*!
+ @method viewInfoAction:
+ @discssion 情報表示ボタンのアクション.写真情報表示Viewを表示する.
+ */
+- (void) viewInfoAction:(PageControlViewController *)pageController  {
+  PhotoInfoViewController *viewController = [[PhotoInfoViewController alloc]
+                                             initWithNibName:@"PhotoInfoViewController" 
+                                             bundle:nil];
+	Photo *photo = [self photoAt:indexForPhoto];
+  UINavigationController *navigationController  = 
+  [[UINavigationController alloc] initWithRootViewController:viewController];
+  
+  viewController.photo= photo;
+  [self.view.window bringSubviewToFront:pageController.view];
+  [[pageController parentViewController] presentModalViewController:navigationController animated:YES];
+	[viewController release];
+  [navigationController release];
 }
 
 

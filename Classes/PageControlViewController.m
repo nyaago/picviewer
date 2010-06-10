@@ -421,6 +421,13 @@
   [self setToolbarStatus];
 }
 
+- (void)infoAction:(id)sender {
+  PageScrollView *scrollView = (PageScrollView *)self.view;
+  if([scrollView.curPage respondsToSelector:@selector(viewInfoAction:)]) {
+    [scrollView.curPage viewInfoAction:self];
+  }
+}
+
 #pragma mark Private Method
 
 - (void)resetScrollOffsetAndInset:(id)arg {
@@ -517,7 +524,7 @@
     UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
                                                               style:UIBarButtonItemStyleBordered 
                                                              target:self
-                                                             action:nil];
+                                                             action:@selector(infoAction:)];
     path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
     info.image = [[UIImage alloc] initWithContentsOfFile:path];
     [toolbarButtons addObject:info];

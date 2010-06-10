@@ -72,5 +72,10 @@ QueuedURLDownloaderDelegate> {
  */
 - (NSArray *) toolbarButtons;
 
+/*!
+ @method setUser
+ @discussion 
+ */
+- (void)setUser:(User *)newUser;
 
 @end

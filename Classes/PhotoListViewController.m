@@ -12,6 +12,7 @@
 #import "Album.h"
 #import "PageControlViewController.h"
 #import "AlbumInfoViewController.h"
+#import "SettingsManager.h"
 
 @interface PhotoImageView : UIImageView
 {
@@ -229,12 +230,17 @@ withListViewController:(PhotoListViewController *)controller {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     [fetchedPhotosController release];
     fetchedPhotosController = nil;
+    SettingsManager *settings = [[SettingsManager alloc] init];
     picasaFetchController = [[PicasaFetchController alloc] init];
     picasaFetchController.delegate = self;
+    picasaFetchController.userId = settings.userId;
+    picasaFetchController.password = settings.password;
     [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
                                user:[self.album.user valueForKey:@"userId"] ];
+    
     downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
     downloader.delegate = self;
+    [settings release];
   }
   else {
   }
@@ -509,6 +515,7 @@ withListViewController:(PhotoListViewController *)controller {
   Photo *photoObject = [fetchedPhotosController 
                         objectAtIndexPath:[NSIndexPath 
                                            indexPathWithIndexes:indexes length:2]];
+  
   return photoObject;
 }
 
@@ -564,15 +571,14 @@ withListViewController:(PhotoListViewController *)controller {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     toolbarButtons = [[NSMutableArray alloc] init];
-    // Info
-    UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
-                                                             style:UIBarButtonItemStyleBordered 
-                                                            target:self
-                                                            action:@selector(infoAction:)];
-    path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
-    info.image = [[UIImage alloc] initWithContentsOfFile:path];
-    [toolbarButtons addObject:info];
-    [info release];
+    
+    // Refresh
+    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] 
+                                initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                                target:self
+                                action:@selector(refreshAction:)];
+    [toolbarButtons addObject:refresh];
+    [refresh release];
     
     // Space
     UIBarButtonItem *spaceRight
@@ -583,13 +589,16 @@ withListViewController:(PhotoListViewController *)controller {
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
     
-    // Setting
-    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] 
-                                 initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
-                                 target:self
-                                 action:@selector(refreshAction:)];
-    [toolbarButtons addObject:refresh];
-    [refresh release];
+    // Info
+    UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
+                                                             style:UIBarButtonItemStyleBordered 
+                                                            target:self
+                                                            action:@selector(infoAction:)];
+    path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
+    info.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:info];
+    [info release];
+    
     
     [pool drain];
   }
@@ -899,7 +908,7 @@ withListViewController:(PhotoListViewController *)controller {
 	  [photoObject setValue:[[photo geoLocation] coordinateString] forKey:@"location"];
   }
   if([photo description] ) {
-		[photoObject setValue:[photo description] forKey:@"description"];
+		[photoObject setValue:[photo description] forKey:@"descript"];
   }
   if([photo width] ) {
     [photoObject setValue:[photo width] forKey:@"width"];
@@ -1035,12 +1044,16 @@ withListViewController:(PhotoListViewController *)controller {
   [self removePhotos];
   //  NSArray *objects = [fetchedPhotosController fetchedObjects];
   // 再ロード
+  SettingsManager *settings = [[SettingsManager alloc] init];
   picasaFetchController = [[PicasaFetchController alloc] init];
   picasaFetchController.delegate = self;
+  picasaFetchController.userId = settings.userId;
+  picasaFetchController.password = settings.password;
   [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
                                         user:[self.album.user valueForKey:@"userId"] ];
   downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
   downloader.delegate = self;
+  [settings release];
   [pool drain];
   
 }
