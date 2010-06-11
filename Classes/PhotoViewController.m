@@ -117,7 +117,7 @@ static NSLock *lockFetchedResultsController;
   scrollView.bounces = NO;
   scrollView.backgroundColor = [UIColor blackColor];
   scrollView.multipleTouchEnabled = YES;
-//	self.view  = scrollView;
+//  self.view  = scrollView;
   self.view.backgroundColor = [UIColor blackColor];
   [self.view addSubview:scrollView];
   self.wantsFullScreenLayout = YES;
@@ -589,14 +589,14 @@ static NSLock *lockFetchedResultsController;
   PhotoInfoViewController *viewController = [[PhotoInfoViewController alloc]
                                              initWithNibName:@"PhotoInfoViewController" 
                                              bundle:nil];
-	Photo *photo = [self photoAt:indexForPhoto];
+  Photo *photo = [self photoAt:indexForPhoto];
   UINavigationController *navigationController  = 
   [[UINavigationController alloc] initWithRootViewController:viewController];
   
   viewController.photo= photo;
   [self.view.window bringSubviewToFront:pageController.view];
   [[pageController parentViewController] presentModalViewController:navigationController animated:YES];
-	[viewController release];
+  [viewController release];
   [navigationController release];
 }
 
@@ -609,8 +609,9 @@ static NSLock *lockFetchedResultsController;
 //  UIActionSheet *actionSheet
   // 送信方法を選択するシートを表示. 選択時の処理は、Delegateに委譲
   Photo *photo = [self photoAt:indexForPhoto];
-  PhotoActionDelegate *delegate = [[PhotoActionDelegate alloc] initWithPhotoObject:photo 
-                                                          withParentViewController:self];
+  PhotoActionDelegate *delegate = [[PhotoActionDelegate alloc] 
+                                   initWithPhotoObject:photo 
+                                   withParentViewController:pageController];
   UIActionSheet *sheet = [[UIActionSheet alloc] 
                           initWithTitle:NSLocalizedString(@"Photo.Action",@"Select!") 
                           delegate:delegate 
@@ -635,16 +636,20 @@ static NSLock *lockFetchedResultsController;
                        withView:(UIView *)view 
                         atScale:(float)scale {
   NSLog(@"scrollViewDidEndZooming:");
+  NSLog(@"view - w:h = %f:%f", view.bounds.size.width, view.bounds.size.height);
+  NSLog(@"scroll view - w:h = %f:%f", zoomingScrollView.bounds.size.width, 
+        zoomingScrollView.bounds.size.height);
+  NSLog(@"scale = %f", scale);
   float rate = (zoomingScrollView.bounds.size.height / view.bounds.size.height);
 
   
   CGRect frame = view.frame;
-  if (scale > rate ) {	// imageViewがscrollViewより高い場合
-  	frame.origin.y = 0;	// 
+  if (scale > rate ) {  // imageViewがscrollViewより高い場合
+//    frame.origin.y = 0;  // 
   }
-  else {								// センタリング
-    float height = view.frame.size.height * rate * scale;
-    frame.origin.y = (zoomingScrollView.frame.size.height - height) / 2;
+  else {                // センタリング
+    float height = view.bounds.size.height * scale;
+//    frame.origin.y = (zoomingScrollView.bounds.size.height - height) / 2;
   }
   view.frame = frame;
   
