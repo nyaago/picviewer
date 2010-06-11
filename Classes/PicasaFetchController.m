@@ -70,7 +70,7 @@
   [service release];
 }
 
-- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)userId {
+- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)targetUserId {
   completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   
@@ -78,7 +78,7 @@
   if(userId && password) {
 	  [service setUserCredentialsWithUsername:userId password:password];
   }
-  NSURL *feedURL = [GDataServiceGooglePhotos photoFeedURLForUserID:userId
+  NSURL *feedURL = [GDataServiceGooglePhotos photoFeedURLForUserID:targetUserId
                                                            albumID:albumId
                                                          albumName:nil
                                                            photoID:nil
@@ -96,7 +96,8 @@
   
 }
 
-- (void) queryPhoto:(NSString *)photo album:(NSString *)albumId user:(NSString *)userId {
+- (void) queryPhoto:(NSString *)photo album:(NSString *)albumId 
+               user:(NSString *)targetUserId {
   completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   
@@ -104,7 +105,7 @@
   if(userId && password) {
 	  [service setUserCredentialsWithUsername:userId password:password];
   }
-  NSURL *feedURL = [GDataServiceGooglePhotos photoFeedURLForUserID:userId
+  NSURL *feedURL = [GDataServiceGooglePhotos photoFeedURLForUserID:targetUserId
                                                            albumID:albumId
                                                          albumName:nil
                                                            photoID:photo

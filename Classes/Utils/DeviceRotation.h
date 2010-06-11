@@ -25,7 +25,7 @@
  @discussion デバイス回転の通知の管理
  */
 @interface DeviceRotation : NSObject {
-  id <DeviceRotationDelegate> delegate;
+  NSObject <DeviceRotationDelegate> *delegate;
   NSLock *lock;
 }
 

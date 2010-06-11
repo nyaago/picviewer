@@ -349,8 +349,8 @@
     if([user.userId isEqual:uid] ) {
       return user;
     }
-    return nil;
   }    
+  return nil;
 }
 
 

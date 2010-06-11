@@ -30,7 +30,7 @@
 
 @synthesize delegate;
 
-- (id) initWithDelegate:(id<DeviceRotationDelegate>)newDelegate {
+- (id) initWithDelegate:(NSObject<DeviceRotationDelegate> *)newDelegate {
   self = [super init];
   if(self) {
     delegate = newDelegate;

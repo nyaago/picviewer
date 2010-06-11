@@ -267,7 +267,7 @@ static NSLock *lockFetchedResultsController;
   [lockFetchedResultsController unlock];
   UIImage *image = nil;
   if(photoObject.photoImage) {
-    PhotoImage *photoImage = photoObject.photoImage;
+    PhotoImage *photoImage = (PhotoImage *)photoObject.photoImage;
     if(photoImage.image) {
       image  = [UIImage imageWithData:photoImage.image];
       imgView = [[UIImageView alloc] initWithImage:image];
@@ -587,7 +587,7 @@ static NSLock *lockFetchedResultsController;
  @method viewInfoAction:
  @discssion 情報表示ボタンのアクション.写真情報表示Viewを表示する.
  */
-- (void) viewInfoAction:(PageControlViewController *)pageController  {
+- (void) viewInfoAction:(PageControlViewController *)parentController  {
   PhotoInfoViewController *viewController = [[PhotoInfoViewController alloc]
                                              initWithNibName:@"PhotoInfoViewController" 
                                              bundle:nil];
@@ -596,8 +596,8 @@ static NSLock *lockFetchedResultsController;
   [[UINavigationController alloc] initWithRootViewController:viewController];
   
   viewController.photo= photo;
-  [self.view.window bringSubviewToFront:pageController.view];
-  [[pageController parentViewController] presentModalViewController:navigationController animated:YES];
+  [self.view.window bringSubviewToFront:parentController.view];
+  [[parentController parentViewController] presentModalViewController:navigationController animated:YES];
   [viewController release];
   [navigationController release];
 }
@@ -607,7 +607,7 @@ static NSLock *lockFetchedResultsController;
  @method doAction:
  @discssion Actionボタンのアクション.写真情報表示Viewを表示する.
  */
-- (void) doAction:(PageControlViewController *)pageController  {
+- (void) doAction:(PageControlViewController *)parentController  {
 //  UIActionSheet *actionSheet
   // 送信方法を選択するシートを表示. 選択時の処理は、Delegateに委譲
   Photo *photo = [self photoAt:indexForPhoto];
@@ -622,7 +622,7 @@ static NSLock *lockFetchedResultsController;
                           otherButtonTitles:NSLocalizedString(@"Email",@"by email"),
                           NSLocalizedString(@"SaveToLibrary",@"to album"),
                           nil];
-  [sheet showInView:pageController.view];                        
+  [sheet showInView:parentController.view];                        
 }
 
 #pragma mark -
@@ -634,6 +634,7 @@ static NSLock *lockFetchedResultsController;
  @discussion Zooming時の通知。
  imageViewの縦の配置調整を行う。
  */
+/*
 - (void)scrollViewDidEndZooming:(UIScrollView *)zoomingScrollView 
                        withView:(UIView *)view 
                         atScale:(float)scale {
@@ -656,7 +657,7 @@ static NSLock *lockFetchedResultsController;
   view.frame = frame;
   
 }
-
+*/
 
 #pragma mark statci Method
 

@@ -58,7 +58,7 @@
  @method PicasaFetchWasError:
  @discussion 認証、ユーザなし以外のエラーの場合の通知メソッド
  */
-- (void) PicasaFetchWasError:(NSError *)error;
+- (void) PicasaFetchWasAuthError:(NSError *)error;
 
 
 
