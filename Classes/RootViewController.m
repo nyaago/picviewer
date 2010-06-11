@@ -81,9 +81,10 @@
     // Pass the selected object to the new view controller.
     [self.navigationController pushViewController:albumViewController animated:YES];
     [albumViewController release];
-    
   }
-  [settings setCurrentUser:nil];
+  else {
+	  [settings setCurrentUser:nil];
+  }
   [settings release];
 }
 
