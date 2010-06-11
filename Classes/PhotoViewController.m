@@ -269,7 +269,8 @@ static NSLock *lockFetchedResultsController;
   UIImage *image = nil;
   if(photoObject.photoImage) {
     PhotoImage *photoImage = (PhotoImage *)photoObject.photoImage;
-    if(photoImage.image) {
+    if(photoImage.image && [photoImage.image length] > 0) {
+      NSLog(@"image length = %d", [photoImage.image length] );
       image  = [UIImage imageWithData:photoImage.image];
       imgView = [[UIImageView alloc] initWithImage:image];
       imgView.frame = [self viewFrameForImage:image];
