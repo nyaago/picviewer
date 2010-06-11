@@ -27,6 +27,7 @@ ScrolledPageViewDelegate> {
   UIScrollView    *scrollView;
   UIImageView	  *imageView;
   UIToolbar		  *toolbar;
+  UIBarButtonItem *backButton;
   
   // 表示する写真のfetchedPhotosController上のインデックス番号
   NSUInteger  indexForPhoto;
@@ -129,5 +130,11 @@ ScrolledPageViewDelegate> {
  @param index 表示する写真のfetchedPhotosController上のインデックス番号
  */
 - (void) setIndexForPhoto:(NSUInteger)index;
+
+/*!
+ @method backButton
+ @discussion 戻るボタンを返す
+ */
++ (UIBarButtonItem *)backButton;
 
 @end

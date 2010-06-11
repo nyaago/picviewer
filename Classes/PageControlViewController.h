@@ -211,6 +211,11 @@
  */
 - (NSUInteger) curPageNumber;
 
+/*!
+ @method pageCount
+ @discussion ページ数を返す
+ */
+- (NSUInteger) pageCount;
 
 
 @end

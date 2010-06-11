@@ -32,6 +32,12 @@
 - (void)doAction:(id)sender;
 
 
+/*!
+ @method setNavifationTitle
+ @discussion Navigation Bar のタイトル(現在ページ/ページ数)の設定
+ */
+- (void)setNavigationTitle;
+
 @end
 
 /*!
@@ -198,6 +204,7 @@
   [scrollView layoutViews];
   // Toolbarのボタンの状態設定
   [self setToolbarStatus];
+  [self setNavigationTitle];
   //  [scrollView toCurPage];
 }
 
@@ -418,6 +425,7 @@
   }
   [scrollView layoutViews];
   [self setToolbarStatus];
+  [self setNavigationTitle];
 }
 
 - (void)toPrevPage:(id)sender {
@@ -434,6 +442,7 @@
   }
   [scrollView layoutViews];
   [self setToolbarStatus];
+  [self setNavigationTitle];
 }
 
 - (void)infoAction:(id)sender {
@@ -481,6 +490,13 @@
     prevButton.enabled = NO;
   }
 }
+
+- (void)setNavigationTitle {
+  NSString *title = [NSString stringWithFormat:@"%d/%d", 
+                     self.curPageNumber + 1, [self pageCount]];
+  self.navigationItem.title = title;
+}
+
 
 - (NSArray *) toolbarButtons {
   NSString *path;
@@ -558,6 +574,8 @@
   return toolbarButtons;
 }
 
+#pragma mark -
+
 - (void) setCurPageNumber:(NSUInteger)n {
   PageScrollView *view = (PageScrollView *)self.view;
   view.curPageNumber = n;
@@ -567,6 +585,13 @@
 - (NSUInteger) curPageNumber {
   PageScrollView *view = (PageScrollView *)self.view;
 	return view.curPageNumber;
+}
+
+- (NSUInteger) pageCount {
+  if(self.source) {
+    return [source pageCount];
+  }
+  return 0;
 }
 
 

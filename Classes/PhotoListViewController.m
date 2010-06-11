@@ -867,6 +867,7 @@ withListViewController:(PhotoListViewController *)controller {
   if(index >= 0 && index < [self photoCount]) {
     PageControlViewController *pageController = 
     [[PageControlViewController alloc] init];
+    self.navigationItem.backBarButtonItem = [PhotoViewController backButton];
     NSLog(@"init PageControllerView retain count = %d",[pageController retainCount]);
     pageController.source = self;
     pageController.curPageNumber = index;
@@ -1173,7 +1174,6 @@ withListViewController:(PhotoListViewController *)controller {
 
 
 #pragma mark -
-
 - (NSUInteger) pageCount {
   id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedPhotosController sections]
                                                   objectAtIndex:0];

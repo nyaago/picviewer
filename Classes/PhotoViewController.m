@@ -37,6 +37,7 @@
  */
 - (CGRect) viewFrame:(UIDeviceOrientation)orientation;
 
+
 @end
 
 @interface PhotoScrollView : UIScrollView   
@@ -490,6 +491,7 @@ static NSLock *lockFetchedResultsController;
   [pool drain];
 }
 
+
 #pragma mark -
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -656,6 +658,17 @@ static NSLock *lockFetchedResultsController;
 }
 
 
+#pragma mark statci Method
+
++ (UIBarButtonItem *)backButton {
+  UIBarButtonItem *backButton = [[UIBarButtonItem alloc] 
+                  initWithTitle:NSLocalizedString(@"Photos", @"Photos")
+                  style:UIBarButtonItemStyleDone 
+                  target:nil
+                  action:nil ];
+	[backButton  autorelease];
+  return backButton;
+}
 
 
 @end
