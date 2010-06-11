@@ -5,18 +5,20 @@
    Created by nyaago on 10/04/23.
    Copyright 2010 __MyCompanyName__. All rights reserved.
  */
-"ERROR" = "エラー";
-"RESULT" = "結果";
+// Alert - Title
+"Error" = "エラー";
+"Result" = "結果";
 
-"ACCOUNTS" = "アカウント";
-"ALBUMS" = "アルバム";
-"PHOTOS" = "写真一覧";
-"SETTINGS" = "設定";
+// Navigation Bar - Title
+"Accounts" = "アカウント";
+"Albums" = "アルバム";
+"Photos" = "写真一覧";
+"Settings" = "設定";
 
 // 設定View
-"SECTION_ACCOUNT" = "アカウント";
-"CAPTION_USER" = "ユーザ名";
-"CAPTION_PASSWORD" = "パスワード";
+"Settings.Account" = "アカウント";
+"Settings.Account.User" = "ユーザ名";
+"Settings.Account.Password" = "パスワード";
 
 // ボタンキャプション
 "Completed" = "完了";
@@ -31,25 +33,26 @@
 // 写真View
 "Photo.Action" = "操作を選択してくだいさい";
 
-
-
-"ERROR_DELETE" = "削除中にエラーが発生しました";
-"ERROR_INSERT" = "追加中にエラーが発生しました";
-"ERROR_INSERT_THUMB" = "サムネイルのキャッシュ登録中にエラーが発生しました";
-"ERROR_FETCH" = "一覧取得中にエラーが発生しました";
-"ERROR_CON_SERVER" = "Googleへの接続中にエラーが発生しました";
-"ERROR_DOWNLOAD_THUMB" = "サムネイルダウンロード中にエラーが発生しました";
-"ERROR_DOWNLOAD_IMAGE" = "画像ダウンロード中にエラーが発生しました";
-"ERROR_AUTH" = "認証エラーです。ユーザID、パスワードを確認してください";
+// Error , Warning
+"Error.Delete" = "削除中にエラーが発生しました";
+"Error.Insert" = "追加中にエラーが発生しました";
+"Error.InsertThumb" = "サムネイルのキャッシュ登録中にエラーが発生しました";
+"Error.Fetch" = "一覧取得中にエラーが発生しました";
+"Error.ConnectionToServer" = "Googleへの接続中にエラーが発生しました";
+"Error.DownloadThumb" = "サムネイルダウンロード中にエラーが発生しました";
+"Error.DownloadImage" = "画像ダウンロード中にエラーが発生しました";
+"Error.Auth" = "認証エラーです。ユーザID、パスワードを確認してください";
 "Error.EMail" = "EMailの送信に失敗しました";
 "Error.SaveToLibrary" = "Photoライブラリーへの保存に失敗しました";
 
 
-"WARN_NO_USER" = "ユーザがみつかりません.";
-"WARN_NO_ALBUM" = "アルバムがみつかりません.";
+"Warn.NoUser" = "ユーザがみつかりません.";
+"Warn.NoAlbum" = "アルバムがみつかりません.";
 
-
+// General
 "Width" = "幅";
 "Height" = "高さ";
+
+// キーワードを置換
 "public" = "公開";
 "private" = "非公開";

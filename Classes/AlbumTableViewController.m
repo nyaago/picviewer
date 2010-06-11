@@ -133,8 +133,8 @@
   if (![[self fetchedAlbumsController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR","Error")
-                              message:NSLocalizedString(@"ERROR_FETCH", @"Error in ng")
+                              initWithTitle:NSLocalizedString(@"Error",@"Error")
+                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
                               delegate:nil
                               cancelButtonTitle:@"OK" 
                               otherButtonTitles:nil];
@@ -245,13 +245,13 @@
     if(hasErrorInInserting || hasErrorDeleting) {
       NSString *message = nil;
       if(hasErrorDeleting) {
-        message = NSLocalizedString(@"ERROR_DELETE", @"Error IN Deleting");
+        message = NSLocalizedString(@"Error.Delete", @"Error IN Deleting");
       }
       else {
-        message = NSLocalizedString(@"ERROR_INSERT", @"Error IN Saving");
+        message = NSLocalizedString(@"Error.Insert", @"Error IN Saving");
       }
       UIAlertView *alertView = [[UIAlertView alloc] 
-                                initWithTitle:NSLocalizedString(@"ERROR", @"Error")
+                                initWithTitle:NSLocalizedString(@"Error", @"Error")
                                 message:message
                                 delegate:self 
                                 cancelButtonTitle:@"OK" 
@@ -263,8 +263,8 @@
   if (![[self fetchedAlbumsController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR","Error")
-                              message:NSLocalizedString(@"ERROR_FETCH", @"Error in ng")
+                              initWithTitle:NSLocalizedString(@"Error","Error")
+                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
                               delegate:nil
                               cancelButtonTitle:@"OK" 
                               otherButtonTitles:nil];
@@ -291,8 +291,8 @@
 - (void) PicasaFetchWasAuthError:(NSError *)error {
   NSLog(@"auth error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSString *title = NSLocalizedString(@"ERROR","Error");
-  NSString *message = NSLocalizedString(@"ERROR_AUTH","AUTH ERROR");
+  NSString *title = NSLocalizedString(@"Error","Error");
+  NSString *message = NSLocalizedString(@"Error.Auth","AUTH ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -317,7 +317,7 @@
   NSLog(@"no user");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSString *title = NSLocalizedString(@"WARN","WARN");
-  NSString *message = NSLocalizedString(@"WARN_NO_USER","NO USER");
+  NSString *message = NSLocalizedString(@"Warn.NoUser","NO USER");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -341,8 +341,8 @@
 - (void) PicasaFetchWasError:(NSError *)error {
   NSLog(@"connection error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSString *title = NSLocalizedString(@"ERROR","Error");
-  NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Connection ERROR");
+  NSString *title = NSLocalizedString(@"Error","Error");
+  NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Connection ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -820,7 +820,7 @@
 - (UIBarButtonItem *)backButton {
   if(!backButton) {
     backButton = [[UIBarButtonItem alloc] 
-                  initWithTitle:NSLocalizedString(@"ACCOUNTS", @"Account")
+                  initWithTitle:NSLocalizedString(@"Accounts", @"Account")
                   style:UIBarButtonItemStyleDone 
                   target:nil
                   action:nil ];
@@ -904,8 +904,8 @@
 - (void)didAllCompleted {
   if(hasErrorInDownloading) {  // Thumbnail ダウンロードエラーがある場合.
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR", @"Error")
-                              message:NSLocalizedString(@"ERROR_DOWNLOAD_THUMB", 
+                              initWithTitle:NSLocalizedString(@"Error", @"Error")
+                              message:NSLocalizedString(@"Error.DownloadThumb", 
                                                         @"Error IN Downloading")
                               delegate:self 
                               cancelButtonTitle:@"OK" 
@@ -915,8 +915,8 @@
   }
   if(hasErrorInInsertingThumbnail) {  // Thumbnail 登録エラーがある場合.
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR", @"Error")
-                              message:NSLocalizedString(@"ERROR_INSERT_THUMB", 
+                              initWithTitle:NSLocalizedString(@"Error", @"Error")
+                              message:NSLocalizedString(@"Error.InsertThumb", 
                                                         @"Error IN Saving")
                               delegate:self 
                               cancelButtonTitle:@"OK" 

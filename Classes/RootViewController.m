@@ -57,8 +57,8 @@
   if (![[self fetchedUsersController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR","Error")
-                              message:NSLocalizedString(@"ERROR_FETCH", @"Error in ng")
+                              initWithTitle:NSLocalizedString(@"Error",@"Error")
+                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
                               delegate:nil
                               cancelButtonTitle:nil 
                               otherButtonTitles:@"OK"];
@@ -148,8 +148,8 @@
     // Error
     NSLog(@"Unresolved error %@", error);
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR","Error")
-                              message:NSLocalizedString(@"ERROR_INSERT", @"Error in adding")
+                              initWithTitle:NSLocalizedString(@"Error","Error")
+                              message:NSLocalizedString(@"Error.Insert", @"Error in adding")
                               delegate:nil
                               cancelButtonTitle:nil 
                               otherButtonTitles:@"OK"];
@@ -234,8 +234,8 @@
     if (![context save:&error]) {
       NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
       UIAlertView *alertView = [[UIAlertView alloc] 
-                                initWithTitle:NSLocalizedString(@"ERROR","Error")
-                                message:NSLocalizedString(@"ERROR_DELETE", @"Error in deleting")
+                                initWithTitle:NSLocalizedString(@"Error","Error")
+                                message:NSLocalizedString(@"Error.Delete", @"Error in deleting")
                                 delegate:nil
                                 cancelButtonTitle:nil 
                                 otherButtonTitles:@"OK"];
@@ -415,11 +415,11 @@
            finishedWithUserFeed:(GDataFeedPhotoUser *)feed
                           error:(NSError *)error {
   if(error) {
-    NSString *title = NSLocalizedString(@"ERROR","Error");
-    NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Error");
+    NSString *title = NSLocalizedString(@"Error","Error");
+    NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Error");
     if ([error code] == 404) {
-      title = NSLocalizedString(@"RESULT",@"Result");
-      message = NSLocalizedString(@"WARN_NO_USER", @"No user");
+      title = NSLocalizedString(@"Result",@"Result");
+      message = NSLocalizedString(@"Warn.NoUser", @"No user");
     }
     //	NSLog(@" error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
@@ -445,8 +445,8 @@
 - (void) PicasaFetchWasAuthError:(NSError *)error {
   NSLog(@"auth error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSString *title = NSLocalizedString(@"ERROR","Error");
-  NSString *message = NSLocalizedString(@"ERROR_AUTH","AUTH ERROR");
+  NSString *title = NSLocalizedString(@"Error","Error");
+  NSString *message = NSLocalizedString(@"Error.Auth","AUTH ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -464,7 +464,7 @@
   NSLog(@"no user");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSString *title = NSLocalizedString(@"WARN","WARN");
-  NSString *message = NSLocalizedString(@"WARN_NO_USER","NO USER");
+  NSString *message = NSLocalizedString(@"Warn.NoUser","NO USER");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -481,8 +481,8 @@
 - (void) PicasaFetchWasError:(NSError *)error {
   NSLog(@"connection error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSString *title = NSLocalizedString(@"ERROR","Error");
-  NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Connection ERROR");
+  NSString *title = NSLocalizedString(@"Error",@"Error");
+  NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Connection ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message

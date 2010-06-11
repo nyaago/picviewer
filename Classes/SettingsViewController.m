@@ -116,7 +116,7 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
   switch (section) {
     case(0) :
-      return NSLocalizedString(@"SECTION_ACCOUNT", @"Acount");
+      return NSLocalizedString(@"Settings.Account", @"Acount");
     default:
       return @"";
   }
@@ -139,7 +139,7 @@
       case(0) : // アカウントの設定
         switch ([indexPath indexAtPosition:1]) {
           case (0):
-            cell.textLabel.text = NSLocalizedString(@"CAPTION_USER",@"User");
+            cell.textLabel.text = NSLocalizedString(@"Settings.Account.User",@"User");
             frame =  CGRectMake(120.0f, 10.0f, 
                                 cell.frame.size.width - 120.0f , 
                                 cell.frame.size.height - 20.0f);
@@ -151,7 +151,7 @@
             [cell addSubview:userTextField];
             break;
           case (1):
-            cell.textLabel.text = NSLocalizedString(@"CAPTION_PASSWORD",@"Password");
+            cell.textLabel.text = NSLocalizedString(@"Settings.Account.Password",@"Password");
             frame =  CGRectMake(120.0f, 10.0f, 
                                 cell.frame.size.width - 120.0f , 
                                 cell.frame.size.height - 20.0f);
@@ -253,8 +253,8 @@
 - (void) PicasaFetchWasAuthError:(NSError *)error {
   NSLog(@"auth error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSString *title = NSLocalizedString(@"ERROR","Error");
-  NSString *message = NSLocalizedString(@"ERROR_AUTH","AUTH ERROR");
+  NSString *title = NSLocalizedString(@"Error",@"Error");
+  NSString *message = NSLocalizedString(@"Error.Auth",@"AUTH ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -272,7 +272,7 @@
   NSLog(@"no user");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSString *title = NSLocalizedString(@"WARN","WARN");
-  NSString *message = NSLocalizedString(@"WARN_NO_USER","NO USER");
+  NSString *message = NSLocalizedString(@"Warn.NoUser","NO USER");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -289,8 +289,8 @@
 - (void) PicasaFetchWasError:(NSError *)error {
   NSLog(@"connection error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSString *title = NSLocalizedString(@"ERROR","Error");
-  NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Connection ERROR");
+  NSString *title = NSLocalizedString(@"Error",@"Error");
+  NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Connection ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message

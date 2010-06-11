@@ -206,8 +206,8 @@ withListViewController:(PhotoListViewController *)controller {
   if (![[self fetchedPhotosController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR","Error")
-                              message:NSLocalizedString(@"ERROR_FETCH", @"Error in ng")
+                              initWithTitle:NSLocalizedString(@"Error",@"Error")
+                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
                               delegate:nil
                               cancelButtonTitle:@"OK" 
                               otherButtonTitles:nil];
@@ -621,11 +621,11 @@ withListViewController:(PhotoListViewController *)controller {
   BOOL hasErrorInInserting = NO;
   if(error) {
     // Error
-    NSString *title = NSLocalizedString(@"ERROR","Error");
-    NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Error");
+    NSString *title = NSLocalizedString(@"Error","Error");
+    NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Error");
     if ([error code] == 404) {   // ユーザがいない
-      title = NSLocalizedString(@"RESULT",@"Result");
-      message = NSLocalizedString(@"WARN_NO_ALBUM", @"No album");
+      title = NSLocalizedString(@"Result",@"Result");
+      message = NSLocalizedString(@"Warn.NoAlbum", @"No album");
     }
     //	NSLog(@" error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
@@ -662,8 +662,8 @@ withListViewController:(PhotoListViewController *)controller {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR","Error")
-                              message:NSLocalizedString(@"ERROR_FETCH", @"Error in ng")
+                              initWithTitle:NSLocalizedString(@"Error","Error")
+                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
                               delegate:nil
                               cancelButtonTitle:@"OK" 
                               otherButtonTitles:nil];
@@ -674,8 +674,8 @@ withListViewController:(PhotoListViewController *)controller {
   }
   if(hasErrorInInserting) {
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR", @"Error")
-                              message:NSLocalizedString(@"ERROR_INSERT", @"Error IN Saving")
+                              initWithTitle:NSLocalizedString(@"Error", @"Error")
+                              message:NSLocalizedString(@"Error.Insert", @"Error IN Saving")
                               delegate:self 
                               cancelButtonTitle:@"OK" 
                               otherButtonTitles:nil];
@@ -700,8 +700,8 @@ withListViewController:(PhotoListViewController *)controller {
 - (void) PicasaFetchWasAuthError:(NSError *)error {
   NSLog(@"auth error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSString *title = NSLocalizedString(@"ERROR","Error");
-  NSString *message = NSLocalizedString(@"ERROR_AUTH","AUTH ERROR");
+  NSString *title = NSLocalizedString(@"Error","Error");
+  NSString *message = NSLocalizedString(@"Error.Auth","AUTH ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -724,7 +724,7 @@ withListViewController:(PhotoListViewController *)controller {
   NSLog(@"no user");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSString *title = NSLocalizedString(@"WARN","WARN");
-  NSString *message = NSLocalizedString(@"WARN_NO_USER","NO USER");
+  NSString *message = NSLocalizedString(@"Warn.NoUser","NO USER");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -746,8 +746,8 @@ withListViewController:(PhotoListViewController *)controller {
 - (void) PicasaFetchWasError:(NSError *)error {
   NSLog(@"connection error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSString *title = NSLocalizedString(@"ERROR","Error");
-  NSString *message = NSLocalizedString(@"ERROR_CON_SERVER","Connection ERROR");
+  NSString *title = NSLocalizedString(@"Error","Error");
+  NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Connection ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -1025,7 +1025,7 @@ withListViewController:(PhotoListViewController *)controller {
 - (UIBarButtonItem *)backButton {
   if(!backButton) {
     backButton = [[UIBarButtonItem alloc] 
-                  initWithTitle:NSLocalizedString(@"ALBUMS", @"Albums")
+                  initWithTitle:NSLocalizedString(@"Albums", @"Albums")
                   style:UIBarButtonItemStyleDone 
                   target:nil
                   action:nil ];
@@ -1099,8 +1099,8 @@ withListViewController:(PhotoListViewController *)controller {
   //  [(UITableView *)self.view reloadData];
   if(hasErrorInDownloading) {  // Thumbnail ダウンロードエラーがある場合.
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR", @"Error")
-                              message:NSLocalizedString(@"ERROR_DOWNLOAD_THUMB", 
+                              initWithTitle:NSLocalizedString(@"Error", @"Error")
+                              message:NSLocalizedString(@"Error.DownloadThumb", 
                                                         @"Error IN Downloading")
                               delegate:self 
                               cancelButtonTitle:@"OK" 
@@ -1110,8 +1110,8 @@ withListViewController:(PhotoListViewController *)controller {
   }
   if(hasErrorInInsertingThumbnail) {  // Thumbnail 登録エラーがある場合.
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR", @"Error")
-                              message:NSLocalizedString(@"ERROR_INSERT_THUMB", 
+                              initWithTitle:NSLocalizedString(@"Error", @"Error")
+                              message:NSLocalizedString(@"Error.InsertThumb", 
                                                         @"Error IN Saving")
                               delegate:self 
                               cancelButtonTitle:@"OK" 

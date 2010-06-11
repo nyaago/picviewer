@@ -5,19 +5,20 @@
    Created by nyaago on 10/04/23.
    Copyright 2010 __MyCompanyName__. All rights reserved.
  */
+// Alert - Title
+"Error" = "Error";
+"Result" = "Result";
 
-"ERROR" = "Error";
-"RESULT" = "Result";
-
-"ACCOUNTS" = "Accounts";
-"ALBUMS" = "Albums";
-"PHOTOS" = "Photos";
-"SETTINGS" = "Settings";
+// Navigation Bar - Title
+"Accounts" = "Accounts";
+"Albums" = "Albums";
+"Photos" = "Photos";
+"Settings" = "Settings";
 
 // 設定View
-"SECTION_ACCOUNT" = "ACCOUNT";
-"CAPTION_USER" = "USER";
-"CAPTION_PASSWORD" = "PASSWORD";
+"Settings.Account" = "ACCOUNT";
+"Settings.Account.User" = "USER";
+"Settings.Account.Password" = "PASSWORD";
 
 // Caption For BUtton
 "Completed" = "Completed";
@@ -33,25 +34,26 @@
 // 写真View
 "Photo.Action" = "Select The Action";
 
-
-"ERROR_DELETE" = "An error occured in deleting the entry";
-"ERROR_INSERT" = "An error occured in addting the entry";
-"ERROR_INSERT_THUMB" = "An error occured in addting the thumbnail";
-"ERROR_FETCH" = "An error occured in fetching  entries";
-"ERROR_CON_SERVER" = "An error occured in connecting to google";
-"ERROR_DOWNLOAD_THUMB" = "An error occured in downloding thumbnails";
-"ERROR_DOWNLOAD_IMAGE" = "An error occured in downloding images";
-"ERROR_AUTH" = "Authorization was failed.";
+// Error , Warning
+"Error.Delete" = "An error occured in deleting the entry";
+"Error.Insert" = "An error occured in addting the entry";
+"Error.InsertThumb" = "An error occured in addting the thumbnail";
+"Error.Fetch" = "An error occured in fetching  entries";
+"Error.ConnectionToServer" = "An error occured in connecting to google";
+"Error.DownloadThumb" = "An error occured in downloding thumbnails";
+"Error.DownloadImage" = "An error occured in downloding images";
+"Error.Auth" = "Authorization was failed.";
 "Error.EMail" = "An error occured in sending email.";
 "Error.SaveToLibrary" = "An error occured in saving to photo library.";
-
  
-"WARN_NO_USER" = "The user not found.";
-"WARN_NO_ALBUM" = "The album not found.";
+"Warn.NoUser" = "The user not found.";
+"Warn.NoAlbum" = "The album not found.";
 
-
+// General
 "Width" = "Width";
 "Height" = "Height";
+
+// キーワードを置換
 "Public" = "Public";
 "Private" = "Private";
 

@@ -88,7 +88,7 @@
   NSLog(@"didSavedPhotoToAlubum ");
   if(error) {
     UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"ERROR", @"error") 
+                              initWithTitle:NSLocalizedString(@"Error", @"error") 
                               message:NSLocalizedString(@"Error.SaveToLibrary",
                                                         "error in saving") 
                               delegate:nil
@@ -141,7 +141,7 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
   UIAlertView *alertView = nil;
   if(error) {
    	alertView = [[UIAlertView alloc] 
-                initWithTitle:NSLocalizedString(@"ERROR", @"error") 
+                initWithTitle:NSLocalizedString(@"Error", @"error") 
                 message:NSLocalizedString(@"Error.EMail","error!") 
                 delegate:nil
                 cancelButtonTitle:NSLocalizedString(@"OK", @"Ok")
