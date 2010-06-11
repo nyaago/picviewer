@@ -48,6 +48,7 @@
  
 "Warn.NoUser" = "The user not found.";
 "Warn.NoAlbum" = "The album not found.";
+"Warn.NetworkNotReachable" = "can't connect to network.";
 
 // General
 "Width" = "Width";

@@ -11,6 +11,7 @@
 #import "PhotoImage.h"
 #import "PhotoInfoViewController.h"
 #import "PhotoActionDelegate.h"
+#import "NetworkReachability.h"
 
 @interface PhotoViewController(Private)
 
@@ -479,6 +480,22 @@ static NSLock *lockFetchedResultsController;
 
 
 - (void) downloadPhoto:(Photo *)photo  {
+  // Network接続確認
+  if(![NetworkReachability reachable]) {
+    NSString *title = NSLocalizedString(@"Notice","Notice");
+    NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
+                                          "not reacable");
+    UIAlertView *alertView = [[UIAlertView alloc] 
+                              initWithTitle:title
+                              message:message
+                              delegate:nil
+                              cancelButtonTitle:@"OK" 
+                              otherButtonTitles:nil];
+    [alertView show];
+    [alertView release];
+    return;
+  }
+  
   // downloader初期化
   downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
   downloader.delegate = self;

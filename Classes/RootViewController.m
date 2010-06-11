@@ -14,6 +14,7 @@
 #import "User.h"
 #import "Album.h"
 #import "SettingsManager.h"
+#import "NetworkReachability.h"
 
 @interface RootViewController(Private)
 
@@ -401,6 +402,11 @@
 #pragma mark NewUserViewControllerDelegate
 
 - (BOOL) doneWithNewUser:(NSString *)user {
+  // Network接続確認
+  if(![NetworkReachability reachable]) {
+    return YES;
+  }
+  
   PicasaFetchController *controller = [[PicasaFetchController alloc] init];
   controller.delegate = self;
   [controller queryUserAndAlbums:user];

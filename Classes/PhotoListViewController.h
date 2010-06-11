@@ -13,7 +13,6 @@
 #import "Album.h"
 #import "Photo.h"
 
-
 @interface PhotoListViewController : UIViewController 
 <NSFetchedResultsControllerDelegate, PicasaFetchControllerDelegate, 
 QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {

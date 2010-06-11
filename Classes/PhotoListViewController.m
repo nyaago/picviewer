@@ -13,6 +13,7 @@
 #import "PageControlViewController.h"
 #import "AlbumInfoViewController.h"
 #import "SettingsManager.h"
+#import "NetworkReachability.h"
 
 @interface PhotoImageView : UIImageView
 {
@@ -221,6 +222,22 @@ withListViewController:(PhotoListViewController *)controller {
   id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedPhotosController sections]
                                                   objectAtIndex:0];
   if([sectionInfo numberOfObjects] == 0) {
+    // Network接続確認
+    if(![NetworkReachability reachable]) {
+      NSString *title = NSLocalizedString(@"Notice","Notice");
+      NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
+                                            "not reacable");
+      UIAlertView *alertView = [[UIAlertView alloc] 
+                                initWithTitle:title
+                                message:message
+                                delegate:nil
+                                cancelButtonTitle:@"OK" 
+                                otherButtonTitles:nil];
+      [alertView show];
+      [alertView release];
+      return;
+    }
+    
     //if([[fetchedAlbumsController sections] count] == 0) {
     progressView.frame = CGRectMake(50.0f, 20.0f, 
                                     self.view.bounds.size.width - 100.0f, 
@@ -1036,9 +1053,11 @@ withListViewController:(PhotoListViewController *)controller {
 }
 
 - (void) refreshPhotos {
+  
   //
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSLog(@"fetchedPhotosController retain count =  %d", [fetchedPhotosController retainCount]);
+  NSLog(@"fetchedPhotosController retain count =  %d", 
+        [fetchedPhotosController retainCount]);
   [fetchedPhotosController release];
   fetchedPhotosController = nil;
   // 削除
@@ -1142,7 +1161,22 @@ withListViewController:(PhotoListViewController *)controller {
 #pragma mark Action
 
 - (void) refreshAction:(id)sender {
-
+  // Network接続確認
+  if(![NetworkReachability reachable]) {
+    NSString *title = NSLocalizedString(@"Notice","Notice");
+    NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
+                                          "not reacable");
+    UIAlertView *alertView = [[UIAlertView alloc] 
+                              initWithTitle:title
+                              message:message
+                              delegate:nil
+                              cancelButtonTitle:@"OK" 
+                              otherButtonTitles:nil];
+    [alertView show];
+    [alertView release];
+    return;
+  }
+  
   progressView.frame = CGRectMake(50.0f, 20.0f, 
                                   self.view.bounds.size.width - 100.0f, 
                                   25.0f);

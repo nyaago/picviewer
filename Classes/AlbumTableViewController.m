@@ -10,6 +10,7 @@
 #import "PhotoListViewController.h"
 #import "Album.h"
 #import "SettingsManager.h"
+#import "NetworkReachability.h"
 
 @interface AlbumTableViewController(Private)
 
@@ -149,6 +150,21 @@
   if([sectionInfo numberOfObjects] == 0) {
     //if([[fetchedAlbumsController sections] count] == 0) {
     // clear fetchedController
+    // Network接続の確認
+    if(![NetworkReachability reachable]) {
+      NSString *title = NSLocalizedString(@"Notice","Notice");
+      NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
+                                            "not reacable");
+      UIAlertView *alertView = [[UIAlertView alloc] 
+                                initWithTitle:title
+                                message:message
+                                delegate:nil
+                                cancelButtonTitle:@"OK" 
+                                otherButtonTitles:nil];
+      [alertView show];
+      [alertView release];
+      return;
+    }
     [fetchedAlbumsController release];
     fetchedAlbumsController = nil;
     // reload
@@ -799,6 +815,21 @@
 
 
 - (void) refreshAlbums {
+  // Network接続の確認
+  if(![NetworkReachability reachable]) {
+    NSString *title = NSLocalizedString(@"Notice","Notice");
+    NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
+                                          "not reacable");
+    UIAlertView *alertView = [[UIAlertView alloc] 
+                              initWithTitle:title
+                              message:message
+                              delegate:nil
+                              cancelButtonTitle:@"OK" 
+                              otherButtonTitles:nil];
+    [alertView show];
+    [alertView release];
+    return;
+  }
   // Album一覧のロード処理を起動
   // clear fetchedController
   [fetchedAlbumsController release];
