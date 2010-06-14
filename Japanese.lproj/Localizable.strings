@@ -23,6 +23,10 @@
 "Settings.Account.User" = "ユーザ名";
 "Settings.Account.Password" = "パスワード";
 
+// User追加View
+"NewUser.Account" = "アカウント名";
+"NewUser.Explanation" = "閲覧したいユーザのアカウント名を入力してください";
+
 // ボタンキャプション
 "Completed" = "完了";
 "Cancel" = "取消";

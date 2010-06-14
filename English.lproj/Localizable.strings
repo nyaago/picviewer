@@ -20,6 +20,10 @@
 "Settings.Account.User" = "USER";
 "Settings.Account.Password" = "PASSWORD";
 
+// User追加View
+"NewUser.Account" = "ACCOUNT";
+"NewUser.Explanation" = "Please input account that you want browse.";
+
 // Caption For BUtton
 "Completed" = "Completed";
 "Cancel" = "Cancel";
