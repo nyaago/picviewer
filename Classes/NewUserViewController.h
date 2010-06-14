@@ -23,6 +23,8 @@
   UIBarButtonItem *doneButton;
   UIBarButtonItem *cancelButton;
   UITextField *userField;
+  UILabel *captionLabel;
+  UILabel *explanationLabel;
   NSObject <NewUserViewControllerDeleate> *delegate;
 }
 
@@ -37,6 +39,19 @@
 /*!
  */
 @property (nonatomic, retain) IBOutlet UITextField *userField;
+
+/*!
+ @property captionLabel
+ @discussion アカウント名入力のキャプションとなるラベル
+ */
+@property (nonatomic, retain) IBOutlet UILabel *captionLabel;
+
+/*!
+ @property explanationLabel
+ @discussion 説明文のラベル
+ */
+@property (nonatomic, retain) IBOutlet UILabel *explanationLabel;
+
 
 
 /*!

@@ -13,6 +13,7 @@
 
 @synthesize doneButton, cancelButton;
 @synthesize userField;
+@synthesize captionLabel, explanationLabel;
 @synthesize delegate;
 
 /*
@@ -26,13 +27,13 @@
  }
  */
 
-/*
  // Implement viewDidLoad to do additional setup after loading the view, 
  //typically from a nib.
- - (void)viewDidLoad {
- [super viewDidLoad];
+- (void)viewDidLoad {
+	[super viewDidLoad];
+  captionLabel.text = NSLocalizedString(@"NewUser.Account", @"Account");
+  explanationLabel.text = NSLocalizedString(@"NewUser.Explanation", @"");
  }
- */
 
 /*
  // Override to allow orientations other than the default portrait orientation.
