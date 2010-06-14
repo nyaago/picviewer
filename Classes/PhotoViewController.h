@@ -36,6 +36,9 @@ ScrolledPageViewDelegate> {
   
   // PageをControll するViewのController
   PageControlViewController *pageController;
+  
+  // 
+  NSInteger lastTapCount;
 }
 
 /*!

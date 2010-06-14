@@ -34,9 +34,17 @@
 - (void) downloadPhoto:(Photo *)photo;
 
 /*!
- 
+ @method viewFrame:
+ @discussion viewのframeのRectを返す
  */
 - (CGRect) viewFrame:(UIDeviceOrientation)orientation;
+
+/*!
+ @method tapAction:
+ @discussion tap発生時に起動されるAction.
+ 2tapでなければ、statusbar,navigationbarの表示/非表示切り替えを行う。
+ */
+- (void) tapAction:(id)arg;
 
 
 @end
@@ -84,7 +92,8 @@ static NSLock *lockFetchedResultsController;
 @synthesize toolbar;
 @synthesize pageController;
 /*
- // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
+ // The designated initializer.  Override if you create the controller programmatically 
+ // and want to perform customization that is not appropriate for viewDidLoad.
  - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
  if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
  // Custom initialization
@@ -94,7 +103,8 @@ static NSLock *lockFetchedResultsController;
  */
 
 
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+// Implement viewDidLoad to do additional setup after loading the view, 
+// typically from a nib.
 // Viewロードの通知 - scrollViewの設定、デバイス回転管理の開始、Downloader初期化
 - (void)viewDidLoad {
   NSLog(@"photo view contoller viewDidLoad");
@@ -180,14 +190,16 @@ static NSLock *lockFetchedResultsController;
 
 - (void)dealloc {
   NSLog(@"PhotoViewController dealloc");
-  NSLog(@"managedObjectContext retain count = %d", [managedObjectContext retainCount]);
+  NSLog(@"managedObjectContext retain count = %d", 
+        [managedObjectContext retainCount]);
   NSLog(@"prevButton retain count = %d", [prevButton retainCount]);
   NSLog(@"nextButton retain count = %d", [nextButton retainCount]);
   NSLog(@"scrollView retain count = %d", [scrollView retainCount]);
   NSLog(@"imageView retain count = %d", [imageView retainCount]);
   NSLog(@"toolbar retain count = %d", [toolbar retainCount]);
   NSLog(@"downloader retain count = %d", [downloader retainCount]);
-  NSLog(@"fetchedPhotosController retain count = %d", [fetchedPhotosController retainCount]);
+  NSLog(@"fetchedPhotosController retain count = %d", 
+        [fetchedPhotosController retainCount]);
   NSLog(@"pageController retain count = %d", [pageController retainCount]);
   
   // Download実行中の場合,停止を要求、完了するまで待つ
@@ -218,6 +230,9 @@ static NSLock *lockFetchedResultsController;
 
 #pragma mark -
 
+#pragma mark PhotoViewController
+
+
 - (Photo *)photoAt:(NSUInteger)index {
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -225,7 +240,8 @@ static NSLock *lockFetchedResultsController;
   indexes[0] = 0;
   indexes[1] = index;
   Photo *photoObject = [fetchedPhotosController 
-                        objectAtIndexPath:[NSIndexPath indexPathWithIndexes:indexes length:2]];
+                        objectAtIndexPath:[NSIndexPath 
+                                           indexPathWithIndexes:indexes length:2]];
   [pool drain];
   return photoObject;
 }  
@@ -239,7 +255,8 @@ static NSLock *lockFetchedResultsController;
   indexes[1] = index;
   [lockFetchedResultsController lock];
   Photo *photoObject = [fetchedPhotosController 
-                        objectAtIndexPath:[NSIndexPath indexPathWithIndexes:indexes length:2]];
+                        objectAtIndexPath:[NSIndexPath 
+                                           indexPathWithIndexes:indexes length:2]];
   [lockFetchedResultsController unlock];
   UIImage *image = nil;
   if(photoObject.thumbnail) {
@@ -264,7 +281,8 @@ static NSLock *lockFetchedResultsController;
   indexes[1] = index;
   [lockFetchedResultsController lock];
   Photo *photoObject = [fetchedPhotosController 
-                        objectAtIndexPath:[NSIndexPath indexPathWithIndexes:indexes length:2]];
+                        objectAtIndexPath:[NSIndexPath 
+                                           indexPathWithIndexes:indexes length:2]];
   [lockFetchedResultsController unlock];
   UIImage *image = nil;
   if(photoObject.photoImage) {
@@ -386,7 +404,8 @@ static NSLock *lockFetchedResultsController;
   CGSize size = image.size;
   CGRect viewRect = self.scrollView.bounds;
   CGRect rect;
-  if(size.height / size.width > viewRect.size.height / viewRect.size.width ) { // 画像が縦長
+  if(size.height / size.width > viewRect.size.height / viewRect.size.width ) { 
+    // 画像が縦長
     float rate = viewRect.size.height / image.size.height;
     float width = size.width * rate;
     rect = CGRectMake((viewRect.size.width -  width) / 2, 
@@ -509,6 +528,12 @@ static NSLock *lockFetchedResultsController;
   [pool drain];
 }
 
+- (void) tapAction:(id)arg {
+  if(lastTapCount == 1) {
+    [self.pageController changeNavigationAndStatusBar];
+  }
+}
+
 
 #pragma mark -
 
@@ -524,9 +549,26 @@ static NSLock *lockFetchedResultsController;
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
   [super touchesEnded:touches withEvent:event];
-  [self.pageController changeNavigationAndStatusBar];
-  [[self nextResponder] touchesEnded:touches withEvent:event];
-  //  [self.pageController changeToolbarStatus];
+  
+  UITouch *touch = [touches anyObject];
+  NSLog(@"touch event - touches - %d, tap count = %d",
+        [touches count], [touch tapCount]);
+  if([touch tapCount] == 2) {
+    if(self.scrollView.zoomScale == 1.0f) {
+    	self.scrollView.zoomScale = self.scrollView.maximumZoomScale;
+    }
+    else {
+    	self.scrollView.zoomScale = 1.0f;
+    }
+    lastTapCount = 2;
+  }
+  else {
+    lastTapCount = 1;
+    [self performSelector:@selector(tapAction:)
+               withObject:nil
+               afterDelay:0.5f];
+  	[[self nextResponder] touchesEnded:touches withEvent:event];
+  }
 }
 
 
@@ -536,10 +578,6 @@ static NSLock *lockFetchedResultsController;
 }
 
 #pragma mark -
-
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-  return self.imageView;
-}
 
 #pragma mark ScrolledPageViewDelegate protocol
 
@@ -552,7 +590,6 @@ static NSLock *lockFetchedResultsController;
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
   // Viewサイズ調整
-  [self viewFrame:orientation];
   self.view.frame = [self viewFrame:orientation];
   CGRect bounds = self.view.frame;
   bounds.origin.x = 0;
@@ -615,7 +652,8 @@ static NSLock *lockFetchedResultsController;
   
   viewController.photo= photo;
   [self.view.window bringSubviewToFront:parentController.view];
-  [[parentController parentViewController] presentModalViewController:navigationController animated:YES];
+  [[parentController parentViewController] presentModalViewController:navigationController 
+                                                             animated:YES];
   [viewController release];
   [navigationController release];
 }
@@ -646,6 +684,11 @@ static NSLock *lockFetchedResultsController;
 #pragma mark -
 
 #pragma mark UIScrollViewDelegate
+
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+  return self.imageView;
+}
 
 /*!
  @method scrollViewDidEndZooming:withView:atScale
