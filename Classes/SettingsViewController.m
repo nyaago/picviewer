@@ -7,7 +7,7 @@
 //
 
 #import "SettingsViewController.h"
-
+#import "NetworkReachability.h"
 
 @implementation SettingsViewController
 
@@ -64,13 +64,6 @@
 }
 */
 
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-*/
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
@@ -100,7 +93,8 @@
 
 
 // Customize the number of rows in the table view.
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+- (NSInteger)tableView:(UITableView *)tableView 
+ numberOfRowsInSection:(NSInteger)section {
   switch (section) {
     case(0) :
       return 2;
@@ -111,9 +105,11 @@
 
 
 /*!
- 各セクションのタイトルを返す
+ @method tableView:titleForHeaderInSection:
+ @discussion 各セクションのタイトルを返す
  */
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+- (NSString *)tableView:(UITableView *)tableView 
+titleForHeaderInSection:(NSInteger)section {
   switch (section) {
     case(0) :
       return NSLocalizedString(@"Settings.Account", @"Acount");
@@ -122,6 +118,10 @@
   }
 }
 
+/*!
+ @method tableView:cellForRowAtIndexPath:
+ @discussion 各Cellオブジェクトを返す
+ */
 // Customize the appearance of table view cells.
 - (UITableViewCell *)tableView:(UITableView *)tableView 
          cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -139,7 +139,8 @@
       case(0) : // アカウントの設定
         switch ([indexPath indexAtPosition:1]) {
           case (0):
-            cell.textLabel.text = NSLocalizedString(@"Settings.Account.User",@"User");
+            cell.textLabel.text = NSLocalizedString(@"Settings.Account.User"
+                                                    ,@"User");
             frame =  CGRectMake(120.0f, 10.0f, 
                                 cell.frame.size.width - 120.0f , 
                                 cell.frame.size.height - 20.0f);
@@ -151,7 +152,8 @@
             [cell addSubview:userTextField];
             break;
           case (1):
-            cell.textLabel.text = NSLocalizedString(@"Settings.Account.Password",@"Password");
+            cell.textLabel.text = NSLocalizedString(@"Settings.Account.Password",
+                                                    @"Password");
             frame =  CGRectMake(120.0f, 10.0f, 
                                 cell.frame.size.width - 120.0f , 
                                 cell.frame.size.height - 20.0f);
@@ -171,7 +173,8 @@
 }
 
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView 
+didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   switch ([indexPath indexAtPosition:0]) {
     case(0) : // アカウント
       switch ([indexPath indexAtPosition:1]) {
@@ -185,57 +188,20 @@
 }
 
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:YES];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
-}
-*/
-
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-
 #pragma mark action
 
 - (void) completeAction:(id)sender {
   settings.userId = userTextField.text;
   settings.password = passwordTextField.text;
   
-  PicasaFetchController *controller = [[PicasaFetchController alloc] init];
-  controller.delegate = self;
-  controller.userId = settings.userId;
-  controller.password = settings.password;
-  [controller queryUserAndAlbums:settings.userId];
+  if([NetworkReachability reachable] ) {
+    // 
+	  PicasaFetchController *controller = [[PicasaFetchController alloc] init];
+	  controller.delegate = self;
+	  controller.userId = settings.userId;
+	  controller.password = settings.password;
+	  [controller queryUserAndAlbums:settings.userId];
+  }
 }
 
 - (void) userDidEndEditing:(id)sender {
@@ -290,7 +256,8 @@
   NSLog(@"connection error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSString *title = NSLocalizedString(@"Error",@"Error");
-  NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Connection ERROR");
+  NSString *message = NSLocalizedString(@"Error.ConnectionToServer",
+                                        "Connection ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message

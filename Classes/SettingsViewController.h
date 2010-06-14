@@ -16,7 +16,7 @@
   UIBarButtonItem *completeButton;
   // 設定情報
   SettingsManager *settings;
-  //
+
   UITextField *userTextField;
   UITextField *passwordTextField;
 }
@@ -24,6 +24,7 @@
 /*!
  @method completeAction:
  @discussion 完了ボタンのアクション、入力内容を保存してViewを閉じる
+ Networkの接続が可能であれば、入力アカウントが有効であるのチェックも行う。
  */
 - (void) completeAction:(id)sender;
 
