@@ -96,6 +96,11 @@
  */
 - (void) refreshAlbums;
 
+/*!
+ @method enableToolbar:
+ @discussion toolbarのButtonの有効無効の切り替え
+ */
+- (void) enableToolbar:(BOOL)enable;
 
 @end
 
@@ -149,7 +154,6 @@
                                                   objectAtIndex:0];
   if([sectionInfo numberOfObjects] == 0) {
     //if([[fetchedAlbumsController sections] count] == 0) {
-    // clear fetchedController
     // Network接続の確認
     if(![NetworkReachability reachable]) {
       NSString *title = NSLocalizedString(@"Notice","Notice");
@@ -165,8 +169,8 @@
       [alertView release];
       return;
     }
-    [fetchedAlbumsController release];
-    fetchedAlbumsController = nil;
+    // toolbarのボタンをdisable
+    [self enableToolbar:NO];
     // reload
     SettingsManager *settings = [[SettingsManager alloc] init];
     picasaFetchController = [[PicasaFetchController alloc] init];
@@ -245,6 +249,9 @@
   if(error) {
   }
   else {
+    // clear fetchedController
+    [fetchedAlbumsController release];
+    fetchedAlbumsController = nil;
     // ローカルDBへの保存
     NSLog(@"the user has %d alblums", [[feed entries] count]);
     // --  削除
@@ -326,6 +333,9 @@
   // Google接続コントローラーをclean
   [picasaFetchController release];
   picasaFetchController = nil;
+  // toolbarのボタンをenable
+  [self enableToolbar:YES];
+
 }
 
 // Googleへの問い合わせの結果、指定ユーザがなかった場合の通知
@@ -351,6 +361,8 @@
   // Google接続コントローラーをclean
   [picasaFetchController release];
   picasaFetchController = nil;
+  // toolbarのボタンをenable
+  [self enableToolbar:YES];
 }
 
 // Googleへの問い合わせの結果、エラーとなった場合の通知
@@ -376,6 +388,8 @@
   // Google接続コントローラーをclean
   [picasaFetchController release];
   picasaFetchController = nil;
+  // toolbarのボタンをenable
+  [self enableToolbar:YES];
 }
 
 
@@ -556,9 +570,8 @@
 
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
   if(picasaFetchController) {
-    [picasaFetchController requireStopping];
-    [picasaFetchController waitCompleted];
     [picasaFetchController release];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     picasaFetchController = nil;
   }
   
@@ -567,6 +580,7 @@
     [downloader requireStopping];
     [downloader waitCompleted];
     [downloader release];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     downloader = nil;
   }
   
@@ -578,6 +592,8 @@
     [user release];
   if(backButton)
     [backButton release];
+  if(refreshButton)
+    [refreshButton release];
   if(toolbarButtons) 
     [toolbarButtons release];
   if(onLoadLock)
@@ -830,10 +846,9 @@
     [alertView release];
     return;
   }
+  // toolbarのボタンをdisable
+  [self enableToolbar:NO];
   // Album一覧のロード処理を起動
-  // clear fetchedController
-  [fetchedAlbumsController release];
-  fetchedAlbumsController = nil;
   // clear fetchedController
   SettingsManager *settings = [[SettingsManager alloc] init];
   picasaFetchController = [[PicasaFetchController alloc] init];
@@ -868,12 +883,11 @@
     
     toolbarButtons = [[NSMutableArray alloc] init];
     // Refresh
-    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] 
+    refreshButton = [[UIBarButtonItem alloc] 
                                 initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
                                 target:self
                                 action:@selector(refreshAction:)];
-    [toolbarButtons addObject:refresh];
-    [refresh release];
+    [toolbarButtons addObject:refreshButton];
     
     
     // Space
@@ -899,6 +913,10 @@
     [pool drain];
   }
   return toolbarButtons;
+}
+
+- (void) enableToolbar:(BOOL)enable {
+  refreshButton.enabled = enable;
 }
 
 
@@ -960,9 +978,12 @@
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   [(UITableView *)self.view reloadData];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // toolbarのボタンをenable
+  [self enableToolbar:YES];
   // downloaderのそうじ
   [downloader release];
   downloader = nil;
+
   [pool drain];
 }
 
@@ -971,6 +992,8 @@
  */
 - (void)dowloadCanceled {
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // toolbarのボタンをenable
+  [self enableToolbar:YES];
 }
 
 

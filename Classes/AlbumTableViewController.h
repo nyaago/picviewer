@@ -34,6 +34,8 @@ QueuedURLDownloaderDelegate> {
   BOOL onLoad;
   // データロード中のロック
   NSLock *onLoadLock;
+  // refresh Button
+  UIBarButtonItem *refreshButton;
 }
 
 /*!

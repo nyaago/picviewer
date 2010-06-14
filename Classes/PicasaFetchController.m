@@ -21,6 +21,7 @@
 
 - (void) handleError:(NSError *)error;
 
+
 @end
 
 
@@ -142,6 +143,7 @@
     [lock unlock];
     return;
   }
+  [lock unlock];
   if(delegate && 
      [delegate 
       respondsToSelector:@selector(userAndAlbumsWithTicket:finishedWithUserFeed:error:)] ) {
@@ -149,6 +151,11 @@
                     finishedWithUserFeed:feed 
                                    error:error];
      }
+  /*
+  [lock lock];
+  completed = YES;
+  [lock unlock];
+   */
 }
 
 - (void)albumAndPhotosWithTicket:(GDataServiceTicket *)ticket
@@ -166,14 +173,17 @@
     [lock unlock];
     return;
   }
+  [lock unlock];
   if(delegate &&
      [delegate
       respondsToSelector:@selector(albumAndPhotosWithTicket:finishedWithAlbumFeed:error:)] ) {
        [delegate albumAndPhotosWithTicket:ticket 
                     finishedWithAlbumFeed:feed 
                                     error:error];
-     }
-  
+  }
+  [lock lock];
+  completed = YES;
+  [lock unlock];
 }
 
 - (void)photoWithTicket:(GDataServiceTicket *)ticket
@@ -198,6 +208,11 @@
         finishedWithPhotoFeed:feed 
                         error:error];
   }
+  /*
+  [lock lock];
+  completed = YES;
+  [lock unlock];
+   */
 }
 
 

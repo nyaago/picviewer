@@ -138,9 +138,15 @@ withListViewController:(PhotoListViewController *)controller {
  */
 - (void)removePhotos;
 
+/*!
+ @method enableToolbar:
+ @discussion toolbarのButtonの有効無効の切り替え
+ */
+- (void) enableToolbar:(BOOL)enable;
+
 
 @end
-  
+
 
 
 
@@ -237,23 +243,24 @@ withListViewController:(PhotoListViewController *)controller {
       [alertView release];
       return;
     }
-    
-    //if([[fetchedAlbumsController sections] count] == 0) {
+    // toolbarのButtonを無効に
+    [self enableToolbar:NO];
+		// progress View
     progressView.frame = CGRectMake(50.0f, 20.0f, 
                                     self.view.bounds.size.width - 100.0f, 
                                     25.0f);
     progressView.progress = 0.0f;
     [self.view addSubview:progressView];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [fetchedPhotosController release];
-    fetchedPhotosController = nil;
+    
+    // 
     SettingsManager *settings = [[SettingsManager alloc] init];
     picasaFetchController = [[PicasaFetchController alloc] init];
     picasaFetchController.delegate = self;
     picasaFetchController.userId = settings.userId;
     picasaFetchController.password = settings.password;
     [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
-                               user:[self.album.user valueForKey:@"userId"] ];
+                                          user:[self.album.user valueForKey:@"userId"] ];
     
     downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
     downloader.delegate = self;
@@ -262,7 +269,7 @@ withListViewController:(PhotoListViewController *)controller {
   else {
   }
   [self setToolbarItems: [self toolbarButtons] animated:YES];
-
+  
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -328,10 +335,16 @@ withListViewController:(PhotoListViewController *)controller {
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
+  // Google問い合わせ中の場合,停止を要求、完了するまで待つ
+  if(picasaFetchController) {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  }
+  
   // Download実行中の場合,停止を要求、完了するまで待つ
   if(downloader) {
     [downloader requireStopping];
     [downloader waitCompleted];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   }
   [self stopToAddThumbnails];
 }
@@ -375,8 +388,8 @@ withListViewController:(PhotoListViewController *)controller {
   NSLog(@"thumbnails retain count = %d", [thumbnails retainCount]);
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
   if(picasaFetchController) {
-    [picasaFetchController requireStopping];
-    [picasaFetchController waitCompleted];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [picasaFetchController release];
     picasaFetchController = nil;
   }
   
@@ -384,6 +397,8 @@ withListViewController:(PhotoListViewController *)controller {
   if(downloader) {
     [downloader requireStopping];
     [downloader waitCompleted];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [downloader release];
     downloader = nil;
   }
   
@@ -391,6 +406,10 @@ withListViewController:(PhotoListViewController *)controller {
     [progressView release];
   if(backButton)
     [backButton release];
+  if(infoButton)
+    [infoButton release];
+  if(refreshButton)
+    [refreshButton release];
   if(toolbarButtons)
     [toolbarButtons release];
   if(album)
@@ -401,14 +420,8 @@ withListViewController:(PhotoListViewController *)controller {
     [fetchedPhotosController release];
     fetchedPhotosController = nil;
   }
-  if(picasaFetchController) {
-    [picasaFetchController release];
-  }
   if(lockSave)
     [lockSave release];
-  if(downloader)
-    [downloader release];
-  
   [self discardTumbnails];
   [thumbnails release];
   [super dealloc];
@@ -438,7 +451,6 @@ withListViewController:(PhotoListViewController *)controller {
   [onAddingThumbnailsLock unlock];
   
   [self.view setNeedsLayout];
-  
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSDate *date0 = [[[NSDate alloc] init] autorelease];	  // for logging
@@ -590,12 +602,11 @@ withListViewController:(PhotoListViewController *)controller {
     toolbarButtons = [[NSMutableArray alloc] init];
     
     // Refresh
-    UIBarButtonItem *refresh = [[UIBarButtonItem alloc] 
-                                initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
-                                target:self
-                                action:@selector(refreshAction:)];
-    [toolbarButtons addObject:refresh];
-    [refresh release];
+    refreshButton = [[UIBarButtonItem alloc] 
+                     initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                     target:self
+                     action:@selector(refreshAction:)];
+    [toolbarButtons addObject:refreshButton];
     
     // Space
     UIBarButtonItem *spaceRight
@@ -607,15 +618,13 @@ withListViewController:(PhotoListViewController *)controller {
     [spaceRight release];
     
     // Info
-    UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
-                                                             style:UIBarButtonItemStyleBordered 
-                                                            target:self
-                                                            action:@selector(infoAction:)];
+    infoButton = [[UIBarButtonItem alloc] initWithTitle:@"" 
+                                                  style:UIBarButtonItemStyleBordered 
+                                                 target:self
+                                                 action:@selector(infoAction:)];
     path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
-    info.image = [[UIImage alloc] initWithContentsOfFile:path];
-    [toolbarButtons addObject:info];
-    [info release];
-    
+    infoButton.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:infoButton];
     
     [pool drain];
   }
@@ -656,6 +665,12 @@ withListViewController:(PhotoListViewController *)controller {
     [pool drain];
     return;
   }
+  // clean fetched controller
+  [fetchedPhotosController release];
+  fetchedPhotosController = nil;
+  // 削除
+  [self removePhotos];
+  
   // ローカルDBへの保存
   NSArray *entries = [feed entries];
   if ([entries count] > 0) {
@@ -734,6 +749,8 @@ withListViewController:(PhotoListViewController *)controller {
   picasaFetchController = nil;
   // 
   [progressView removeFromSuperview];
+  // toolbarのボタンを有効に
+  [self enableToolbar:YES];
 }
 
 // Googleへの問い合わせの結果、指定ユーザがなかった場合の通知
@@ -757,6 +774,8 @@ withListViewController:(PhotoListViewController *)controller {
   picasaFetchController = nil;
   // 
   [progressView removeFromSuperview];
+  // toolbarのボタンを有効に
+  [self enableToolbar:YES];
 }
 
 // Googleへの問い合わせの結果、エラーとなった場合の通知
@@ -780,6 +799,8 @@ withListViewController:(PhotoListViewController *)controller {
   picasaFetchController = nil;
   // 
   [progressView removeFromSuperview];
+  // toolbarのボタンを有効に
+  [self enableToolbar:YES];
 }
 
 
@@ -846,7 +867,7 @@ withListViewController:(PhotoListViewController *)controller {
   NSPredicate *predicate 
   = [NSPredicate predicateWithFormat:@"%K = %@", @"album.albumId", album.albumId];
   [fetchRequest setPredicate:predicate];
-
+  
   NSError *error;
   // データの削除、親(album)からの関連の削除 + (albumに含まれる)全Photoデータの削除
   NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
@@ -912,7 +933,7 @@ withListViewController:(PhotoListViewController *)controller {
 
 - (Photo *)insertPhoto:(GDataEntryPhoto *)photo   withAlbum:(Album *)album {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
+  
   NSString *photoId = [photo GPhotoID];
   // 新しい永続化オブジェクトを作って
   Photo *photoObject 
@@ -948,7 +969,7 @@ withListViewController:(PhotoListViewController *)controller {
     NSLog(@"URL for the photo - %@", [content URLString] );
     [photoObject setValue:[content URLString] forKey:@"urlForContent"];
   }
-
+  
   // Save the context.
   NSError *error = nil;
   if ([self.album respondsToSelector:@selector(addPhotoObject:) ] ) {
@@ -1056,13 +1077,9 @@ withListViewController:(PhotoListViewController *)controller {
   
   //
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSLog(@"fetchedPhotosController retain count =  %d", 
-        [fetchedPhotosController retainCount]);
-  [fetchedPhotosController release];
-  fetchedPhotosController = nil;
-  // 削除
-  [self removePhotos];
   //  NSArray *objects = [fetchedPhotosController fetchedObjects];
+  // toolbarのButtonを無効に
+  [self enableToolbar:NO];
   // 再ロード
   SettingsManager *settings = [[SettingsManager alloc] init];
   picasaFetchController = [[PicasaFetchController alloc] init];
@@ -1076,6 +1093,11 @@ withListViewController:(PhotoListViewController *)controller {
   [settings release];
   [pool drain];
   
+}
+
+- (void) enableToolbar:(BOOL)enable {
+  refreshButton.enabled = enable;
+  infoButton.enabled = enable;
 }
 
 
@@ -1143,6 +1165,9 @@ withListViewController:(PhotoListViewController *)controller {
   [progressView removeFromSuperview];
   [downloader release];
   downloader = nil;
+  // toolbarのボタンを有効に
+  [self enableToolbar:YES];
+  //
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:) 
                            toTarget:self 
@@ -1154,6 +1179,8 @@ withListViewController:(PhotoListViewController *)controller {
  */
 - (void)dowloadCanceled {
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // toolbarのボタンを有効に
+  [self enableToolbar:YES];
 }
 
 
@@ -1192,10 +1219,10 @@ withListViewController:(PhotoListViewController *)controller {
 } 
 
 - (void) infoAction:(id)sender {
-
+  
   AlbumInfoViewController *viewController = [[AlbumInfoViewController alloc]
-                                         initWithNibName:@"AlbumInfoViewController" 
-                                         bundle:nil];
+                                             initWithNibName:@"AlbumInfoViewController" 
+                                             bundle:nil];
   UINavigationController *navigationController  = 
   [[UINavigationController alloc] initWithRootViewController:viewController];
   

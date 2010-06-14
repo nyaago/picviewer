@@ -206,6 +206,7 @@ static NSLock *lockFetchedResultsController;
   if(downloader) {
     [downloader requireStopping];
     [downloader waitCompleted];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [downloader release];
   }
   
@@ -217,8 +218,6 @@ static NSLock *lockFetchedResultsController;
   if(imageView)
     [imageView release];
   [toolbar release];
-  if(downloader)
-    [downloader release];
   if(fetchedPhotosController) {
     [fetchedPhotosController release];
     fetchedPhotosController = nil;
@@ -391,6 +390,8 @@ static NSLock *lockFetchedResultsController;
   [self.scrollView addSubview:imageView];
   [downloader release];
   downloader = nil;
+  // 
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
 
@@ -515,7 +516,7 @@ static NSLock *lockFetchedResultsController;
     [alertView release];
     return;
   }
-  
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   // downloader初期化
   downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
   downloader.delegate = self;

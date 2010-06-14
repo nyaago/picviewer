@@ -17,6 +17,8 @@
 <NSFetchedResultsControllerDelegate, PicasaFetchControllerDelegate, 
 QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
   
+  @private
+  
   Album *album;
   
   NSFetchedResultsController *fetchedPhotosController;
@@ -47,6 +49,10 @@ QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
   NSMutableArray *toolbarButtons;
   // Picasaデータ取得コントローラー
   PicasaFetchController *picasaFetchController;
+  // refresh Button
+  UIBarButtonItem *refreshButton;
+  // view information Button
+  UIBarButtonItem *infoButton;
 }
 
 /*!
