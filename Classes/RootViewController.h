@@ -8,13 +8,15 @@
 
 #import "NewUserViewController.h"
 #import "PicasaFetchController.h"
+#import "LabeledActivityIndicator.h"
 
 /*!
  @class RootViewController
  RootのView. ユーザの一覧を表示するView
  */
 @interface RootViewController : UITableViewController 
-<NSFetchedResultsControllerDelegate,NewUserViewControllerDeleate, PicasaFetchControllerDelegate> {
+<NSFetchedResultsControllerDelegate,NewUserViewControllerDeleate, 
+PicasaFetchControllerDelegate, LabeledActivityIndicatorDelegate> {
   NSFetchedResultsController *fetchedUsersController;
   
   NSManagedObjectContext *managedObjectContext;
@@ -22,7 +24,8 @@
   UIBarButtonItem *addButton;
   // toolbarに表示するButtonの配列
   NSMutableArray *toolbarButtons;
-
+  // 削除処理中のindicator
+  LabeledActivityIndicator *indicatorView;
 }
 
 /*!

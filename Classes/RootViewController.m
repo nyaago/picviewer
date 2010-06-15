@@ -36,6 +36,12 @@
 
 - (User *)userWithUserId:(NSString *)uid;
 
+/*!
+ @method deleteUser:
+ @discussion Userを削除
+ */
+- (void)deleteUser:(User *)user;
+
 @end
 
 
@@ -44,6 +50,14 @@
 @synthesize fetchedUsersController, managedObjectContext;
 
 #pragma mark View lifecycle
+
+- (void) loadView {
+  [super loadView];
+  CGRect frame = CGRectMake(0.0f, self.view.frame.size.height - 200.0f , 
+                            self.view.frame.size.width, 200.0f);
+  indicatorView = [[LabeledActivityIndicator alloc] initWithFrame:frame];
+  [indicatorView setMessage:NSLocalizedString(@"Root.Deleting", "on deleting")];
+}
 
 // Viewロード時の通知.
 // Navigation Bar のボタンの追加とUserデータのFetched Controllerの生成.
@@ -71,17 +85,19 @@
   if(userId) {
     //	  User *user = [self selectUser:userId];
     User *user = [self userWithUserId:userId];
-    AlbumTableViewController *albumViewController = 
-    [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" 
-                                               bundle:nil];
-    //  AlbumTableViewController *albumViewController = 
-    //  [[AlbumTableViewController alloc] init];
-    self.navigationItem.backBarButtonItem =  [albumViewController backButton];
-    albumViewController.managedObjectContext = self.managedObjectContext;
-    albumViewController.user = user;
-    // Pass the selected object to the new view controller.
-    [self.navigationController pushViewController:albumViewController animated:YES];
-    [albumViewController release];
+    if(user) {
+      AlbumTableViewController *albumViewController = 
+      [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" 
+                                                 bundle:nil];
+      //  AlbumTableViewController *albumViewController = 
+      //  [[AlbumTableViewController alloc] init];
+      self.navigationItem.backBarButtonItem =  [albumViewController backButton];
+      albumViewController.managedObjectContext = self.managedObjectContext;
+      albumViewController.user = user;
+      // Pass the selected object to the new view controller.
+      [self.navigationController pushViewController:albumViewController animated:YES];
+      [albumViewController release];
+    }
   }
   else {
 	  [settings setCurrentUser:nil];
@@ -124,7 +140,7 @@
 
 #pragma mark -
 
-#pragma mark Add a new object
+#pragma mark Add a new object / delete object
 
 - (User *)insertNewUser:(NSString *)user {
   // Create a new instance of the entity managed by the fetched results controller.
@@ -155,6 +171,26 @@
     return nil;
   }
   return (User *)newManagedObject;
+}
+
+
+- (void)deleteUser:(User *)user {
+
+  [managedObjectContext deleteObject:user];
+  // Save the context.
+  NSError *error = nil;
+  if (![managedObjectContext save:&error]) {
+    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+    UIAlertView *alertView = [[UIAlertView alloc] 
+                              initWithTitle:NSLocalizedString(@"Error","Error")
+                              message:NSLocalizedString(@"Error.Delete", 
+                                                        @"Error in deleting")
+                              delegate:nil
+                              cancelButtonTitle:nil 
+                              otherButtonTitles:@"OK"];
+    [alertView show];
+    [alertView release];
+  }
 }
 
 #pragma mark -
@@ -200,8 +236,6 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   AlbumTableViewController *albumViewController = 
 	[[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" 
                                              bundle:nil];
-  //  AlbumTableViewController *albumViewController = 
-  //  [[AlbumTableViewController alloc] init];
   self.navigationItem.backBarButtonItem =  [albumViewController backButton];
   NSManagedObject *selectedObject = 
   [[self fetchedUsersController] objectAtIndexPath:indexPath];
@@ -221,24 +255,13 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 forRowAtIndexPath:(NSIndexPath *)indexPath {
   
   if (editingStyle == UITableViewCellEditingStyleDelete) {
-    // Delete the managed object for the given index path
-    NSManagedObjectContext *context = [fetchedUsersController managedObjectContext];
-    [context deleteObject:[fetchedUsersController objectAtIndexPath:indexPath]];
+    // indicator View を表示して、Background threadで削除処理の起動、
+  	[self.view addSubview:indicatorView];
+    User *user = [fetchedUsersController objectAtIndexPath:indexPath];
+    [indicatorView startWithTarget:self 
+                      withSelector:@selector(deleteUser:) 
+                        withObject:user];
     
-    // Save the context.
-    NSError *error = nil;
-    if (![context save:&error]) {
-      NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-      UIAlertView *alertView = [[UIAlertView alloc] 
-                                initWithTitle:NSLocalizedString(@"Error","Error")
-                                message:NSLocalizedString(@"Error.Delete", 
-                                                          @"Error in deleting")
-                                delegate:nil
-                                cancelButtonTitle:nil 
-                                otherButtonTitles:@"OK"];
-      [alertView show];
-      [alertView release];
-    }
   }   
 }
 
@@ -305,38 +328,6 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   [self.tableView reloadData];
 }
 
-/*
- Instead of using controllerDidChangeContent: to respond to all changes, 
- you can implement all the delegate methods 
- to update the table view in response to individual changes.  
- This may have performance implications 
- if a large number of changes are made simultaneously.
- 
- // Notifies the delegate that section and object changes are about to be processed 
- and notifications will be sent. 
- - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller {
- [self.tableView beginUpdates];
- }
- 
- - (void)controller:(NSFetchedResultsController *)controller 
- didChangeSection:(id <NSFetchedResultsSectionInfo>)sectionInfo 
- atIndex:(NSUInteger)sectionIndex forChangeType:(NSFetchedResultsChangeType)type {
- // Update the table view appropriately.
- }
- 
- - (void)controller:(NSFetchedResultsController *)controller 
- didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath 
- forChangeType:(NSFetchedResultsChangeType)type 
- newIndexPath:(NSIndexPath *)newIndexPath {
- // Update the table view appropriately.
- }
- 
- - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller {
- [self.tableView endUpdates];
- } 
- */
-
-
 
 - (User *)userWithUserId:(NSString *)uid {
   id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedUsersController sections] 
@@ -374,6 +365,9 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   [managedObjectContext release];
   [addButton release];
   [toolbarButtons release];
+  if(indicatorView) {
+    [indicatorView release];
+  }
   [super dealloc];
 }
 #pragma mark -
@@ -521,7 +515,13 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   [navigationController release];
 }
 
+#pragma mark LabeledActivityIndicatorDelegate
 
+- (void)indicatorStoped:(LabeledActivityIndicator *)indicatorView {
+  [indicatorView removeFromSuperview];
+}
+
+#pragma mark -
 
 #pragma mark -
 

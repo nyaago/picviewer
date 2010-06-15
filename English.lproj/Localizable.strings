@@ -42,6 +42,9 @@
 // 写真View
 "Photo.Action" = "Select The Action";
 
+//
+"Root.Deleting" = "On deleting..";
+
 // Error , Warning
 "Error.Delete" = "An error occured in deleting the entry";
 "Error.Insert" = "An error occured in addting the entry";

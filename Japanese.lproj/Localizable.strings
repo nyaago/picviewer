@@ -44,6 +44,9 @@
 // 写真View
 "Photo.Action" = "操作を選択してくだいさい";
 
+//
+"Root.Deleting" = "削除中です";
+
 // Error , Warning
 "Error.Delete" = "削除中にエラーが発生しました";
 "Error.Insert" = "追加中にエラーが発生しました";

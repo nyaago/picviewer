@@ -35,6 +35,7 @@
 		72A7A86011A14267001E0080 /* preferences.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A7A85F11A14267001E0080 /* preferences.png */; };
 		72B4882511C1FE0100338152 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72B4882411C1FE0100338152 /* SystemConfiguration.framework */; };
 		72B4882E11C1FE3E00338152 /* NetworkReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 72B4882D11C1FE3E00338152 /* NetworkReachability.m */; };
+		72BFE61011C716FD00A7990C /* LabeledActivityIndicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 72BFE60F11C716FD00A7990C /* LabeledActivityIndicator.m */; };
 		72C4AC8F119AED2200F4B664 /* PhotoImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C4AC8E119AED2200F4B664 /* PhotoImage.m */; };
 		72C6183A118A6F52001FD7C7 /* DeviceRotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61839118A6F52001FD7C7 /* DeviceRotation.m */; };
 		72C61C32118AECF8001FD7C7 /* PageControlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */; };
@@ -127,6 +128,8 @@
 		72B4882411C1FE0100338152 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		72B4882C11C1FE3E00338152 /* NetworkReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkReachability.h; sourceTree = "<group>"; };
 		72B4882D11C1FE3E00338152 /* NetworkReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkReachability.m; sourceTree = "<group>"; };
+		72BFE60E11C716FD00A7990C /* LabeledActivityIndicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabeledActivityIndicator.h; sourceTree = "<group>"; };
+		72BFE60F11C716FD00A7990C /* LabeledActivityIndicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabeledActivityIndicator.m; sourceTree = "<group>"; };
 		72C4AC8D119AED2200F4B664 /* PhotoImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoImage.h; sourceTree = "<group>"; };
 		72C4AC8E119AED2200F4B664 /* PhotoImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoImage.m; sourceTree = "<group>"; };
 		72C61838118A6F52001FD7C7 /* DeviceRotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceRotation.h; sourceTree = "<group>"; };
@@ -215,6 +218,8 @@
 				72B4882D11C1FE3E00338152 /* NetworkReachability.m */,
 				729DA04C11C630F200E88C45 /* LabeledProgressView.h */,
 				729DA04D11C630F200E88C45 /* LabeledProgressView.m */,
+				72BFE60E11C716FD00A7990C /* LabeledActivityIndicator.h */,
+				72BFE60F11C716FD00A7990C /* LabeledActivityIndicator.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -464,6 +469,7 @@
 				728A5BC211C0C2790058811E /* PhotoActionDelegate.m in Sources */,
 				72B4882E11C1FE3E00338152 /* NetworkReachability.m in Sources */,
 				729DA04E11C630F200E88C45 /* LabeledProgressView.m in Sources */,
+				72BFE61011C716FD00A7990C /* LabeledActivityIndicator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
