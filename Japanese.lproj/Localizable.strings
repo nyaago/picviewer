@@ -27,6 +27,10 @@
 "NewUser.Account" = "アカウント名";
 "NewUser.Explanation" = "閲覧したいユーザのアカウント名を入力してください";
 
+// Photo List
+"PhotoList.DownloadList" = "一覧をダウンロード中です";
+"PhotoList.DownloadThumb" = "サムネイルをダウンロード中です";
+
 // ボタンキャプション
 "Completed" = "完了";
 "Cancel" = "取消";

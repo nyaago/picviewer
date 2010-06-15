@@ -24,6 +24,10 @@
 "NewUser.Account" = "ACCOUNT";
 "NewUser.Explanation" = "Please input account that you want browse.";
 
+// Photo List
+"PhotoList.DownloadList" = "Downloading list..";
+"PhotoList.DownloadThumb" = "Downloading thumbnail..";
+
 // Caption For BUtton
 "Completed" = "Completed";
 "Cancel" = "Cancel";
