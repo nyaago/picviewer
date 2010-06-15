@@ -72,7 +72,8 @@
     //	  User *user = [self selectUser:userId];
     User *user = [self userWithUserId:userId];
     AlbumTableViewController *albumViewController = 
-    [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" bundle:nil];
+    [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" 
+                                               bundle:nil];
     //  AlbumTableViewController *albumViewController = 
     //  [[AlbumTableViewController alloc] init];
     self.navigationItem.backBarButtonItem =  [albumViewController backButton];
@@ -120,16 +121,9 @@
 
 }
 
-/*
- // Override to allow orientations other than the default portrait orientation.
- - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
- // Return YES for supported orientations.
- return (interfaceOrientation == UIInterfaceOrientationPortrait);
- }
- */
-
 
 #pragma mark -
+
 #pragma mark Add a new object
 
 - (User *)insertNewUser:(NSString *)user {
@@ -151,7 +145,8 @@
     NSLog(@"Unresolved error %@", error);
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error","Error")
-                              message:NSLocalizedString(@"Error.Insert", @"Error in adding")
+                              message:NSLocalizedString(@"Error.Insert", 
+                                                        @"Error in adding")
                               delegate:nil
                               cancelButtonTitle:nil 
                               otherButtonTitles:@"OK"];
@@ -171,14 +166,17 @@
 }
 
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedUsersController sections] objectAtIndex:section];
+- (NSInteger)tableView:(UITableView *)tableView 
+ numberOfRowsInSection:(NSInteger)section {
+  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedUsersController sections] 
+                                                  objectAtIndex:section];
   return [sectionInfo numberOfObjects];
 }
 
 
 // Customize the appearance of table view cells.
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+- (UITableViewCell *)tableView:(UITableView *)tableView 
+         cellForRowAtIndexPath:(NSIndexPath *)indexPath {
   
   NSString *CellIdentifier = 
   [@"Cell" stringByAppendingFormat:@"%d",[indexPath indexAtPosition:1 ] ];
@@ -196,10 +194,12 @@
 
 // tableのCell選択時の通知.
 // Album一覧Viewを表示する.
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView 
+didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   
   AlbumTableViewController *albumViewController = 
-	[[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" bundle:nil];
+	[[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" 
+                                             bundle:nil];
   //  AlbumTableViewController *albumViewController = 
   //  [[AlbumTableViewController alloc] init];
   self.navigationItem.backBarButtonItem =  [albumViewController backButton];
@@ -214,17 +214,11 @@
 }
 
 
-/*
- // Override to support conditional editing of the table view.
- - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the specified item to be editable.
- return YES;
- }
- */
-
 // Override to support editing the table view.
 // 選択されているUserの削除を行う.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView 
+commitEditingStyle:(UITableViewCellEditingStyle)editingStyle 
+forRowAtIndexPath:(NSIndexPath *)indexPath {
   
   if (editingStyle == UITableViewCellEditingStyleDelete) {
     // Delete the managed object for the given index path
@@ -237,7 +231,8 @@
       NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
       UIAlertView *alertView = [[UIAlertView alloc] 
                                 initWithTitle:NSLocalizedString(@"Error","Error")
-                                message:NSLocalizedString(@"Error.Delete", @"Error in deleting")
+                                message:NSLocalizedString(@"Error.Delete", 
+                                                          @"Error in deleting")
                                 delegate:nil
                                 cancelButtonTitle:nil 
                                 otherButtonTitles:@"OK"];
@@ -248,7 +243,8 @@
 }
 
 // 
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+- (BOOL)tableView:(UITableView *)tableView 
+canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   // The table view should not be re-orderable.
   return NO;
 }
@@ -269,21 +265,27 @@
   // Create the fetch request for the entity.
   NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
   // Edit the entity name as appropriate.
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"User" inManagedObjectContext:managedObjectContext];
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"User" 
+                                            inManagedObjectContext:managedObjectContext];
   [fetchRequest setEntity:entity];
   
   // Set the batch size to a suitable number.
   [fetchRequest setFetchBatchSize:20];
   
   // Edit the sort key as appropriate.
-  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp" ascending:NO];
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] 
+                                      initWithKey:@"timeStamp" ascending:NO];
   NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
   
   [fetchRequest setSortDescriptors:sortDescriptors];
   
   // Edit the section name key path and cache name if appropriate.
   // nil for section name key path means "no sections".
-  NSFetchedResultsController *aFetchedUsersController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:managedObjectContext sectionNameKeyPath:nil cacheName:@"Root"];
+  NSFetchedResultsController *aFetchedUsersController = [[NSFetchedResultsController alloc] 
+                                                         initWithFetchRequest:fetchRequest 
+                                                         managedObjectContext:managedObjectContext 
+                                                         sectionNameKeyPath:nil 
+                                                         cacheName:@"Root"];
   aFetchedUsersController.delegate = self;
   self.fetchedUsersController = aFetchedUsersController;
   
@@ -307,7 +309,8 @@
  Instead of using controllerDidChangeContent: to respond to all changes, 
  you can implement all the delegate methods 
  to update the table view in response to individual changes.  
- This may have performance implications if a large number of changes are made simultaneously.
+ This may have performance implications 
+ if a large number of changes are made simultaneously.
  
  // Notifies the delegate that section and object changes are about to be processed 
  and notifications will be sent. 
@@ -345,8 +348,9 @@
   indexes[1] = 0;
   for(int i = 0; i < n; ++i) {
     indexes[1] = i;
-    NSManagedObject *object = [fetchedUsersController objectAtIndexPath:[NSIndexPath 
-                                                                          indexPathWithIndexes:indexes length:2]];
+    NSManagedObject *object = 
+    [fetchedUsersController objectAtIndexPath:[NSIndexPath 
+                                               indexPathWithIndexes:indexes length:2]];
     User *user = (User *)object;
     if([user.userId isEqual:uid] ) {
       return user;
@@ -528,22 +532,13 @@
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     toolbarButtons = [[NSMutableArray alloc] init];
-    // Info
-    /*
-    UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
-                                                             style:UIBarButtonItemStyleBordered 
-                                                            target:self
-                                                            action:nil];
-    path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
-    info.image = [[UIImage alloc] initWithContentsOfFile:path];
-    [toolbarButtons addObject:info];
-    [info release];
-    */
+
     // Space
-    UIBarButtonItem *spaceRight = [[UIBarButtonItem alloc] 
-                                   initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                   target:self
-                                   action:nil];
+    UIBarButtonItem *spaceRight = 
+    [[UIBarButtonItem alloc] 
+     initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+     target:self
+     action:nil];
     spaceRight.width = 30.0f;
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];

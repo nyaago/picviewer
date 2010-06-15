@@ -140,7 +140,8 @@
     return persistentStoreCoordinator;
   }
   
-  NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] stringByAppendingPathComponent: @"PicasaViewer.sqlite"]];
+  NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] 
+                                             stringByAppendingPathComponent: @"PicasaViewer.sqlite"]];
   
   NSError *error = nil;
   persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] 
