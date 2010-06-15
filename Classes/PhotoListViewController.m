@@ -239,7 +239,7 @@ withListViewController:(PhotoListViewController *)controller {
     // toolbarのButtonを無効に
     [self enableToolbar:NO];
 		// progress View
-    progressView.progressView.progress = 0.0f;
+    progressView.progress = 0.0f;
     [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
                                                @"download")];
     [self.view addSubview:progressView];
@@ -702,10 +702,10 @@ withListViewController:(PhotoListViewController *)controller {
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadThumb",
                                              @"download")];
   if([self thumbnailCount] == 0) {
-    progressView.progressView.progress = 1.0f;
+    progressView.progress = 1.0f;
   }
   else {
-    progressView.progressView.progress = 1.0f / [self thumbnailCount];
+    progressView.progress = 1.0f / [self thumbnailCount];
   }
   [downloader start];
   [downloader finishQueuing];
@@ -1104,7 +1104,7 @@ withListViewController:(PhotoListViewController *)controller {
 - (void)downloadDidFailWithError:(NSError *)error withUserInfo:(NSDictionary *)info {
   NSLog(@"downloadDidFailWithError");
   hasErrorInDownloading = YES;
-  progressView.progressView.progress = progressView.progressView.progress + (1.0 / [self thumbnailCount] );
+  progressView.progress = progressView.progress + (1.0 / [self thumbnailCount] );
 }
 
 
@@ -1118,7 +1118,7 @@ withListViewController:(PhotoListViewController *)controller {
       hasErrorInInsertingThumbnail = YES;
     }
   }
-  progressView.progressView.progress = progressView.progressView.progress + 
+  progressView.progress = progressView.progress + 
   (1.0 / [self thumbnailCount] );
 }
 
@@ -1197,7 +1197,7 @@ withListViewController:(PhotoListViewController *)controller {
                                   self.view.bounds.size.width - 100.0f, 
                                   25.0f);
    */
-  progressView.progressView.progress = 0.0f;
+  progressView.progress = 0.0f;
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
                                              @"download")];
   [self discardTumbnails];
