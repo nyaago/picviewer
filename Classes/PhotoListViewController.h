@@ -12,6 +12,7 @@
 #import "PageControlViewController.h"
 #import "Album.h"
 #import "Photo.h"
+#import "LabeledProgressView.h"
 
 @interface PhotoListViewController : UIViewController 
 <NSFetchedResultsControllerDelegate, PicasaFetchControllerDelegate, 
@@ -28,7 +29,7 @@ QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
   
   UIBarButtonItem *backButton;
   UIScrollView *scrollView;
-  UIProgressView *progressView;
+  LabeledProgressView *progressView;
   // ローカルDB保存時の Lock Object
   NSLock  *lockSave;
   // Download中にエラーが発生したか?
@@ -83,7 +84,7 @@ QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
  @property progressView
  @discussion ダウンロード処理中に表示するProgressBar のView
  */
-@property (nonatomic, retain) IBOutlet UIProgressView *progressView;
+@property (nonatomic, retain) IBOutlet LabeledProgressView *progressView;
 
 /*!
  @method loadThumbnails

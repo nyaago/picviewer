@@ -28,6 +28,7 @@
 		72582A851189B7B200A8A6FC /* PhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72582A831189B7B200A8A6FC /* PhotoViewController.xib */; };
 		728A5BC211C0C2790058811E /* PhotoActionDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 728A5BC111C0C2790058811E /* PhotoActionDelegate.m */; };
 		728A5BE711C0D4CF0058811E /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 728A5BE611C0D4CF0058811E /* MessageUI.framework */; };
+		729DA04E11C630F200E88C45 /* LabeledProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 729DA04D11C630F200E88C45 /* LabeledProgressView.m */; };
 		72A7A5C511A11B39001E0080 /* arrowleft.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A7A5C211A11B39001E0080 /* arrowleft.png */; };
 		72A7A5C611A11B39001E0080 /* arrowright.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A7A5C311A11B39001E0080 /* arrowright.png */; };
 		72A7A5C711A11B39001E0080 /* newspaper.png in Resources */ = {isa = PBXBuildFile; fileRef = 72A7A5C411A11B39001E0080 /* newspaper.png */; };
@@ -117,6 +118,8 @@
 		728A5BC011C0C2790058811E /* PhotoActionDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoActionDelegate.h; sourceTree = "<group>"; };
 		728A5BC111C0C2790058811E /* PhotoActionDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoActionDelegate.m; sourceTree = "<group>"; };
 		728A5BE611C0D4CF0058811E /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
+		729DA04C11C630F200E88C45 /* LabeledProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabeledProgressView.h; sourceTree = "<group>"; };
+		729DA04D11C630F200E88C45 /* LabeledProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabeledProgressView.m; sourceTree = "<group>"; };
 		72A7A5C211A11B39001E0080 /* arrowleft.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = arrowleft.png; path = Resources/arrowleft.png; sourceTree = "<group>"; };
 		72A7A5C311A11B39001E0080 /* arrowright.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = arrowright.png; path = Resources/arrowright.png; sourceTree = "<group>"; wrapsLines = 0; };
 		72A7A5C411A11B39001E0080 /* newspaper.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = newspaper.png; path = Resources/newspaper.png; sourceTree = "<group>"; };
@@ -210,6 +213,8 @@
 				728A5BC111C0C2790058811E /* PhotoActionDelegate.m */,
 				72B4882C11C1FE3E00338152 /* NetworkReachability.h */,
 				72B4882D11C1FE3E00338152 /* NetworkReachability.m */,
+				729DA04C11C630F200E88C45 /* LabeledProgressView.h */,
+				729DA04D11C630F200E88C45 /* LabeledProgressView.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -458,6 +463,7 @@
 				72D7E7D011BF5643001685AF /* PhotoInfoViewController.m in Sources */,
 				728A5BC211C0C2790058811E /* PhotoActionDelegate.m in Sources */,
 				72B4882E11C1FE3E00338152 /* NetworkReachability.m in Sources */,
+				729DA04E11C630F200E88C45 /* LabeledProgressView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

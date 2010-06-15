@@ -159,16 +159,6 @@ withListViewController:(PhotoListViewController *)controller {
 
 #pragma mark View lifecycle
 
-/*
- // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
- - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
- if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
- // Custom initialization
- }
- return self;
- }
- */
-
 
 /*!
  @method loadView
@@ -184,14 +174,17 @@ withListViewController:(PhotoListViewController *)controller {
   if(thumbnails == nil) {
     thumbnails = [[NSMutableDictionary alloc] init];
   }
+  CGRect frame = CGRectMake(0.0f, self.view.frame.size.height - 200.0f , 
+                            self.view.frame.size.width, 200.0f);
+  progressView = [[LabeledProgressView alloc] initWithFrame:frame];
 }
+
 
 /*!
  @method viewDidLoad:
  @discussion viewLoad時の通知,ロック変数,FetchedResultsControllerの初期化を行う.
  写真データが0件の場合は、Download処理を起動.
  */
-// Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
   NSLog(@"load did load");
   NSLog(@"photo view  viewDidLoad");
@@ -246,10 +239,9 @@ withListViewController:(PhotoListViewController *)controller {
     // toolbarのButtonを無効に
     [self enableToolbar:NO];
 		// progress View
-    progressView.frame = CGRectMake(50.0f, 20.0f, 
-                                    self.view.bounds.size.width - 100.0f, 
-                                    25.0f);
-    progressView.progress = 0.0f;
+    progressView.progressView.progress = 0.0f;
+    [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
+                                               @"download")];
     [self.view addSubview:progressView];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
@@ -316,15 +308,6 @@ withListViewController:(PhotoListViewController *)controller {
     [self loadThumbnails];
 }
 
-
-
-/*
- // Override to allow orientations other than the default portrait orientation.
- - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
- // Return YES for supported orientations
- return (interfaceOrientation == UIInterfaceOrientationPortrait);
- }
- */
 
 - (void)didReceiveMemoryWarning {
   // Releases the view if it doesn't have a superview.
@@ -609,10 +592,10 @@ withListViewController:(PhotoListViewController *)controller {
     [toolbarButtons addObject:refreshButton];
     
     // Space
-    UIBarButtonItem *spaceRight
-    = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                                    target:self
-                                                    action:nil];
+    UIBarButtonItem *spaceRight = [[UIBarButtonItem alloc] 
+                                   initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                   target:self
+                                   action:nil];
     spaceRight.width = 30.0f;
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
@@ -695,7 +678,8 @@ withListViewController:(PhotoListViewController *)controller {
     
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error","Error")
-                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
+                              message:NSLocalizedString(@"Error.Fetch", 
+                                                        @"Error in ng")
                               delegate:nil
                               cancelButtonTitle:@"OK" 
                               otherButtonTitles:nil];
@@ -707,18 +691,21 @@ withListViewController:(PhotoListViewController *)controller {
   if(hasErrorInInserting) {
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error", @"Error")
-                              message:NSLocalizedString(@"Error.Insert", @"Error IN Saving")
+                              message:NSLocalizedString(@"Error.Insert", 
+                                                        @"Error IN Saving")
                               delegate:self 
                               cancelButtonTitle:@"OK" 
                               otherButtonTitles:nil];
     [alertView show];
     [alertView release];
   }
+  [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadThumb",
+                                             @"download")];
   if([self thumbnailCount] == 0) {
-    progressView.progress = 1.0f;
+    progressView.progressView.progress = 1.0f;
   }
   else {
-    progressView.progress = 1.0f / [self thumbnailCount];
+    progressView.progressView.progress = 1.0f / [self thumbnailCount];
   }
   [downloader start];
   [downloader finishQueuing];
@@ -783,7 +770,8 @@ withListViewController:(PhotoListViewController *)controller {
   NSLog(@"connection error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSString *title = NSLocalizedString(@"Error","Error");
-  NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Connection ERROR");
+  NSString *message = NSLocalizedString(@"Error.ConnectionToServer",
+                                        "Connection ERROR");
   UIAlertView *alertView = [[UIAlertView alloc] 
                             initWithTitle:title
                             message:message
@@ -1116,7 +1104,7 @@ withListViewController:(PhotoListViewController *)controller {
 - (void)downloadDidFailWithError:(NSError *)error withUserInfo:(NSDictionary *)info {
   NSLog(@"downloadDidFailWithError");
   hasErrorInDownloading = YES;
-  progressView.progress = progressView.progress + (1.0 / [self thumbnailCount] );
+  progressView.progressView.progress = progressView.progressView.progress + (1.0 / [self thumbnailCount] );
 }
 
 
@@ -1130,7 +1118,8 @@ withListViewController:(PhotoListViewController *)controller {
       hasErrorInInsertingThumbnail = YES;
     }
   }
-  progressView.progress = progressView.progress + (1.0 / [self thumbnailCount] );
+  progressView.progressView.progress = progressView.progressView.progress + 
+  (1.0 / [self thumbnailCount] );
 }
 
 /*!
@@ -1203,11 +1192,14 @@ withListViewController:(PhotoListViewController *)controller {
     [alertView release];
     return;
   }
-  
+  /*
   progressView.frame = CGRectMake(50.0f, 20.0f, 
                                   self.view.bounds.size.width - 100.0f, 
                                   25.0f);
-  progressView.progress = 0.0f;
+   */
+  progressView.progressView.progress = 0.0f;
+  [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
+                                             @"download")];
   [self discardTumbnails];
   [self.view addSubview:progressView];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
