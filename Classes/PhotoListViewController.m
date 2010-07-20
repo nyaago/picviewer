@@ -802,6 +802,7 @@ withListViewController:(PhotoListViewController *)controller {
   if (fetchedPhotosController != nil) {
     return fetchedPhotosController;
   }
+  [NSFetchedResultsController deleteCacheWithName:nil];
   
   /*
    Set up the fetched results controller.
@@ -1025,8 +1026,8 @@ withListViewController:(PhotoListViewController *)controller {
 
 
 - (CGPoint) pointForThumb:(NSUInteger)n {
-  NSLog(@"width = %f, height = %f", self.scrollView.bounds.size.width, 
-        self.scrollView.bounds.size.height);
+//  NSLog(@"width = %f, height = %f", self.scrollView.bounds.size.width, 
+//        self.scrollView.bounds.size.height);
   NSUInteger cols = self.scrollView.bounds.size.width / 80.0f;
   NSUInteger row = n / cols;	// base - 0
   NSUInteger col = n % cols;	// base - 0
@@ -1045,7 +1046,8 @@ withListViewController:(PhotoListViewController *)controller {
   NSInteger y = (NSInteger)point.y;
   NSInteger col = x / (NSInteger)80.0f;
   NSInteger row = y / (NSInteger)80.0f;
-  NSInteger colByRow = (NSInteger)self.scrollView.bounds.size.width / (NSInteger)80.0f;
+  NSInteger colByRow = 
+  				(NSInteger)self.scrollView.bounds.size.width / (NSInteger)80.0f;
   return row * colByRow + col;
 }
 
@@ -1075,7 +1077,7 @@ withListViewController:(PhotoListViewController *)controller {
   picasaFetchController.userId = settings.userId;
   picasaFetchController.password = settings.password;
   [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
-                                        user:[self.album.user valueForKey:@"userId"] ];
+                                        user:[self.album.user valueForKey:@"userId"]];
   downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
   downloader.delegate = self;
   [settings release];
@@ -1101,7 +1103,8 @@ withListViewController:(PhotoListViewController *)controller {
 /*!
  ダウンロードエラー時の通知
  */
-- (void)downloadDidFailWithError:(NSError *)error withUserInfo:(NSDictionary *)info {
+- (void)downloadDidFailWithError:(NSError *)error 
+                    withUserInfo:(NSDictionary *)info {
   NSLog(@"downloadDidFailWithError");
   hasErrorInDownloading = YES;
   progressView.progress = progressView.progress + (1.0 / [self thumbnailCount] );
@@ -1220,7 +1223,8 @@ withListViewController:(PhotoListViewController *)controller {
   
   viewController.album = self.album;
   [self.view.window bringSubviewToFront:self.view];
-  [[self parentViewController] presentModalViewController:navigationController animated:YES];
+  [[self parentViewController] presentModalViewController:navigationController 
+                                                 animated:YES];
 	[viewController release];
   [navigationController release];
 }
