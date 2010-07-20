@@ -134,7 +134,7 @@ static NSLock *lockFetchedResultsController;
   [self.view addSubview:scrollView];
   self.wantsFullScreenLayout = YES;
   // デバイス回転の管理
-  //  deviceRotation = [[DeviceRotation alloc] initWithDelegate:self];
+  //deviceRotation = [[DeviceRotation alloc] initWithDelegate:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -170,14 +170,14 @@ static NSLock *lockFetchedResultsController;
    */
 }
 
-
+/*
 // Override to allow orientations other than the default portrait orientation.
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
   // Return YES for supported orientations
   return YES;
   // return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
-
+*/
 
 - (void)didReceiveMemoryWarning {
   // Releases the view if it doesn't have a superview.
@@ -224,6 +224,8 @@ static NSLock *lockFetchedResultsController;
   }
   if(pageController)
     [pageController release];
+  if(deviceRotation)
+    [deviceRotation release];
   [super dealloc];
 }
 
@@ -317,33 +319,6 @@ static NSLock *lockFetchedResultsController;
 
 #pragma mark -
 
-#pragma mark DeviceRotationDelegate
-
-// デバイス回転の通知
-// Viewサイズ調整、toolbarの配置調整をしてい写真を表示
-- (void)deviceRotated:(UIDeviceOrientation)orientation {
-  NSLog(@"deviceRotated:");
-  // Viewサイズ調整
-  self.view.frame = [self viewFrame:orientation];
-  CGRect bounds = self.view.frame;
-  bounds.origin.x = 0;
-  bounds.origin.y = 0;
-  self.scrollView.frame = bounds;
-  // toolBar配置
-  CGRect toolbarFrame = toolbar.frame;
-  toolbarFrame.origin.y 
-  = self.view.frame.size.height - toolbarFrame.size.height ;
-  toolbar.frame = toolbarFrame;
-  // 写真を再表示
-  [self showImage];
-  [self.view bringSubviewToFront:toolbar];
-}
-
-
-#pragma mark -
-
-
-
 
 #pragma mark QueuedURLDownloaderDelegate
 
@@ -396,6 +371,35 @@ static NSLock *lockFetchedResultsController;
 
 
 #pragma mark -
+
+#pragma mark DeviceRotationDelegate
+
+-(void) deviceRotated:(UIDeviceOrientation)orient {
+  return;
+  CGFloat angle = 0.0f;
+  UIView *v = self.view.superview;
+  if(orient == UIDeviceOrientationLandscapeLeft) {
+  	angle = M_PI_2;
+    v.transform = CGAffineTransformRotate( v.transform, 
+                                                         angle);
+  }
+  else if(orient == UIDeviceOrientationLandscapeRight)  {
+  	angle = M_PI_2;
+    v.transform = CGAffineTransformRotate( v.transform, 
+                                                         angle);
+  }
+  else  if(orient == UIDeviceOrientationPortraitUpsideDown) {
+    angle = M_PI_2;
+    v.transform = CGAffineTransformRotate( v.transform, 
+                                                         angle);
+  }
+  else  if(orient == UIDeviceOrientationPortrait) {
+		v.transform = CGAffineTransformIdentity;    
+  }
+
+ 
+}
+  
 
 #pragma mark Private
 

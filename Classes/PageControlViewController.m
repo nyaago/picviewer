@@ -225,9 +225,10 @@
   // Return YES for supported orientations
   //  [UIApplication sharedApplication].statusBarHidden = YES;
   //  self.navigationController.navigationBar.hidden = YES;
-  
+//	[self deviceRotated:interfaceOrientation];
   return YES;
 }
+
 
 /*
  touch終了
@@ -350,10 +351,13 @@
     pageView.prevPage.view.hidden = YES;
   }
   [view layoutViews];
+  // toolbarボタンの状態
+  [self setToolbarStatus];
   // scrollViewのcontentのinsetとoffsetを調整(1回、描画処理に戻ってから呼ばれるようにする)
   [self performSelectorOnMainThread:@selector(resetScrollOffsetAndInset:) 
                          withObject:[NSNumber numberWithBool:hidden]
                       waitUntilDone:NO];
+
   
 }
 
@@ -382,7 +386,13 @@
   
   // 表示/非表示の反転
   BOOL hidden = !self.navigationController.navigationBar.hidden;
-  [[UIApplication sharedApplication] setStatusBarHidden:hidden animated:YES];
+  if([UIApplication 
+      instancesRespondToSelector:@selector(setStatusBarHidden:withAnimation:)]) {
+  	[[UIApplication sharedApplication] setStatusBarHidden:hidden withAnimation:YES];
+  }
+	else {
+	  [[UIApplication sharedApplication] setStatusBarHidden:hidden animated:YES];
+  }
   self.navigationController.navigationBar.hidden = hidden;
   CGRect frame = self.navigationController.navigationBar.frame;
   frame.origin.y = statusBarHeight;

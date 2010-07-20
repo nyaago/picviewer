@@ -138,7 +138,7 @@
   
   @private
   // ページに表示するViewを提供するソースオブジェクト
-  UIViewController<PageControlViewControllerDataSource> *source;
+  NSObject<PageControlViewControllerDataSource> *source;
   // 現在ページ - @TODO - Viewから取得する..
  // NSUInteger curPageNumber;
   // 機器回転通知の管理オブジェクト
@@ -159,7 +159,8 @@
  @property source
  @discussion ページに表示するViewを提供するソースオブジェクト
  */
-@property (nonatomic, retain) UIViewController<PageControlViewControllerDataSource> *source;
+@property (nonatomic, retain) NSObject<PageControlViewControllerDataSource> *source;
+
 
 /*!
  @property curPageNumber
@@ -252,9 +253,11 @@
 
 /*!
  @method setPageController
- 
+ @discuttion PageViewのコントローラーを設定
  */
 - (void) setPageController:(PageControlViewController *)controller;
+
+
 
 @optional
 
@@ -293,7 +296,10 @@
  */
 - (UIViewController<ScrolledPageViewDelegate> *) pageAt:(NSUInteger)n;
 
+@optional
+
 
 @end
+
 
 

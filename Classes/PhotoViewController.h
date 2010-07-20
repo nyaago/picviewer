@@ -39,6 +39,8 @@ ScrolledPageViewDelegate> {
   
   // 
   NSInteger lastTapCount;
+  
+  DeviceRotation *deviceRotation;
 }
 
 /*!
