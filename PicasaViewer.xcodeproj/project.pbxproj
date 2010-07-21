@@ -39,7 +39,6 @@
 		72C4AC8F119AED2200F4B664 /* PhotoImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C4AC8E119AED2200F4B664 /* PhotoImage.m */; };
 		72C6183A118A6F52001FD7C7 /* DeviceRotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61839118A6F52001FD7C7 /* DeviceRotation.m */; };
 		72C61C32118AECF8001FD7C7 /* PageControlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */; };
-		72C61C33118AECF8001FD7C7 /* PageScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61C31118AECF8001FD7C7 /* PageScrollView.m */; };
 		72D577881180357300F687DB /* PicasaFetchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577871180357300F687DB /* PicasaFetchController.m */; };
 		72D577E811804AAE00F687DB /* NewUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577E611804AAE00F687DB /* NewUserViewController.m */; };
 		72D577E911804AAE00F687DB /* NewUserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D577E711804AAE00F687DB /* NewUserViewController.xib */; };
@@ -136,7 +135,6 @@
 		72C61839118A6F52001FD7C7 /* DeviceRotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceRotation.m; sourceTree = "<group>"; };
 		72C61C2E118AECF8001FD7C7 /* PageControlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PageControlViewController.h; sourceTree = "<group>"; };
 		72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageControlViewController.m; sourceTree = "<group>"; };
-		72C61C31118AECF8001FD7C7 /* PageScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageScrollView.m; sourceTree = "<group>"; };
 		72D577861180357300F687DB /* PicasaFetchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PicasaFetchController.h; sourceTree = "<group>"; };
 		72D577871180357300F687DB /* PicasaFetchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasaFetchController.m; sourceTree = "<group>"; };
 		72D577E511804AAE00F687DB /* NewUserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewUserViewController.h; sourceTree = "<group>"; };
@@ -186,7 +184,6 @@
 			children = (
 				72C61C2E118AECF8001FD7C7 /* PageControlViewController.h */,
 				72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */,
-				72C61C31118AECF8001FD7C7 /* PageScrollView.m */,
 				72EA5B4A1181539400065915 /* Utils */,
 				72EA5A991181400D00065915 /* Models */,
 				28C286DF0D94DF7D0034E888 /* RootViewController.h */,
@@ -460,7 +457,6 @@
 				72582A841189B7B200A8A6FC /* PhotoViewController.m in Sources */,
 				72C6183A118A6F52001FD7C7 /* DeviceRotation.m in Sources */,
 				72C61C32118AECF8001FD7C7 /* PageControlViewController.m in Sources */,
-				72C61C33118AECF8001FD7C7 /* PageScrollView.m in Sources */,
 				72C4AC8F119AED2200F4B664 /* PhotoImage.m in Sources */,
 				721C217611A2C85700D05256 /* SettingsViewController.m in Sources */,
 				721C21D711A3762400D05256 /* SettingsManager.m in Sources */,
@@ -528,7 +524,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
 				OTHER_LDFLAGS = "-all_load";
 				PREBINDING = NO;
-				SDKROOT = iphoneos3.1.3;
+				SDKROOT = iphoneos4.0;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
 			};
@@ -548,7 +544,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
 				OTHER_LDFLAGS = "-all_load";
 				PREBINDING = NO;
-				SDKROOT = iphoneos3.1.3;
+				SDKROOT = iphoneos4.0;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
 			};
