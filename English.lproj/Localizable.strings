@@ -64,6 +64,8 @@
 // General
 "Width" = "Width";
 "Height" = "Height";
+"Location" = "Locaton";
+
 
 // キーワードを置換
 "Public" = "Public";

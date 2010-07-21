@@ -133,7 +133,9 @@
 //            cell.textLabel.text = self.photo.descript;
 //            break;
           case(1) :
-            cell.textLabel.text = self.photo.location;
+            cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@",
+                                   NSLocalizedString(@"Location", @"Location"),
+                                   self.photo.location];
             break;
           case(2) :
             {

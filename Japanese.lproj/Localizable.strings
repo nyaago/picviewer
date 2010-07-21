@@ -67,6 +67,7 @@
 // General
 "Width" = "幅";
 "Height" = "高さ";
+"Location" = "緯度-経度";
 
 // キーワードを置換
 "public" = "公開";
