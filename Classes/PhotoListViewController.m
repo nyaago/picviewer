@@ -15,6 +15,8 @@
 #import "SettingsManager.h"
 #import "NetworkReachability.h"
 
+#define kDownloadMaxAtSameTime 5
+
 @interface PhotoImageView : UIImageView
 {
   PhotoListViewController *listViewController;
@@ -70,6 +72,19 @@ withListViewController:(PhotoListViewController *)controller {
  Viewが何番目のIndexの写真であるかを返す
  */
 - (NSUInteger) indexForPhoto:(UIView *)targetView;
+
+/*!
+ @method thumbWidth
+ @discussion thumbnailの幅
+ */
+- (NSUInteger) thumbWidth;
+
+/*!
+ @method thumbHeigth
+ @discussion thumbnailの高さ
+ */
+- (NSUInteger) thumbHeight;
+
 
 /*!
  @method insertPhoto:withAlbum
@@ -254,7 +269,8 @@ withListViewController:(PhotoListViewController *)controller {
     [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
                                           user:[self.album.user valueForKey:@"userId"] ];
     
-    downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
+    downloader = [[QueuedURLDownloader alloc] 
+                  initWithMaxAtSameTime:kDownloadMaxAtSameTime];
     downloader.delegate = self;
     [settings release];
   }
@@ -436,7 +452,7 @@ withListViewController:(PhotoListViewController *)controller {
   [self.view setNeedsLayout];
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSDate *date0 = [[[NSDate alloc] init] autorelease];	  // for logging
+  //NSDate *date0 = [[[NSDate alloc] init] autorelease];	  // for logging
   for(NSUInteger i = 0; i < [self thumbnailCount]; ++i) {
     /*
      NSDate *date1 = [[[NSDate alloc] init] autorelease];  // for logging
@@ -462,11 +478,11 @@ withListViewController:(PhotoListViewController *)controller {
      [date2 timeIntervalSinceDate:date1]);
      */
   }
-  
+  /*
   NSDate *date3 = [[[NSDate alloc] init] autorelease];	// for logging
   NSLog(@"interval creating all views for a thumbnail = %f", 
         [date3 timeIntervalSinceDate:date0]);
-  
+  */
   // scrollViewのcontent sizeを設定(main threadで行う必要がある)
   [self performSelectorOnMainThread:@selector(setContentSizeWithImageCount:) 
                          withObject:[NSNumber numberWithInt:[self photoCount]] 
@@ -1028,28 +1044,57 @@ withListViewController:(PhotoListViewController *)controller {
 - (CGPoint) pointForThumb:(NSUInteger)n {
 //  NSLog(@"width = %f, height = %f", self.scrollView.bounds.size.width, 
 //        self.scrollView.bounds.size.height);
-  NSUInteger cols = self.scrollView.bounds.size.width / 80.0f;
+  NSUInteger w = [self thumbWidth];
+  NSUInteger h = [self thumbHeight];
+  NSUInteger padding = 2.0f;
+  NSUInteger cols = self.scrollView.bounds.size.width / w;
   NSUInteger row = n / cols;	// base - 0
   NSUInteger col = n % cols;	// base - 0
-  return CGPointMake(col * 80.0f + 1.0f, row * 80.0f + 1.0f);
+  return CGPointMake(col * h + padding, row * w + padding);
 }
 
 - (CGRect) frameForThums:(NSUInteger)n {
+  NSUInteger w = [self thumbWidth];
+  NSUInteger h = [self thumbHeight];
+  NSUInteger padding = 2.0f;
   CGPoint point = [self pointForThumb:n];
-  return CGRectMake(point.x, point.y, 80.0f - 2.0f, 80.0f - 2.0f);
+  return CGRectMake(point.x, point.y, w - padding * 2, h - padding *2);
 }
 
 - (NSUInteger) indexForPhoto:(UIView *)targetView {
+  NSUInteger w = [self thumbWidth];
+  NSUInteger h = [self thumbHeight];
   CGRect frame = [targetView frame];
   CGPoint point = frame.origin;
   NSInteger x = (NSInteger)point.x;
   NSInteger y = (NSInteger)point.y;
-  NSInteger col = x / (NSInteger)80.0f;
-  NSInteger row = y / (NSInteger)80.0f;
+  NSInteger col = x / (NSInteger)h;
+  NSInteger row = y / (NSInteger)w;
   NSInteger colByRow = 
-  				(NSInteger)self.scrollView.bounds.size.width / (NSInteger)80.0f;
+  				(NSInteger)self.scrollView.bounds.size.width / (NSInteger)w;
   return row * colByRow + col;
 }
+
+- (NSUInteger) thumbWidth {
+  NSInteger w = self.view.frame.size.width;
+  if(w > 640) {
+    return w / 6;
+  }
+  else {
+    return w / 4;
+  }
+}
+
+- (NSUInteger) thumbHeight {
+  NSInteger w = self.view.frame.size.width;
+  if(w > 640) {
+    return w / 6;
+  }
+  else {
+    return w / 4;
+  }
+}
+
 
 - (UIBarButtonItem *)backButton {
   if(!backButton) {
@@ -1078,7 +1123,8 @@ withListViewController:(PhotoListViewController *)controller {
   picasaFetchController.password = settings.password;
   [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
                                         user:[self.album.user valueForKey:@"userId"]];
-  downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
+  downloader = [[QueuedURLDownloader alloc] 
+                initWithMaxAtSameTime:kDownloadMaxAtSameTime];
   downloader.delegate = self;
   [settings release];
   [pool drain];
@@ -1238,7 +1284,7 @@ withListViewController:(PhotoListViewController *)controller {
   
 }
 
-- (UIViewController<ScrolledPageViewDelegate> *) pageAt:(NSUInteger)n {
+- (UIViewController<PageViewDelegate> *) pageAt:(NSUInteger)n {
   PhotoViewController *viewController = [[PhotoViewController alloc] 
                                          initWithNibName:@"PhotoViewController" 
                                          bundle:nil];

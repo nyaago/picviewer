@@ -105,7 +105,7 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)fragment {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSLog(@"connection:didReceiveData");
+//  NSLog(@"connection:didReceiveData");
   if(fragment) {
     //NSLog(@"data length = %d", [fragment length]);
   }
@@ -130,7 +130,7 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 - (void)connection:(NSURLConnection *)connection 
 didReceiveResponse:(NSURLResponse *)response {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSLog(@"connection:didReceiveResponse ");
+//  NSLog(@"connection:didReceiveResponse ");
   if ([delegate respondsToSelector:@selector(didReceiveResponse:withUserInfo:)])
     [delegate didReceiveResponse:response withUserInfo:userInfo];
   [pool drain];
@@ -138,9 +138,9 @@ didReceiveResponse:(NSURLResponse *)response {
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSLog(@"connection:connectionDidFinishLoading ");
+//  NSLog(@"connection:connectionDidFinishLoading ");
   if(data) {
-    NSLog(@"data length = %d", [data length]);
+//    NSLog(@"data length = %d", [data length]);
   }
   if(self.userInfo) {
     /*
@@ -156,7 +156,7 @@ didReceiveResponse:(NSURLResponse *)response {
     [delegate didFinishLoading:data withUserInfo:userInfo];
   [self.queuedDownloader finishDownload:self];
   [pool drain];
-  NSLog(@"drain");
+//  NSLog(@"drain");
 }
 
 

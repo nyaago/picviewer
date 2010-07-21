@@ -133,8 +133,6 @@ static NSLock *lockFetchedResultsController;
   self.view.backgroundColor = [UIColor blackColor];
   [self.view addSubview:scrollView];
   self.wantsFullScreenLayout = YES;
-  // デバイス回転の管理
-  //deviceRotation = [[DeviceRotation alloc] initWithDelegate:self];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -224,8 +222,6 @@ static NSLock *lockFetchedResultsController;
   }
   if(pageController)
     [pageController release];
-  if(deviceRotation)
-    [deviceRotation release];
   [super dealloc];
 }
 
@@ -272,11 +268,11 @@ static NSLock *lockFetchedResultsController;
   return imgView;
 }
 
-- (UIView *)photoImageAt:(NSUInteger)index {
+- (UIImageView *)photoImageAt:(NSUInteger)index {
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSLog(@"Photo view controller photoImageAt");
-  UIView *imgView = nil;
+  UIImageView *imgView = nil;
   NSUInteger indexes[2];
   indexes[0] = 0;
   indexes[1] = index;
@@ -359,10 +355,18 @@ static NSLock *lockFetchedResultsController;
   }
   [lockFetchedResultsController unlock];
   imageView = [self photoImageAt:indexForPhoto];
-//  self.scrollView.contentOffset  = CGPointMake(0.0f, 
-//                                               (scrollView.bounds.size.height - 
-//                                               imageView.bounds.size.height) / 2);
-  [self.scrollView addSubview:imageView];
+  
+  // 最大ズームスケールの設定
+  if(imageView) {
+    if(imageView.image.size.width > self.scrollView.frame.size.width) {
+      self.scrollView.maximumZoomScale = 
+      imageView.image.size.width / self.scrollView.frame.size.width;
+    }
+    else {
+      self.scrollView.maximumZoomScale = 1.0f;
+    }
+    [self.scrollView addSubview:imageView];
+  }
   [downloader release];
   downloader = nil;
   // 
@@ -372,36 +376,6 @@ static NSLock *lockFetchedResultsController;
 
 #pragma mark -
 
-#pragma mark DeviceRotationDelegate
-
--(void) deviceRotated:(UIDeviceOrientation)orient {
-  return;
-  CGFloat angle = 0.0f;
-  UIView *v = self.view.superview;
-  if(orient == UIDeviceOrientationLandscapeLeft) {
-  	angle = M_PI_2;
-    v.transform = CGAffineTransformRotate( v.transform, 
-                                                         angle);
-  }
-  else if(orient == UIDeviceOrientationLandscapeRight)  {
-  	angle = M_PI_2;
-    v.transform = CGAffineTransformRotate( v.transform, 
-                                                         angle);
-  }
-  else  if(orient == UIDeviceOrientationPortraitUpsideDown) {
-    angle = M_PI_2;
-    v.transform = CGAffineTransformRotate( v.transform, 
-                                                         angle);
-  }
-  else  if(orient == UIDeviceOrientationPortrait) {
-		v.transform = CGAffineTransformIdentity;    
-  }
-
- 
-}
-  
-
-#pragma mark Private
 
 -(CGRect) viewFrameForImage:(UIImage *)image {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -469,32 +443,29 @@ static NSLock *lockFetchedResultsController;
     [imageView release];
     imageView = nil;
   }
+  
+  // Photo Viewを生成.PhotoがなければThumbnailのView
   imageView = [self photoImageAt:indexForPhoto];
   if(!imageView) {
     imageView = [self thumbnailAt:indexForPhoto];
     mustDownload = YES;
   }
-  /*
-   CGRect bounds = scrollView.frame;
-   NSLog(@"scrollView - x => %f,y => %f, width => %f, height => %f", 
-   bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
-   bounds = self.view.frame;
-   NSLog(@"view - x => %f,y => %f, width => %f, height => %f", 
-   bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
-   */
+  
+  // 最大ズームスケールの設定
+  if(imageView.image.size.width > self.scrollView.frame.size.width) {
+	  self.scrollView.maximumZoomScale = 
+  	imageView.image.size.width / self.scrollView.frame.size.width;
+  }
+  else {
+    self.scrollView.maximumZoomScale = 1.0f;
+  }
+
   scrollView.contentSize = imageView.frame.size;
 //  self.scrollView.contentOffset  = CGPointMake(0.0f, 
 //                                                (scrollView.bounds.size.height - 
 //                                                imageView.bounds.size.height) / 2);
   [self.scrollView addSubview:imageView];
-  /*
-   bounds = scrollView.frame;
-   NSLog(@"scrollView - x => %f,y => %f, width => %f, height => %f", 
-   bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
-   bounds = self.view.frame;
-   NSLog(@"view - x => %f,y => %f, width => %f, height => %f", 
-   bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
-   */
+
   //  Photoがnilだった場合、ダウンロード処理の起動
   if(mustDownload) {
     NSLog(@"down load photo");
@@ -542,6 +513,8 @@ static NSLock *lockFetchedResultsController;
 
 #pragma mark -
 
+#pragma mark UIResponder
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
   [super touchesBegan:touches withEvent:event];
   [[self nextResponder] touchesBegan:touches withEvent:event];
@@ -552,12 +525,19 @@ static NSLock *lockFetchedResultsController;
   [[self nextResponder] touchesCancelled:touches withEvent:event];
 }
 
+/*!
+ @method touchesEnded:withEvent:
+ @discussion touch終了時の通知.
+ 2tapのときは、Photoを最大表示.1tapのときは、navigation/toolbar/statusbarの
+ 表示切り替えを起動する.
+ */
+
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
   [super touchesEnded:touches withEvent:event];
   
   UITouch *touch = [touches anyObject];
-  NSLog(@"touch event - touches - %d, tap count = %d",
-        [touches count], [touch tapCount]);
+  //NSLog(@"touch event - touches - %d, tap count = %d",
+  //      [touches count], [touch tapCount]);
   if([touch tapCount] == 2) {
     if(self.scrollView.zoomScale == 1.0f) {
     	self.scrollView.zoomScale = self.scrollView.maximumZoomScale;
@@ -584,13 +564,13 @@ static NSLock *lockFetchedResultsController;
 
 #pragma mark -
 
-#pragma mark ScrolledPageViewDelegate protocol
+#pragma mark PageViewDelegate protocol
 
 /*!
- @method pageDidAddWithPageScrollViewController:withOrientation
+ @method pageDidAddWithPageViewController:withOrientation
  @discussion このViewがPagingScrollViewに追加されたときの通知
  */
-- (void)pageDidAddWithPageScrollViewController:(PageControlViewController *)controller 
+- (void)pageDidAddWithPageViewController:(PageControlViewController *)controller 
                                withOrientation:(UIDeviceOrientation)orientation{
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
@@ -612,7 +592,7 @@ static NSLock *lockFetchedResultsController;
   [pool drain];
 }
 
-- (void) pageScrollView:(PageControlViewController *)controller 
+- (void) pageView:(PageControlViewController *)controller 
                 rotated:(UIDeviceOrientation)orientation {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   

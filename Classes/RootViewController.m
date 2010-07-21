@@ -76,7 +76,7 @@
                               message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
                               delegate:nil
                               cancelButtonTitle:nil 
-                              otherButtonTitles:@"OK"];
+                              otherButtonTitles:@"OK", nil];
     [alertView show];
     [alertView release];
   }
@@ -165,7 +165,7 @@
                                                         @"Error in adding")
                               delegate:nil
                               cancelButtonTitle:nil 
-                              otherButtonTitles:@"OK"];
+                              otherButtonTitles:@"OK", nil];
     [alertView show];
     [alertView release];
     return nil;
@@ -187,7 +187,7 @@
                                                         @"Error in deleting")
                               delegate:nil
                               cancelButtonTitle:nil 
-                              otherButtonTitles:@"OK"];
+                              otherButtonTitles:@"OK", nil];
     [alertView show];
     [alertView release];
   }

@@ -17,8 +17,8 @@
  @discussion 写真表示View
  */
 @interface PhotoViewController : UIViewController 
-<UIScrollViewDelegate, DeviceRotationDelegate,QueuedURLDownloaderDelegate,
-ScrolledPageViewDelegate> {
+<UIScrollViewDelegate, QueuedURLDownloaderDelegate,
+PageViewDelegate> {
   NSFetchedResultsController *fetchedPhotosController;
   NSManagedObjectContext *managedObjectContext;
   
@@ -37,10 +37,8 @@ ScrolledPageViewDelegate> {
   // PageをControll するViewのController
   PageControlViewController *pageController;
   
-  // 
+  // 最近のtap数
   NSInteger lastTapCount;
-  
-  DeviceRotation *deviceRotation;
 }
 
 /*!
