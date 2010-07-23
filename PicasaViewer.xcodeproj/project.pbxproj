@@ -18,6 +18,8 @@
 		721C217611A2C85700D05256 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 721C217411A2C85700D05256 /* SettingsViewController.m */; };
 		721C217711A2C85700D05256 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 721C217511A2C85700D05256 /* SettingsViewController.xib */; };
 		721C21D711A3762400D05256 /* SettingsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 721C21D611A3762400D05256 /* SettingsManager.m */; };
+		72289E3211F97947007A00CB /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 72289E3011F97947007A00CB /* icon.png */; };
+		72289E3311F97947007A00CB /* icon.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 72289E3111F97947007A00CB /* icon.jpg */; };
 		722D6D5011869787004F0F0D /* AlbumTableViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 722D6D4F11869787004F0F0D /* AlbumTableViewController.xib */; };
 		722D6DCB1186A0EE004F0F0D /* PhotoListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 722D6DC91186A0EE004F0F0D /* PhotoListViewController.m */; };
 		722D6DCC1186A0EE004F0F0D /* PhotoListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */; };
@@ -103,6 +105,8 @@
 		721C217511A2C85700D05256 /* SettingsViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingsViewController.xib; sourceTree = "<group>"; };
 		721C21D511A3762400D05256 /* SettingsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsManager.h; sourceTree = "<group>"; };
 		721C21D611A3762400D05256 /* SettingsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsManager.m; sourceTree = "<group>"; };
+		72289E3011F97947007A00CB /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = Resources/icon.png; sourceTree = "<group>"; };
+		72289E3111F97947007A00CB /* icon.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = icon.jpg; path = Resources/icon.jpg; sourceTree = "<group>"; };
 		722D6D4F11869787004F0F0D /* AlbumTableViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumTableViewController.xib; sourceTree = "<group>"; };
 		722D6DC81186A0EE004F0F0D /* PhotoListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoListViewController.h; sourceTree = "<group>"; };
 		722D6DC91186A0EE004F0F0D /* PhotoListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoListViewController.m; sourceTree = "<group>"; };
@@ -254,6 +258,8 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72289E3011F97947007A00CB /* icon.png */,
+				72289E3111F97947007A00CB /* icon.jpg */,
 				72D7E7CF11BF5643001685AF /* PhotoInfoViewController.xib */,
 				72FFBD1511ABA46700E16BA4 /* AlbumInfoViewController.xib */,
 				721C217511A2C85700D05256 /* SettingsViewController.xib */,
@@ -431,6 +437,8 @@
 				721C217711A2C85700D05256 /* SettingsViewController.xib in Resources */,
 				72FFBD1711ABA46700E16BA4 /* AlbumInfoViewController.xib in Resources */,
 				72D7E7D111BF5643001685AF /* PhotoInfoViewController.xib in Resources */,
+				72289E3211F97947007A00CB /* icon.png in Resources */,
+				72289E3311F97947007A00CB /* icon.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
