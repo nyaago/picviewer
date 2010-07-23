@@ -722,6 +722,7 @@ withListViewController:(PhotoListViewController *)controller {
   }
   else {
     progressView.progress = 1.0f / [self thumbnailCount];
+    [progressView setNeedsLayout];
   }
   [downloader start];
   [downloader finishQueuing];
@@ -1167,8 +1168,19 @@ withListViewController:(PhotoListViewController *)controller {
       hasErrorInInsertingThumbnail = YES;
     }
   }
-  progressView.progress = progressView.progress + 
-  (1.0 / [self thumbnailCount] );
+  NSNumber *f = [NSNumber numberWithFloat:progressView.progress + 
+                 (1.0f / [self thumbnailCount]) ];
+  [self performSelectorOnMainThread:@selector(updateProgress:) 
+                         withObject:f
+                      waitUntilDone:NO];
+//  progressView.progress = progressView.progress + 
+//  (1.0 / [self thumbnailCount] );
+}
+
+- (void) updateProgress:(NSNumber *)v {
+  NSLog(@"progress - %f", [v floatValue]);
+  progressView.progress = [v floatValue];
+  [progressView setNeedsLayout];
 }
 
 /*!

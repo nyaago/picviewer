@@ -51,6 +51,13 @@
   messageLabel.text = message;
 }
 
+- (void) setProgress:(float)v {
+  progressView.progress = v;
+}
 
+
+- (float) progress {
+  return progressView.progress;
+}
 
 @end
