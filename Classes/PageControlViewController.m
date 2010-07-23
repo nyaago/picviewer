@@ -426,7 +426,7 @@
      view.curPageNumber == 0 && point.x >= scrollView.bounds.size.width) {
     NSLog(@"page count = %d", [source pageCount]);
     if(view.curPageNumber + 1 < [source pageCount] ) {
-      [view toNextPage];
+   //   [view toNextPage];
       if(view.curPageNumber + 1 < [source pageCount]) {
 				[self toNextPage:self];        
       }
@@ -439,7 +439,7 @@
   // 前のページへの移動時
   else if(point.x < scrollView.bounds.size.width) {
     if(view.curPageNumber > 0) {
-      [view toPrevPage];
+  //    [view toPrevPage];
       if(view.curPageNumber > 0) {
         [self toPrevPage:self];
       }
@@ -455,6 +455,7 @@
   if(pageView.prevPage) {
     pageView.prevPage.view.hidden = YES;
   }
+  [view layoutViews];
   // scrollViewのcontentのinsetとoffsetを調整(1回、描画処理に戻ってから呼ばれるようにする)
   [self performSelectorOnMainThread:@selector(resetScrollOffsetAndInset:) 
                          withObject:[NSNumber numberWithBool:hidden]
