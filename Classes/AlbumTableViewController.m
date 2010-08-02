@@ -14,67 +14,8 @@
 
 @interface AlbumTableViewController(Private)
 
-/*!
- @method insertAlbum:withUser;
- @discussion Album情報をローカルDBに登録する.
- @param album - GoogleDataのAlbumEntry
- @param withUser - CoreDataのuser Object
- @return 更新結果のCoreDataのAlbumObject
- */
-- (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject;
-
-/*!
- @method updateAlbum:withGDataAlbum:withUser
- @discussion Album情報をローカルDBに変更登録する.
- @param album - GoogleDataのAlbumEntry
- @param withUser - CoreDataのuser Object
- @return 更新結果のCoreDataのAlbumObject
- */
-- (Album *)updateAlbum:(Album *)albumObject 
-        withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject;
-
-/*!
- @method fillAlbumObject:withGDataEntry:withUser
- @discussion GoogleのPhotoAlbumのEntryよりCoreDataのAlbum Objectへ値を設定
- @param albumObject - 設定対象のAlbum Object
- @param album - GoogleDataのAlbumEntry
- @param withUser - CoreDataのuser Object
- @return CoreDataのAlbumObject
- */
-- (Album *)fillAlbumObject:(Album *)albumObject
-            withGDataEntry:(GDataEntryPhotoAlbum *)album 
-                  withUser:(User *)userObject;
-
-/*!
- @method deleteAlbum:
- @discussion Album情報をローカルDBに登録する.
- @param albumObject 削除対象のAlbum
- @param user 参照元のUser
- */
-- (void)deleteAlbum:(Album *)albumObject withUser:(User *)userObject;
 
 
-- (void)deleteAlbumsWithUserFeed:(GDataFeedPhotoUser *)album 
-                        withUser:(User *)userObject
-                        hasError:(BOOL *)f;
-
-- (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)album 
-                                withUser:(User *)userObject
-                                hasError:(BOOL *)f;
-
-
-/*!
- @method selectAlbum
- @discussion AlbumのManagedObjectを取得する
- */
-- (Album *)selectAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject hasError:(BOOL *)f;
-
-
-/*!
- @method updateThumbnail:forAlbum
- @discussion アルバムのThumbnailをローカルDBに更新登録する.
- */
-- (Album *)updateThumbnail:(NSData *)thumbnailData forAlbum:(Album *)album;
 /*!
  @method downloadThumbnail:withAlbumModel
  @discussion AlbumのThumbnailをダウンロードする.
@@ -102,12 +43,16 @@
  */
 - (void) enableToolbar:(BOOL)enable;
 
+- (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)album 
+                                withUser:(User *)userObject
+                                hasError:(BOOL *)f;
+
 @end
 
 
 @implementation AlbumTableViewController
 
-@synthesize fetchedAlbumsController, managedObjectContext;
+@synthesize managedObjectContext;
 @synthesize user;
 
 #pragma mark View lifecycle
@@ -134,9 +79,12 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   self.navigationItem.leftBarButtonItem = nil;
+  modelController = [[AlbumModelController alloc] 
+                     initWithContext:self.managedObjectContext 
+                     withUser:self.user];
   
   NSError *error = nil;
-  if (![[self fetchedAlbumsController] performFetch:&error]) {
+  if (![[modelController fetchedAlbumsController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error",@"Error")
@@ -150,10 +98,7 @@
   // Albumが0件であれば、Googleへの問い合わせを起動.
   // 問い合わせ結果は、userAndAlbumsWithTicket:finishedWithUserFeed:errorで受け
   // CoreDataへの登録を行う
-  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedAlbumsController sections]
-                                                  objectAtIndex:0];
-  if([sectionInfo numberOfObjects] == 0) {
-    //if([[fetchedAlbumsController sections] count] == 0) {
+  if([modelController albumCount] == 0) {
     // Network接続の確認
     if(![NetworkReachability reachable]) {
       NSString *title = NSLocalizedString(@"Notice","Notice");
@@ -249,13 +194,10 @@
   if(error) {
   }
   else {
-    // clear fetchedController
-    [fetchedAlbumsController release];
-    fetchedAlbumsController = nil;
     // ローカルDBへの保存
     NSLog(@"the user has %d alblums", [[feed entries] count]);
     // --  削除
-    [self deleteAlbumsWithUserFeed:feed 
+    [modelController deleteAlbumsWithUserFeed:feed 
                           withUser:user 
                           hasError:&hasErrorDeleting];
     // -- 更新、新規
@@ -283,7 +225,7 @@
       [alertView release];
     }
   }
-  if (![[self fetchedAlbumsController] performFetch:&error]) {
+  if (![[modelController fetchedAlbumsController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error","Error")
@@ -396,21 +338,13 @@
 #pragma mark Table view methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-  if(!fetchedAlbumsController) {
-    return 0;
-  }
-  return [[fetchedAlbumsController sections] count];
+  return [[modelController.fetchedAlbumsController sections] count];
 }
 
 
 // Customize the number of rows in the table view.
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  if(!fetchedAlbumsController) {
-    return 0;
-  }
-  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedAlbumsController sections]
-                                                  objectAtIndex:section];
-  return [sectionInfo numberOfObjects];
+  return [modelController albumCount];
 }
 
 
@@ -424,11 +358,11 @@
     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault 
                                    reuseIdentifier:CellIdentifier] autorelease];
   }
-  Album *managedObject = (Album *)[fetchedAlbumsController objectAtIndexPath:indexPath];
+  Album *managedObject = [modelController albumAt:indexPath];
   cell.textLabel.text = [[managedObject valueForKey:@"title"] description];
   if(!cell.imageView.image) {
     // Configure the cell.
-    Album *managedObject = (Album *)[fetchedAlbumsController objectAtIndexPath:indexPath];
+    Album *managedObject = (Album *)[modelController albumAt:indexPath];
     if(managedObject.thumbnail) {
       UIImage *image = [[UIImage alloc] initWithData:managedObject.thumbnail];
       cell.imageView.image = image;
@@ -454,8 +388,7 @@
   [[PhotoListViewController alloc] initWithNibName:@"PhotoListViewController" bundle:nil];
   self.navigationItem.backBarButtonItem =  [photoViewController backButton];
   
-  NSManagedObject *selectedObject = 
-  [[self fetchedAlbumsController] objectAtIndexPath:indexPath];
+  Album *selectedObject = [modelController albumAt:indexPath];
   photoViewController.managedObjectContext = self.managedObjectContext;
   photoViewController.album = (Album *)selectedObject;
   // Pass the selected object to the new view controller.
@@ -508,63 +441,11 @@
  }
  */
 
-#pragma mark Fetched results controller
-
-- (NSFetchedResultsController *)fetchedAlbumsController {
-  
-  if (fetchedAlbumsController != nil) {
-    return fetchedAlbumsController;
-  }
-  
-  /*
-   Set up the fetched results controller.
-   */
-  // Create the fetch request for the entity.
-  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-  // Edit the entity name as appropriate.
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Album"
-                                            inManagedObjectContext:managedObjectContext];
-  [fetchRequest setEntity:entity];
-  
-  NSPredicate *predicate 
-  = [NSPredicate predicateWithFormat:@"%K = %@", @"user.userId", user.userId];
-  [fetchRequest setPredicate:predicate];
-  
-  // Set the batch size to a suitable number.
-  [fetchRequest setFetchBatchSize:20];
-  
-  // Edit the sort key as appropriate.
-  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" 
-                                                                 ascending:NO];
-  NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
-  
-  [fetchRequest setSortDescriptors:sortDescriptors];
-  
-  // Edit the section name key path and cache name if appropriate.
-  // nil for section name key path means "no sections".
-  NSFetchedResultsController *aFetchedAlbumsController = [[NSFetchedResultsController alloc] 
-                                                          initWithFetchRequest:fetchRequest 
-                                                          managedObjectContext:managedObjectContext 
-                                                          sectionNameKeyPath:nil 
-                                                          cacheName:@"Root"];
-  aFetchedAlbumsController.delegate = self;
-  self.fetchedAlbumsController = aFetchedAlbumsController;
-  
-  [aFetchedAlbumsController release];
-  [fetchRequest release];
-  [sortDescriptor release];
-  [sortDescriptors release];
-  
-  return fetchedAlbumsController;
-}    
-
-
 
 
 - (void)dealloc {
   NSLog(@"AlbumTableViewController deallloc");
   NSLog(@"managedObjectContext retain count = %d",[managedObjectContext retainCount]);
-  NSLog(@"fetchedAlbumsController retain count = %d",[fetchedAlbumsController retainCount]);
   NSLog(@"user retain count = %d",[user retainCount]);
   NSLog(@"backButton retain count = %d",[backButton retainCount]);
 
@@ -584,8 +465,8 @@
     downloader = nil;
   }
   
-  if(fetchedAlbumsController)
-    [fetchedAlbumsController release];
+  if(modelController)
+    [modelController release];
   if(managedObjectContext)
     [managedObjectContext release];
   if(user)
@@ -602,127 +483,14 @@
 }
 
 #pragma mark Private
-- (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject{
 
-  // 新しい永続化オブジェクトを作って
-  NSManagedObject *newManagedObject 
-  = [NSEntityDescription insertNewObjectForEntityForName:@"Album"
-                                  inManagedObjectContext:managedObjectContext];
-  
-  // 値を設定
-  [newManagedObject setValue:[album GPhotoID] forKey:@"albumId"];
-  [self fillAlbumObject:(Album *)newManagedObject 
-         withGDataEntry:album 
-               withUser:userObject];
-  
-  
-  // Save the context.
-  NSError *error = nil;
-  if ([self.user respondsToSelector:@selector(addAlbumObject:) ] ) {
-    [self.user addAlbumObject:newManagedObject];
-  }	
-  if (![managedObjectContext save:&error]) {
-    // 
-    return nil;	
-  }
-  return (Album *)newManagedObject;
-}
-
-- (Album *)updateAlbum:(Album *)albumObject 
-        withGDataAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject {
-  
-  // 値を設定
-  [self fillAlbumObject:albumObject 
-         withGDataEntry:album 
-               withUser:userObject];
-  
-  // Save the context.
-  NSError *error = nil;
-  if (![managedObjectContext save:&error]) {
-    // 
-    return nil;	
-  }
-  return albumObject;
-}
-
-- (Album *)fillAlbumObject:(Album *)albumObject
-            withGDataEntry:(GDataEntryPhotoAlbum *)album 
-                  withUser:(User *)userObject {
-  // 各値を設定（If appropriate, configure the new managed object.）
-  [albumObject setValue:[[album title] contentStringValue] forKey:@"title"];
-  [albumObject setValue:[[album timestamp] dateValue] forKey:@"timeStamp"];
-  if([album description]) {
-		[albumObject setValue:[album description] forKey:@"descript"];
-  }
-	[albumObject setValue:[album access] forKey:@"access"];
-  [albumObject setValue:[album photosUsed] forKey:@"photosUsed"];
-  
-  // thumbnailのurl
-  if([[[album mediaGroup] mediaThumbnails] count] > 0) {
-    GDataMediaThumbnail *thumbnail = [[[album mediaGroup] mediaThumbnails]  
-                                      objectAtIndex:0];
-    NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
-    [albumObject setValue:[thumbnail URLString] forKey:@"urlForThumbnail"];
-  }
-  return albumObject;
-}
-
-
-- (void)deleteAlbum:(Album *)albumObject withUser:(User *)userObject {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSSet *set = [NSSet setWithObject:albumObject];
-  // 参照元User削除
-  [userObject removeAlbum:set];
-  // Album削除
-  [managedObjectContext deleteObject:(NSManagedObject *)albumObject];
-  // Save the context.
-  NSError *error = nil;
-  if (![managedObjectContext save:&error]) {
-    NSLog(@"error Occured in remveing Album - %@", error);
-    [pool drain];
-    return;
-  }
-  [pool drain];
-  return;
-}
-
-
-- (Album *)selectAlbum:(GDataEntryPhotoAlbum *)album   
-              withUser:(User *)userObject  hasError:(BOOL *)f{
-  *f = NO;
-  // Create the fetch request for the entity.
-  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-  // Edit the entity name as appropriate.
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Album"
-                                            inManagedObjectContext:managedObjectContext];
-  [fetchRequest setEntity:entity];
-  NSPredicate *predicate 
-  = [NSPredicate predicateWithFormat:@"%K = %@ AND %K = %@", 
-     @"albumId", [album GPhotoID],
-     @"user.userId", userObject.userId ];
-  [fetchRequest setPredicate:predicate];
-  
-  NSError *error;
-  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
-  if(!items) {
-    NSLog(@"Unresolved error %@", error);
-    hasErrorInInsertingThumbnail = YES;
-    *f = YES;
-    return nil;
-  }
-  if([items count] >= 1) {
-    return (Album *)[items objectAtIndex:0];
-  }
-  
-  return nil;
-}
 
 - (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)feed 
                                 withUser:(User *)userObject 
                                 hasError:(BOOL *)f {
-
+  
   BOOL hasErrorInInserting = NO;
-
+  
   NSArray *entries = [feed entries];
   for (int i = 0; i < [entries count]; ++i) {
     GDataEntryPhotoAlbum *album = [entries objectAtIndex:i];
@@ -730,17 +498,19 @@
           [[album title] contentStringValue], [album GPhotoID], [album feedLink]);
     //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
     BOOL hasError;
-    Album *albumModel = [self selectAlbum:album withUser:userObject hasError:&hasError];
+    Album *albumModel = [modelController selectAlbum:album 
+                                            withUser:userObject 
+                                            hasError:&hasError];
     if(hasError) {
       hasErrorInInserting = YES;
       continue;
     }
     if(albumModel) {
-      albumModel = [self updateAlbum:albumModel 
+      albumModel = [modelController updateAlbum:albumModel 
                       withGDataAlbum:album withUser:userObject];
     }
     else {
-      albumModel =  [self insertAlbum:album withUser:userObject];
+      albumModel =  [modelController insertAlbum:album withUser:userObject];
     }
     if(albumModel) {
       [self downloadThumbnail:album withAlbumModel:albumModel];
@@ -753,65 +523,6 @@
 }	
 
 
-
-- (void)deleteAlbumsWithUserFeed:(GDataFeedPhotoUser *)feed 
-                        withUser:(User *)userObject 
-                        hasError:(BOOL *)f {
-
-  // Create the fetch request for the entity.
-  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-  // Edit the entity name as appropriate.
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Album"
-                                            inManagedObjectContext:managedObjectContext];
-  [fetchRequest setEntity:entity];
-  NSPredicate *predicate 
-  = [NSPredicate predicateWithFormat:@"%K = %@ ", 
-     @"user.userId", userObject.userId ];
-  [fetchRequest setPredicate:predicate];
-  
-  
-  NSError *error;
-  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
-  if(!items) {
-    NSLog(@"Unresolved error %@", error);
-    hasErrorInInsertingThumbnail = YES;
-    *f = YES;
-    return;
-  }
-  
-  
-  NSArray *entries = [feed entries];
-	
-  for(Album *albumObject in items) {
-    BOOL found = NO;
-    for(GDataEntryPhotoAlbum *albumEntry in entries) {
-      NSLog(@"compare %@ with %@", albumObject.albumId, [albumEntry GPhotoID]);
-      if ([albumObject.albumId isEqualToString:[albumEntry GPhotoID]]) {
-        found = YES;
-      }
-    }
-    if(found == NO) {
-	    [self deleteAlbum:albumObject withUser:userObject];
-    }
-  }
-}
-
-
-
-
-- (Album *)updateThumbnail:(NSData *)thumbnailData forAlbum:(Album *)album {
-  if(!album)
-    return nil;
-  album.thumbnail = thumbnailData;
-  NSError *error = nil;
-  if (![managedObjectContext save:&error]) {
-    // 
-    NSLog(@"Unresolved error %@", error);
-    hasErrorInInsertingThumbnail = YES;
-    return nil;	
-  }
-  return album;
-}
 
 - (void) downloadThumbnail:(GDataEntryPhotoAlbum *)album withAlbumModel:(Album *)model {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -943,7 +654,9 @@
 - (void)didFinishLoading:(NSData *)data withUserInfo:(NSDictionary *)info {
   Album *model = (Album *)[info objectForKey:@"album"];
   if(model) {
-    [self updateThumbnail:data forAlbum:model];
+    if([modelController updateThumbnail:data forAlbum:model] == nil) {
+      hasErrorInInsertingThumbnail = YES;
+    }
   }
 }
 

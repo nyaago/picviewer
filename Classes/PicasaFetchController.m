@@ -88,7 +88,7 @@
   GDataQueryGooglePhotos *query = [GDataQueryGooglePhotos queryWithFeedURL:feedURL];
   //  [query setMaxResults:25];
   [query setThumbsize:64];
-  [query setImageSize:800];
+  //[query setImageSize:800];
   NSLog(@"queryAlbumAndPhotos URL =  %@", [query URL]);
   [service 	fetchFeedWithURL:[query URL]
                     delegate:self 

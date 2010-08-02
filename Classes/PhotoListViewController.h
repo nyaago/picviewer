@@ -12,19 +12,20 @@
 #import "PageControlViewController.h"
 #import "Album.h"
 #import "Photo.h"
+#import "PhotoModelController.h"
 #import "LabeledProgressView.h"
 
 @interface PhotoListViewController : UIViewController 
-<NSFetchedResultsControllerDelegate, PicasaFetchControllerDelegate, 
+<PicasaFetchControllerDelegate, 
 QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
   
   @private
   
   Album *album;
   
-  NSFetchedResultsController *fetchedPhotosController;
   NSManagedObjectContext *managedObjectContext;
   
+  PhotoModelController *modelController;
   QueuedURLDownloader *downloader;
   
   UIBarButtonItem *backButton;
@@ -113,24 +114,6 @@ QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
  */
 - (UIImageView *)thumbnailAt:(NSUInteger)index;
 
-/*!
- @method thumbnailCount
- @discussion サムネイル数を返す
- */
-- (NSUInteger)thumbnailCount;
-
-/*!
- @method photoCount
- @discussion 写真数を返す
- */
-- (NSUInteger)photoCount;
-
-
-/*!
- @method photoAt:
- @discussion 指定したインデックスのPhoto Objectを返す
- */
-- (Photo *)photoAt:(NSUInteger)index;
 
 /*!
  @method backButton

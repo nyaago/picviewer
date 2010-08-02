@@ -10,6 +10,7 @@
 #import "User.h"
 #import "PicasaFetchController.h"
 #import "QueuedURLDownloader.h"
+#import "AlbumModelController.h"
 
 /*!
  @class AlbumTableViewController
@@ -19,7 +20,7 @@
 <NSFetchedResultsControllerDelegate, PicasaFetchControllerDelegate, 
 QueuedURLDownloaderDelegate> {
   
-  NSFetchedResultsController *fetchedAlbumsController;
+  AlbumModelController *modelController;
   NSManagedObjectContext *managedObjectContext;
   User *user;
   QueuedURLDownloader *downloader;
@@ -38,11 +39,6 @@ QueuedURLDownloaderDelegate> {
   UIBarButtonItem *refreshButton;
 }
 
-/*!
- @property fetchedAlbumsController
- @discussion Album一覧のFetched Controller
- */
-@property (nonatomic, retain) NSFetchedResultsController *fetchedAlbumsController;
 
 /*!
  @property managedObjectContext

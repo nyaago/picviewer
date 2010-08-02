@@ -87,17 +87,6 @@ withListViewController:(PhotoListViewController *)controller {
 
 
 /*!
- @method insertPhoto:withAlbum
- @discussion Photo情報をローカルDBに登録する.
- */
-- (Photo *)insertPhoto:(GDataEntryPhoto *)photo   withAlbum:(Album *)user;
-/*!
- @method updateThumbnail:forPhoto
- @discussion PhotoのThumbnailをローカルDBに更新登録する.
- @return 正常であれば、挿入したModelObject, エラーであればnil
- */
-- (Photo *)updateThumbnail:(NSData *)thumbnailData forPhoto:(Photo *)photo;
-/*!
  @method downloadThumbnail:withPhotoModel
  @discussion photoのThumbnailをダウンロードする.
  @param photo Googleから取得したPhoto情報
@@ -147,11 +136,6 @@ withListViewController:(PhotoListViewController *)controller {
  */
 - (void) refreshPhotos;
 
-/*!
- @method removePhotos
- @discussion 現在のAlbumのPhotoデータを全て削除
- */
-- (void)removePhotos;
 
 /*!
  @method enableToolbar:
@@ -167,7 +151,7 @@ withListViewController:(PhotoListViewController *)controller {
 
 @implementation PhotoListViewController
 
-@synthesize fetchedPhotosController, managedObjectContext;
+@synthesize managedObjectContext;
 @synthesize album;
 @synthesize scrollView;
 @synthesize progressView;
@@ -205,20 +189,14 @@ withListViewController:(PhotoListViewController *)controller {
   NSLog(@"photo view  viewDidLoad");
   [super viewDidLoad];
   lockSave = [[NSLock alloc] init];
+  modelController = [[PhotoModelController alloc] 
+                     initWithContext:self.managedObjectContext 
+                     withAlbum:self.album];
+  modelController.managedObjectContext = self.managedObjectContext;
+  
   NSLog(@"fetchedPhotosController");
-  // fetchedResultsControllerのメモリを一回クリア(メモリ圧迫するので)
-  /*
-   if(fetchedPhotosController) {
-   NSLog(@"photo list view did load - fetchedPhotosController retainCount = %d",
-   [fetchedPhotosController retainCount]);
-   [fetchedPhotosController release];
-   fetchedPhotosController = nil;
-   
-   //	if([fetchedPhotosController retainCount] == 0)
-   }
-   */
   NSError *error = nil;
-  if (![[self fetchedPhotosController] performFetch:&error]) {
+  if (![[modelController fetchedPhotosController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error",@"Error")
@@ -233,9 +211,7 @@ withListViewController:(PhotoListViewController *)controller {
   // Photoが0件であれば、Googleへの問い合わせを起動.
   // 問い合わせ結果は、albumAndPhotoWithTicket:finishedWithUserFeed:errorで受け
   // CoreDataへの登録を行う
-  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedPhotosController sections]
-                                                  objectAtIndex:0];
-  if([sectionInfo numberOfObjects] == 0) {
+  if([modelController photoCount] == 0) {
     // Network接続確認
     if(![NetworkReachability reachable]) {
       NSString *title = NSLocalizedString(@"Notice","Notice");
@@ -356,9 +332,6 @@ withListViewController:(PhotoListViewController *)controller {
   NSLog(@"backBUtton retain count = %d", [backButton retainCount]);
   NSLog(@"album retain count = %d", [album retainCount]);
   NSLog(@"managedObjectContext retain count = %d", [managedObjectContext retainCount]);
-  if(fetchedPhotosController)
-    NSLog(@"fetchedPhotosController retain count = %d", 
-          [fetchedPhotosController retainCount]);
   NSLog(@"thumbnails count = %d", [thumbnails count]);
   NSLog(@"thumbnails retain count = %d", [thumbnails retainCount]);
   
@@ -367,6 +340,8 @@ withListViewController:(PhotoListViewController *)controller {
   lockSave = nil;
   [downloader release];
   downloader = nil;
+  [modelController release];
+  modelController = nil;
   [self discardTumbnails];
   NSLog(@"discard thumbnails count = %d", [thumbnails count]);
   
@@ -380,9 +355,6 @@ withListViewController:(PhotoListViewController *)controller {
   NSLog(@"backBUtton retain count = %d", [backButton retainCount]);
   NSLog(@"album retain count = %d", [album retainCount]);
   NSLog(@"managedObjectContext retain count = %d", [managedObjectContext retainCount]);
-  if(fetchedPhotosController)
-    NSLog(@"fetchedPhotosController retain count = %d", 
-          [fetchedPhotosController retainCount]);
   NSLog(@"thumbnails count = %d", [thumbnails count]);
   NSLog(@"thumbnails retain count = %d", [thumbnails retainCount]);
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
@@ -400,7 +372,8 @@ withListViewController:(PhotoListViewController *)controller {
     [downloader release];
     downloader = nil;
   }
-  
+  [self discardTumbnails];
+  [thumbnails release];
   if(progressView)
     [progressView release];
   if(backButton)
@@ -413,16 +386,12 @@ withListViewController:(PhotoListViewController *)controller {
     [toolbarButtons release];
   if(album)
     [album release];
+  if(modelController)
+    [modelController release];
   if(managedObjectContext)
     [managedObjectContext release];
-  if(fetchedPhotosController) {
-    [fetchedPhotosController release];
-    fetchedPhotosController = nil;
-  }
   if(lockSave)
     [lockSave release];
-  [self discardTumbnails];
-  [thumbnails release];
   [super dealloc];
 }
 
@@ -453,7 +422,7 @@ withListViewController:(PhotoListViewController *)controller {
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   //NSDate *date0 = [[[NSDate alloc] init] autorelease];	  // for logging
-  for(NSUInteger i = 0; i < [self thumbnailCount]; ++i) {
+  for(NSUInteger i = 0; i < [modelController photoCount]; ++i) {
     /*
      NSDate *date1 = [[[NSDate alloc] init] autorelease];  // for logging
      */
@@ -485,7 +454,7 @@ withListViewController:(PhotoListViewController *)controller {
   */
   // scrollViewのcontent sizeを設定(main threadで行う必要がある)
   [self performSelectorOnMainThread:@selector(setContentSizeWithImageCount:) 
-                         withObject:[NSNumber numberWithInt:[self photoCount]] 
+                         withObject:[NSNumber numberWithInt:[modelController photoCount]] 
                       waitUntilDone:NO];
   [onAddingThumbnailsLock lock];
   onAddingThumbnails = NO;
@@ -511,7 +480,7 @@ withListViewController:(PhotoListViewController *)controller {
 
 
 - (void)discardTumbnails {
-  NSInteger n = [self thumbnailCount];
+  NSInteger n = [modelController photoCount];
   for(NSUInteger i = 0; i < n; ++i) {
     [self discardTumbnailAt:i];
   }
@@ -534,18 +503,6 @@ withListViewController:(PhotoListViewController *)controller {
   [thumbnails removeObjectForKey:[NSNumber numberWithInt:index]];
 }
 
-- (Photo *)photoAt:(NSUInteger)index {
-  NSUInteger indexes[2];
-  if(index >= [self photoCount])
-    return nil;
-  indexes[0] = 0;
-  indexes[1] = index;
-  Photo *photoObject = [fetchedPhotosController 
-                        objectAtIndexPath:[NSIndexPath 
-                                           indexPathWithIndexes:indexes length:2]];
-  
-  return photoObject;
-}
 
 - (UIView *)thumbnailAt:(NSUInteger)index {
   
@@ -559,9 +516,7 @@ withListViewController:(PhotoListViewController *)controller {
   if(!imageView) {
     // 画像データを取得してUIImageViewを生成
     indexes[1] = index;
-    Photo *photoObject = [fetchedPhotosController 
-                          objectAtIndexPath:[NSIndexPath 
-                                             indexPathWithIndexes:indexes length:2]];
+    Photo *photoObject = [modelController photoAt:index];
     UIImage *image = nil;
     if(photoObject.thumbnail) {
       image  = [UIImage imageWithData:photoObject.thumbnail];
@@ -578,18 +533,6 @@ withListViewController:(PhotoListViewController *)controller {
   
   [pool drain];
   return imageView;
-}
-
-
-- (NSUInteger)photoCount {
-  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedPhotosController sections]
-                                                  objectAtIndex:0];
-  return [sectionInfo numberOfObjects];
-}
-
-
-- (NSUInteger)thumbnailCount {
-  return [self photoCount];
 }
 
 
@@ -665,10 +608,10 @@ withListViewController:(PhotoListViewController *)controller {
     return;
   }
   // clean fetched controller
-  [fetchedPhotosController release];
-  fetchedPhotosController = nil;
+  //[fetchedPhotosController release];
+  //fetchedPhotosController = nil;
   // 削除
-  [self removePhotos];
+  [modelController removePhotos];
   
   // ローカルDBへの保存
   NSArray *entries = [feed entries];
@@ -679,7 +622,7 @@ withListViewController:(PhotoListViewController *)controller {
       NSLog(@"photo - title = %@, ident=%@, feedlink=%@",
             [[photo title] contentStringValue], [photo GPhotoID], [photo feedLink]);
       //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
-      Photo *photoModel =  [self insertPhoto:photo withAlbum:album];
+      Photo *photoModel =  [modelController insertPhoto:photo withAlbum:album];
       if(photoModel) {
         [self downloadThumbnail:photo withPhotoModel:photoModel];
       }
@@ -689,7 +632,7 @@ withListViewController:(PhotoListViewController *)controller {
     }
   }	
   // Photo一覧のFetched Controllerを生成
-  if (![[self fetchedPhotosController] performFetch:&error]) {
+  if (![modelController.fetchedPhotosController performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     
     UIAlertView *alertView = [[UIAlertView alloc] 
@@ -717,11 +660,11 @@ withListViewController:(PhotoListViewController *)controller {
   }
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadThumb",
                                              @"download")];
-  if([self thumbnailCount] == 0) {
+  if([modelController photoCount] == 0) {
     progressView.progress = 1.0f;
   }
   else {
-    progressView.progress = 1.0f / [self thumbnailCount];
+    progressView.progress = 1.0f / [modelController photoCount];
     [progressView setNeedsLayout];
   }
   [downloader start];
@@ -812,86 +755,6 @@ withListViewController:(PhotoListViewController *)controller {
 
 #pragma mark -
 
-#pragma mark Fetched results controller
-
-- (NSFetchedResultsController *)fetchedPhotosController {
-  
-  if (fetchedPhotosController != nil) {
-    return fetchedPhotosController;
-  }
-  [NSFetchedResultsController deleteCacheWithName:nil];
-  
-  /*
-   Set up the fetched results controller.
-   */
-  // Create the fetch request for the entity.
-  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-  // Edit the entity name as appropriate.
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
-                                            inManagedObjectContext:managedObjectContext];
-  [fetchRequest setEntity:entity];
-  
-  NSPredicate *predicate 
-  = [NSPredicate predicateWithFormat:@"%K = %@", @"album.albumId", album.albumId];
-  [fetchRequest setPredicate:predicate];
-  
-  // Set the batch size to a suitable number.
-  [fetchRequest setFetchBatchSize:20];
-  
-  // Edit the sort key as appropriate.
-  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp" 
-                                                                 ascending:NO];
-  NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
-  
-  [fetchRequest setSortDescriptors:sortDescriptors];
-  
-  // Edit the section name key path and cache name if appropriate.
-  // nil for section name key path means "no sections".
-  NSFetchedResultsController *aFetchedPhotosController = [[NSFetchedResultsController alloc] 
-                                                          initWithFetchRequest:fetchRequest 
-                                                          managedObjectContext:managedObjectContext 
-                                                          sectionNameKeyPath:nil 
-                                                          cacheName:@"Root"];
-  aFetchedPhotosController.delegate = self;
-  self.fetchedPhotosController = aFetchedPhotosController;
-  
-  [aFetchedPhotosController release];
-  [fetchRequest release];
-  [sortDescriptor release];
-  [sortDescriptors release];
-  
-  return fetchedPhotosController;
-}    
-
-- (void)removePhotos {
-  // Create the fetch request for the entity.
-  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-  // Edit the entity name as appropriate.
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
-                                            inManagedObjectContext:managedObjectContext];
-  [fetchRequest setEntity:entity];
-  NSPredicate *predicate 
-  = [NSPredicate predicateWithFormat:@"%K = %@", @"album.albumId", album.albumId];
-  [fetchRequest setPredicate:predicate];
-  
-  NSError *error;
-  // データの削除、親(album)からの関連の削除 + (albumに含まれる)全Photoデータの削除
-  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
-	NSSet *set = [NSSet setWithArray:items];
-  [album removePhoto:set];
-  for (NSManagedObject *managedObject in items) {
-    [managedObjectContext deleteObject:managedObject];
-    NSLog(@" object deleted");
-  }
-  //
-  if (![managedObjectContext save:&error]) {
-    NSLog(@"Error deleting- error:%@",error);
-  }
-  [fetchRequest release];
-	//[items release];  
-  return;
-}    
-
 
 #pragma mark Touch
 
@@ -908,7 +771,7 @@ withListViewController:(PhotoListViewController *)controller {
   //  if([touchView is: UIImageView.class]) {
   // 写真表示Viewへ
   NSInteger index = [self indexForPhoto:touchView];
-  if(index >= 0 && index < [self photoCount]) {
+  if(index >= 0 && index < [modelController photoCount]) {
     PageControlViewController *pageController = 
     [[PageControlViewController alloc] init];
     self.navigationItem.backBarButtonItem = [PhotoViewController backButton];
@@ -937,93 +800,7 @@ withListViewController:(PhotoListViewController *)controller {
 
 #pragma mark Private
 
-- (Photo *)insertPhoto:(GDataEntryPhoto *)photo   withAlbum:(Album *)album {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  
-  NSString *photoId = [photo GPhotoID];
-  // 新しい永続化オブジェクトを作って
-  Photo *photoObject 
-  = (Photo *)[NSEntityDescription insertNewObjectForEntityForName:@"Photo"
-                                           inManagedObjectContext:managedObjectContext];
-  // 値を設定
-  [photoObject setValue:photoId forKey:@"photoId"];
-  [photoObject setValue:[[photo title] contentStringValue] forKey:@"title"];
-  [photoObject setValue:[[photo timestamp] dateValue] forKey:@"timeStamp"];
-  if([photo geoLocation]) {
-	  [photoObject setValue:[[photo geoLocation] coordinateString] forKey:@"location"];
-  }
-  if([photo description] ) {
-		[photoObject setValue:[photo description] forKey:@"descript"];
-  }
-  if([photo width] ) {
-    [photoObject setValue:[photo width] forKey:@"width"];
-  }
-  if([photo height] ) {
-    [photoObject setValue:[photo height] forKey:@"height"];
-  }
-  
-  // 画像url
-  if([[[photo mediaGroup] mediaThumbnails] count] > 0) {
-    GDataMediaThumbnail *thumbnail = [[[photo mediaGroup] mediaThumbnails]  
-                                      objectAtIndex:0];
-    NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
-    [photoObject setValue:[thumbnail URLString] forKey:@"urlForThumbnail"];
-  }
-  if([[[photo mediaGroup] mediaContents] count] > 0) {
-    GDataMediaContent *content = [[[photo mediaGroup] mediaContents]  
-                                  objectAtIndex:0];
-    NSLog(@"URL for the photo - %@", [content URLString] );
-    [photoObject setValue:[content URLString] forKey:@"urlForContent"];
-  }
-  
-  // Save the context.
-  NSError *error = nil;
-  if ([self.album respondsToSelector:@selector(addPhotoObject:) ] ) {
-    [self.album addPhotoObject:(NSManagedObject *)photoObject];
-  }	
-  [lockSave lock];
-  if (![managedObjectContext save:&error]) {
-    // 
-    [lockSave unlock];
-    NSLog(@"Unresolved error %@", error);
-    NSLog(@"Failed to save to data store: %@", [error localizedDescription]);
-		NSArray* detailedErrors = [[error userInfo] objectForKey:NSDetailedErrorsKey];
-		if(detailedErrors != nil && [detailedErrors count] > 0) {
-			for(NSError* detailedError in detailedErrors) {
-				NSLog(@"  DetailedError: %@", [detailedError userInfo]);
-			}
-		}
-		else {
-			NSLog(@"  %@", [error userInfo]);
-		}
-    
-    [pool drain];
-    return nil;	
-  }
-  //  [managedObjectContext processPendingChanges]:
-  [lockSave unlock];
-  [pool drain];
-  return photoObject;
-}
 
-- (Photo *)updateThumbnail:(NSData *)thumbnailData forPhoto:(Photo *)photo {
-  if(!photo)
-    return nil;
-  if(!thumbnailData || [thumbnailData length] == 0) 
-    return photo;
-  photo.thumbnail = thumbnailData;
-  NSError *error = nil;
-  [lockSave lock];
-  if (![managedObjectContext save:&error]) {
-    // 
-    [lockSave unlock];
-    NSLog(@"Unresolved error %@", error);
-    return nil;	
-  }
-  [lockSave unlock];
-  return photo;
-  
-}
 
 - (void) downloadThumbnail:(GDataEntryPhoto *)photo withPhotoModel:(Photo *)model {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -1154,7 +931,7 @@ withListViewController:(PhotoListViewController *)controller {
                     withUserInfo:(NSDictionary *)info {
   NSLog(@"downloadDidFailWithError");
   hasErrorInDownloading = YES;
-  progressView.progress = progressView.progress + (1.0 / [self thumbnailCount] );
+  progressView.progress = progressView.progress + (1.0 / [modelController photoCount] );
 }
 
 
@@ -1164,12 +941,12 @@ withListViewController:(PhotoListViewController *)controller {
 - (void)didFinishLoading:(NSData *)data withUserInfo:(NSDictionary *)info {
   Photo *photo = (Photo *)[info objectForKey:@"photo"];
   if(photo) {
-    if( [self updateThumbnail:data forPhoto:photo] == nil) {
+    if( [modelController updateThumbnail:data forPhoto:photo] == nil) {
       hasErrorInInsertingThumbnail = YES;
     }
   }
   NSNumber *f = [NSNumber numberWithFloat:progressView.progress + 
-                 (1.0f / [self thumbnailCount]) ];
+                 (1.0f / [modelController photoCount]) ];
   [self performSelectorOnMainThread:@selector(updateProgress:) 
                          withObject:f
                       waitUntilDone:NO];
@@ -1290,9 +1067,7 @@ withListViewController:(PhotoListViewController *)controller {
 
 #pragma mark -
 - (NSUInteger) pageCount {
-  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedPhotosController sections]
-                                                  objectAtIndex:0];
-  return [sectionInfo numberOfObjects];
+  return [modelController photoCount];
   
 }
 
@@ -1300,7 +1075,7 @@ withListViewController:(PhotoListViewController *)controller {
   PhotoViewController *viewController = [[PhotoViewController alloc] 
                                          initWithNibName:@"PhotoViewController" 
                                          bundle:nil];
-  viewController.fetchedPhotosController = self.fetchedPhotosController;
+  viewController.fetchedPhotosController = modelController.fetchedPhotosController;
   viewController.managedObjectContext = self.managedObjectContext;
   viewController.indexForPhoto = n;
   return viewController;

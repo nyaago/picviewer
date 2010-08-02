@@ -25,6 +25,8 @@
 		722D6DCC1186A0EE004F0F0D /* PhotoListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */; };
 		722D6DED1186C80E004F0F0D /* Photo.m in Sources */ = {isa = PBXBuildFile; fileRef = 722D6DEC1186C80E004F0F0D /* Photo.m */; };
 		7234EA44117E820800D7AC45 /* libGDataTouchStaticLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7234E9DA117E7C7F00D7AC45 /* libGDataTouchStaticLib.a */; };
+		7238233412068EF60046D754 /* PhotoModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7238233312068EF60046D754 /* PhotoModelController.m */; };
+		723823A61206A3C70046D754 /* AlbumModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 723823A51206A3C70046D754 /* AlbumModelController.m */; };
 		7251549011851B2A00B136DF /* QueuedURLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 7251548F11851B2A00B136DF /* QueuedURLDownloader.m */; };
 		72582A841189B7B200A8A6FC /* PhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72582A821189B7B200A8A6FC /* PhotoViewController.m */; };
 		72582A851189B7B200A8A6FC /* PhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72582A831189B7B200A8A6FC /* PhotoViewController.xib */; };
@@ -114,6 +116,10 @@
 		722D6DEB1186C80E004F0F0D /* Photo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Photo.h; sourceTree = "<group>"; };
 		722D6DEC1186C80E004F0F0D /* Photo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Photo.m; sourceTree = "<group>"; };
 		7234E9CB117E7C7F00D7AC45 /* GData.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GData.xcodeproj; path = "../gdata-objectivec-client/Source/GData.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		7238233212068EF60046D754 /* PhotoModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoModelController.h; sourceTree = "<group>"; };
+		7238233312068EF60046D754 /* PhotoModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoModelController.m; sourceTree = "<group>"; };
+		723823A41206A3C70046D754 /* AlbumModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumModelController.h; sourceTree = "<group>"; };
+		723823A51206A3C70046D754 /* AlbumModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumModelController.m; sourceTree = "<group>"; };
 		7251548E11851B2A00B136DF /* QueuedURLDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QueuedURLDownloader.h; sourceTree = "<group>"; };
 		7251548F11851B2A00B136DF /* QueuedURLDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QueuedURLDownloader.m; sourceTree = "<group>"; };
 		72582A811189B7B200A8A6FC /* PhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoViewController.h; sourceTree = "<group>"; };
@@ -322,6 +328,10 @@
 				722D6DEC1186C80E004F0F0D /* Photo.m */,
 				72C4AC8D119AED2200F4B664 /* PhotoImage.h */,
 				72C4AC8E119AED2200F4B664 /* PhotoImage.m */,
+				7238233212068EF60046D754 /* PhotoModelController.h */,
+				7238233312068EF60046D754 /* PhotoModelController.m */,
+				723823A41206A3C70046D754 /* AlbumModelController.h */,
+				723823A51206A3C70046D754 /* AlbumModelController.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -474,6 +484,8 @@
 				72B4882E11C1FE3E00338152 /* NetworkReachability.m in Sources */,
 				729DA04E11C630F200E88C45 /* LabeledProgressView.m in Sources */,
 				72BFE61011C716FD00A7990C /* LabeledActivityIndicator.m in Sources */,
+				7238233412068EF60046D754 /* PhotoModelController.m in Sources */,
+				723823A61206A3C70046D754 /* AlbumModelController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -552,6 +564,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
 				OTHER_LDFLAGS = "-all_load";
 				PREBINDING = NO;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "5A905269-681A-45B5-A5E1-D817DE5CFB3F";
 				SDKROOT = iphoneos4.0;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
