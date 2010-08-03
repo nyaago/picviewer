@@ -93,7 +93,7 @@
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* PicasaViewerAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PicasaViewerAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* PicasaViewerAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasaViewerAppDelegate.m; sourceTree = "<group>"; };
-		1D6058910D05DD3D006BFB54 /* PicasaViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PicasaViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1D6058910D05DD3D006BFB54 /* PicViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PicViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		28860B760F44E54D00985440 /* PicasaViewer.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = PicasaViewer.xcdatamodel; sourceTree = "<group>"; };
 		28860BE40F44EE6400985440 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -231,7 +231,7 @@
 		19C28FACFE9D520D11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				1D6058910D05DD3D006BFB54 /* PicasaViewer.app */,
+				1D6058910D05DD3D006BFB54 /* PicViewer.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -360,9 +360,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		1D6058900D05DD3D006BFB54 /* PicasaViewer */ = {
+		1D6058900D05DD3D006BFB54 /* PicViewer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "PicasaViewer" */;
+			buildConfigurationList = 1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "PicViewer" */;
 			buildPhases = (
 				1D60588D0D05DD3D006BFB54 /* Resources */,
 				1D60588E0D05DD3D006BFB54 /* Sources */,
@@ -372,9 +372,9 @@
 			);
 			dependencies = (
 			);
-			name = PicasaViewer;
+			name = PicViewer;
 			productName = PicasaViewer;
-			productReference = 1D6058910D05DD3D006BFB54 /* PicasaViewer.app */;
+			productReference = 1D6058910D05DD3D006BFB54 /* PicViewer.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -402,7 +402,7 @@
 			);
 			projectRoot = "";
 			targets = (
-				1D6058900D05DD3D006BFB54 /* PicasaViewer */,
+				1D6058900D05DD3D006BFB54 /* PicViewer */,
 			);
 		};
 /* End PBXProject section */
@@ -522,7 +522,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = PicasaViewer_Prefix.pch;
 				INFOPLIST_FILE = "PicasaViewer-Info.plist";
-				PRODUCT_NAME = PicasaViewer;
+				PRODUCT_NAME = PicViewer;
 			};
 			name = Debug;
 		};
@@ -534,7 +534,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = PicasaViewer_Prefix.pch;
 				INFOPLIST_FILE = "PicasaViewer-Info.plist";
-				PRODUCT_NAME = PicasaViewer;
+				PRODUCT_NAME = PicViewer;
 			};
 			name = Release;
 		};
@@ -582,7 +582,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "PicasaViewer" */ = {
+		1D6058960D05DD3E006BFB54 /* Build configuration list for PBXNativeTarget "PicViewer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1D6058940D05DD3E006BFB54 /* Debug */,
