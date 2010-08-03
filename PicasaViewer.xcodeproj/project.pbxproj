@@ -192,21 +192,20 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				72C61C2E118AECF8001FD7C7 /* PageControlViewController.h */,
-				72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				7294AD121208152900319658 /* GData */,
 				72EA5B4A1181539400065915 /* Utils */,
 				72EA5A991181400D00065915 /* Models */,
 				28C286DF0D94DF7D0034E888 /* RootViewController.h */,
 				28C286E00D94DF7D0034E888 /* RootViewController.m */,
+				72C61C2E118AECF8001FD7C7 /* PageControlViewController.h */,
+				72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */,
 				1D3623240D0F684500981E51 /* PicasaViewerAppDelegate.h */,
 				1D3623250D0F684500981E51 /* PicasaViewerAppDelegate.m */,
-				72D577861180357300F687DB /* PicasaFetchController.h */,
-				72D577871180357300F687DB /* PicasaFetchController.m */,
 				72D577E511804AAE00F687DB /* NewUserViewController.h */,
 				72D577E611804AAE00F687DB /* NewUserViewController.m */,
 				72EA5B5911815C9A00065915 /* AlbumTableViewController.h */,
 				72EA5B5A11815C9A00065915 /* AlbumTableViewController.m */,
-				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				722D6DC91186A0EE004F0F0D /* PhotoListViewController.m */,
 				722D6DC81186A0EE004F0F0D /* PhotoListViewController.h */,
 				72582A811189B7B200A8A6FC /* PhotoViewController.h */,
@@ -221,8 +220,6 @@
 				72D7E7CE11BF5643001685AF /* PhotoInfoViewController.m */,
 				728A5BC011C0C2790058811E /* PhotoActionDelegate.h */,
 				728A5BC111C0C2790058811E /* PhotoActionDelegate.m */,
-				72B4882C11C1FE3E00338152 /* NetworkReachability.h */,
-				72B4882D11C1FE3E00338152 /* NetworkReachability.m */,
 				729DA04C11C630F200E88C45 /* LabeledProgressView.h */,
 				729DA04D11C630F200E88C45 /* LabeledProgressView.m */,
 				72BFE60E11C716FD00A7990C /* LabeledActivityIndicator.h */,
@@ -317,6 +314,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		7294AD121208152900319658 /* GData */ = {
+			isa = PBXGroup;
+			children = (
+				72D577861180357300F687DB /* PicasaFetchController.h */,
+				72D577871180357300F687DB /* PicasaFetchController.m */,
+			);
+			path = GData;
+			sourceTree = "<group>";
+		};
 		72EA5A991181400D00065915 /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -339,6 +345,8 @@
 		72EA5B4A1181539400065915 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				72B4882C11C1FE3E00338152 /* NetworkReachability.h */,
+				72B4882D11C1FE3E00338152 /* NetworkReachability.m */,
 				72EA5B501181577500065915 /* URLDownload.h */,
 				72EA5B511181577500065915 /* URLDownload.m */,
 				7251548E11851B2A00B136DF /* QueuedURLDownloader.h */,
