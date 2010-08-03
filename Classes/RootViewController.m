@@ -517,8 +517,8 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 
 #pragma mark LabeledActivityIndicatorDelegate
 
-- (void)indicatorStoped:(LabeledActivityIndicator *)indicatorView {
-  [indicatorView removeFromSuperview];
+- (void)indicatorStoped:(LabeledActivityIndicator *)view {
+  [view removeFromSuperview];
 }
 
 #pragma mark -
