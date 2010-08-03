@@ -19,4 +19,6 @@
  */
 + (BOOL)reachable;
 
+
++ (BOOL)reachableByWifi;
 @end

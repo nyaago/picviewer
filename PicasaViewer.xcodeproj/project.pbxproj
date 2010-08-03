@@ -311,7 +311,7 @@
 			children = (
 				7234E9DA117E7C7F00D7AC45 /* libGDataTouchStaticLib.a */,
 				7234E9DC117E7C7F00D7AC45 /* GDataUnitTests.octest */,
-				7234E9DE117E7C7F00D7AC45 /* GDataIPhoneUnitTests.octest */,
+				7234E9DE117E7C7F00D7AC45 /* GDataTouchUnitTests.octest */,
 				7234E9E0117E7C7F00D7AC45 /* DevelopmentTestTool */,
 			);
 			name = Products;
@@ -414,10 +414,10 @@
 			remoteRef = 7234E9DB117E7C7F00D7AC45 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		7234E9DE117E7C7F00D7AC45 /* GDataIPhoneUnitTests.octest */ = {
+		7234E9DE117E7C7F00D7AC45 /* GDataTouchUnitTests.octest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
-			path = GDataIPhoneUnitTests.octest;
+			path = GDataTouchUnitTests.octest;
 			remoteRef = 7234E9DD117E7C7F00D7AC45 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};

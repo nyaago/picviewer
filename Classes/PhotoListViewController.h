@@ -55,13 +55,9 @@ QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
   UIBarButtonItem *refreshButton;
   // view information Button
   UIBarButtonItem *infoButton;
+  
+  BOOL onRefresh;
 }
-
-/*!
- @property fetchedAlbumsController
- @discussion Album一覧のFetched Controller
- */
-@property (nonatomic, retain) NSFetchedResultsController *fetchedPhotosController;
 
 /*!
  @property managedObjectContext

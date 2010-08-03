@@ -191,7 +191,7 @@
   
   // Edit the sort key as appropriate.
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp" 
-                                                                 ascending:NO];
+                                                                 ascending:YES];
   NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
   
   [fetchRequest setSortDescriptors:sortDescriptors];
@@ -236,5 +236,36 @@
   
 }
 
+- (Photo *)selectPhoto:(GDataEntryPhoto *)photo  hasError:(BOOL *)f{
+  *f = NO;
+  // Create the fetch request for the entity.
+  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+  // Edit the entity name as appropriate.
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
+                                            inManagedObjectContext:managedObjectContext];
+  [fetchRequest setEntity:entity];
+  NSPredicate *predicate 
+  = [NSPredicate predicateWithFormat:@"%K = %@ ", 
+     @"photoId", [photo GPhotoID]];
+  [fetchRequest setPredicate:predicate];
+  
+  NSError *error;
+  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+  if(!items) {
+    NSLog(@"Unresolved error %@", error);
+    *f = YES;
+    return nil;
+  }
+  if([items count] >= 1) {
+    return (Photo *)[items objectAtIndex:0];
+  }
+  
+  return nil;
+}
+
+
+- (void) setLastAdd {
+  self.album.lastAddPhotoAt = [NSDate date];
+}
 
 @end

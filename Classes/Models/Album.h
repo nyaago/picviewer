@@ -20,6 +20,7 @@
 @property (retain) NSString *access;
 @property (retain) NSDate *timeStamp;
 @property (retain) NSString *descript;
+@property (retain) NSDate *lastAddPhotoAt;
 @property (nonatomic, retain) NSData *thumbnail;
 @property (nonatomic, retain) NSNumber *photosUsed;
 

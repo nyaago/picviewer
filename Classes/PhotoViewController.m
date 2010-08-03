@@ -124,12 +124,10 @@ static NSLock *lockFetchedResultsController;
   scrollView.minimumZoomScale = 1.0;
   scrollView.delegate = self;
   scrollView.scrollEnabled = YES;
-  scrollView.scrollEnabled = YES;
   scrollView.userInteractionEnabled = YES;
   scrollView.bounces = NO;
   scrollView.backgroundColor = [UIColor blackColor];
   scrollView.multipleTouchEnabled = YES;
-//  self.view  = scrollView;
   self.view.backgroundColor = [UIColor blackColor];
   [self.view addSubview:scrollView];
   self.wantsFullScreenLayout = YES;
@@ -387,11 +385,11 @@ static NSLock *lockFetchedResultsController;
     // 画像が縦長
     float rate = viewRect.size.height / image.size.height;
     float width = size.width * rate;
+    
     rect = CGRectMake((viewRect.size.width -  width) / 2, 
                       0.0f, 
                       width, 
                       viewRect.size.height);
-    
   }
   else { // 画像が横長
     float rate = viewRect.size.width / image.size.width;
@@ -402,17 +400,18 @@ static NSLock *lockFetchedResultsController;
                       viewRect.size.width, 
                       height);
   }
-  [pool drain];
+	[pool drain];
   return rect;
 }
 
 - (CGRect)viewFrame:(UIDeviceOrientation)orientation {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
-  UIView *v = self.view.superview;
-  CGRect rect = v.frame;
   
   // View階層Debug
+  /*
+  UIView *v = self.view.superview;
+  CGRect rect = v.frame;
   v = self.view;
   for(int i = 0; i < 4; ++i) {
     NSLog(@"Class = %@,Page view,x ==> %f, y => %f, width => %f, height => %f ",
@@ -422,10 +421,9 @@ static NSLock *lockFetchedResultsController;
           );
     v = v.superview;
   }
+   */
   
   CGRect bounds = self.view.frame;
-  //  bounds.size.height += statusBarHeight;
-  //  bounds.origin.y = 0 -  statusBarHeight;
   [pool drain];
   return bounds;
 }
@@ -460,10 +458,7 @@ static NSLock *lockFetchedResultsController;
     self.scrollView.maximumZoomScale = 1.0f;
   }
 
-  scrollView.contentSize = imageView.frame.size;
-//  self.scrollView.contentOffset  = CGPointMake(0.0f, 
-//                                                (scrollView.bounds.size.height - 
-//                                                imageView.bounds.size.height) / 2);
+  scrollView.contentSize = self.view.frame.size;
   [self.scrollView addSubview:imageView];
 
   //  Photoがnilだった場合、ダウンロード処理の起動
@@ -675,35 +670,58 @@ static NSLock *lockFetchedResultsController;
   return self.imageView;
 }
 
+- (void)scrollViewDidZoom:(UIScrollView *)scrollView {
+  CGRect frame = imageView.frame;
+  if( (self.scrollView.bounds.size.width - 
+       self.scrollView.contentSize.width) / 2 > 0) {
+	  frame.origin.x = (self.scrollView.bounds.size.width - 
+                      self.scrollView.contentSize.width) / 2;
+  }
+  else {
+    frame.origin.x = 0.0f;
+  }
+  if((self.scrollView.bounds.size.height - 
+      self.scrollView.contentSize.height) / 2 > 0) {
+  	frame.origin.y = (self.scrollView.bounds.size.height - 
+                      self.scrollView.contentSize.height) / 2;
+  }
+  else {
+    frame.origin.y = 0.0f;
+  }
+  
+  imageView.frame = frame;
+  
+}
+
 /*!
  @method scrollViewDidEndZooming:withView:atScale
  @discussion Zooming時の通知。
  imageViewの縦の配置調整を行う。
  */
-/*
+
 - (void)scrollViewDidEndZooming:(UIScrollView *)zoomingScrollView 
                        withView:(UIView *)view 
                         atScale:(float)scale {
-  NSLog(@"scrollViewDidEndZooming:");
-  NSLog(@"view - w:h = %f:%f", view.bounds.size.width, view.bounds.size.height);
-  NSLog(@"scroll view - w:h = %f:%f", zoomingScrollView.bounds.size.width, 
-        zoomingScrollView.bounds.size.height);
-  NSLog(@"scale = %f", scale);
-  float rate = (zoomingScrollView.bounds.size.height / view.bounds.size.height);
-
-  
-  CGRect frame = view.frame;
-  if (scale > rate ) {  // imageViewがscrollViewより高い場合
-//    frame.origin.y = 0;  // 
+  CGRect frame = imageView.frame;
+  if( (self.scrollView.bounds.size.width - 
+       self.scrollView.contentSize.width) / 2 > 0) {
+	  frame.origin.x = (self.scrollView.bounds.size.width - 
+                      self.scrollView.contentSize.width) / 2;
   }
-  else {                // センタリング
-    float height = view.bounds.size.height * scale;
-//    frame.origin.y = (zoomingScrollView.bounds.size.height - height) / 2;
+  else {
+    frame.origin.x = 0.0f;
   }
-  view.frame = frame;
-  
+  if((self.scrollView.bounds.size.height - 
+      self.scrollView.contentSize.height) / 2 > 0) {
+  	frame.origin.y = (self.scrollView.bounds.size.height - 
+                      self.scrollView.contentSize.height) / 2;
+  }
+  else {
+    frame.origin.y = 0.0f;
+  }
+  imageView.frame = frame;
 }
-*/
+
 
 #pragma mark statci Method
 

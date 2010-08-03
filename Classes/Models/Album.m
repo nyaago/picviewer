@@ -14,5 +14,6 @@
 @dynamic albumId,timeStamp, thumbnail, title, urlForThumbnail, descript;
 @dynamic access, photosUsed;
 @dynamic photo, user;
+@dynamic lastAddPhotoAt;
 
 @end

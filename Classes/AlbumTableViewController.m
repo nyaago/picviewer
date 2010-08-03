@@ -496,7 +496,6 @@
     GDataEntryPhotoAlbum *album = [entries objectAtIndex:i];
     NSLog(@"album - title = %@, ident=%@, feedlink=%@",
           [[album title] contentStringValue], [album GPhotoID], [album feedLink]);
-    //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
     BOOL hasError;
     Album *albumModel = [modelController selectAlbum:album 
                                             withUser:userObject 

@@ -114,8 +114,10 @@
  delegateのalbumAndPhotosWithTicket:finishedWithAlbumFeed:error:で通知を受ける
  @param albumId album id
  @param userId user id
+ @param photoSize 写真のサイズ
  */
-- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)userId;
+- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)userId 
+withPhotoSize:(NSNumber *)photoSize;
 /*!
  @method queryPhoto:album:user
  @discussion 指定したユーザ/アルバム/写真IDの写真情報を取得

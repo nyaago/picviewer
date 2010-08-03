@@ -84,7 +84,7 @@
   [fetchRequest setFetchBatchSize:20];
   
   // Edit the sort key as appropriate.
-  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" 
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp" 
                                                                  ascending:NO];
   NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
   
@@ -156,6 +156,14 @@
                   withUser:(User *)userObject {
   // 各値を設定（If appropriate, configure the new managed object.）
   [albumObject setValue:[[album title] contentStringValue] forKey:@"title"];
+  /*
+  NSDateFormatter *formatter  = [[NSDateFormatter alloc] init];
+  [formatter setDateStyle:NSDateFormatterFullStyle];
+  NSLog(@"album - %@ timestamp = %@",
+        [album title],
+        [formatter stringFromDate:[[album timestamp] dateValue]]);
+	[formatter release];
+   */
   [albumObject setValue:[[album timestamp] dateValue] forKey:@"timeStamp"];
   if([album description]) {
 		[albumObject setValue:[album description] forKey:@"descript"];

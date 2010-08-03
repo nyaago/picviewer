@@ -128,8 +128,6 @@ withListViewController:(PhotoListViewController *)controller {
 - (void) infoAction:(id)sender;
 
 
-
-
 /*!
  @method refreshPhotos
  @discussion Photoデータを1回削除後、再ロード(Picasaへの問い合わせ+Thumbnail - download)
@@ -143,6 +141,24 @@ withListViewController:(PhotoListViewController *)controller {
  */
 - (void) enableToolbar:(BOOL)enable;
 
+/*!
+ @method daysBetween:and:
+ @discussion 日付オブジェクトの時間差を返す.
+ */
+- (NSInteger)minutesBetween:(NSDate *)d1 and:(NSDate *)d2;
+
+
+/*!
+ @method mustLoad
+ @discussion データロードを行うかどうかの判定
+ */
+- (BOOL)mustLoad;
+
+/*!
+ @method mustRefresh
+ @discussion データの全ロードを行うがどうかの判定
+ */
+- (BOOL)mustRefresh;
 
 @end
 
@@ -211,29 +227,21 @@ withListViewController:(PhotoListViewController *)controller {
   // Photoが0件であれば、Googleへの問い合わせを起動.
   // 問い合わせ結果は、albumAndPhotoWithTicket:finishedWithUserFeed:errorで受け
   // CoreDataへの登録を行う
-  if([modelController photoCount] == 0) {
-    // Network接続確認
-    if(![NetworkReachability reachable]) {
-      NSString *title = NSLocalizedString(@"Notice","Notice");
-      NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
-                                            "not reacable");
-      UIAlertView *alertView = [[UIAlertView alloc] 
-                                initWithTitle:title
-                                message:message
-                                delegate:nil
-                                cancelButtonTitle:@"OK" 
-                                otherButtonTitles:nil];
-      [alertView show];
-      [alertView release];
-      return;
-    }
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  if([self mustLoad]) {
+
+    // クリア + 全ロードか?
+    onRefresh = [self mustRefresh];
+      
     // toolbarのButtonを無効に
     [self enableToolbar:NO];
-		// progress View
+    // progress View
     progressView.progress = 0.0f;
     [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
                                                @"download")];
-    [self.view addSubview:progressView];
+    if(onRefresh) {
+      [self.view addSubview:progressView];
+    }
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
     // 
@@ -243,7 +251,8 @@ withListViewController:(PhotoListViewController *)controller {
     picasaFetchController.userId = settings.userId;
     picasaFetchController.password = settings.password;
     [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
-                                          user:[self.album.user valueForKey:@"userId"] ];
+                                          user:[self.album.user valueForKey:@"userId"] 
+                                 withPhotoSize:[NSNumber numberWithInt:settings.imageSize]];
     
     downloader = [[QueuedURLDownloader alloc] 
                   initWithMaxAtSameTime:kDownloadMaxAtSameTime];
@@ -253,7 +262,7 @@ withListViewController:(PhotoListViewController *)controller {
   else {
   }
   [self setToolbarItems: [self toolbarButtons] animated:YES];
-  
+  [pool drain];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -296,8 +305,10 @@ withListViewController:(PhotoListViewController *)controller {
 - (void) afterViewDidAppear:(id)arg {
   
   
-  if([thumbnails count] == 0)
-    [self loadThumbnails];
+  if([thumbnails count] != 0) {
+    [self discardTumbnails];
+  }
+  [self loadThumbnails];
 }
 
 
@@ -340,8 +351,6 @@ withListViewController:(PhotoListViewController *)controller {
   lockSave = nil;
   [downloader release];
   downloader = nil;
-  [modelController release];
-  modelController = nil;
   [self discardTumbnails];
   NSLog(@"discard thumbnails count = %d", [thumbnails count]);
   
@@ -611,7 +620,9 @@ withListViewController:(PhotoListViewController *)controller {
   //[fetchedPhotosController release];
   //fetchedPhotosController = nil;
   // 削除
-  [modelController removePhotos];
+  if(onRefresh) {
+	  [modelController removePhotos];
+  }
   
   // ローカルDBへの保存
   NSArray *entries = [feed entries];
@@ -622,16 +633,26 @@ withListViewController:(PhotoListViewController *)controller {
       NSLog(@"photo - title = %@, ident=%@, feedlink=%@",
             [[photo title] contentStringValue], [photo GPhotoID], [photo feedLink]);
       //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
-      Photo *photoModel =  [modelController insertPhoto:photo withAlbum:album];
-      if(photoModel) {
-        [self downloadThumbnail:photo withPhotoModel:photoModel];
-      }
-      else {
-        hasErrorInInserting = YES;
+      BOOL f;
+      if(onRefresh || ![modelController selectPhoto:photo hasError:&f] ) {
+        if([progressView subviews] != nil) {
+          // toolbarのButtonを無効に
+          [self enableToolbar:NO];
+					// progress 状態表示
+          [self.view addSubview:progressView];
+        }
+        Photo *photoModel =  [modelController insertPhoto:photo withAlbum:album];
+        if(photoModel) {
+          [self downloadThumbnail:photo withPhotoModel:photoModel];
+        }
+        else {
+          hasErrorInInserting = YES;
+        }
       }
     }
   }	
   // Photo一覧のFetched Controllerを生成
+  [NSFetchedResultsController deleteCacheWithName:@"Root"];
   if (![modelController.fetchedPhotosController performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     
@@ -672,6 +693,7 @@ withListViewController:(PhotoListViewController *)controller {
   [pool drain];
   [picasaFetchController release];
   picasaFetchController = nil;
+  onRefresh = NO;
 }
 
 
@@ -887,7 +909,10 @@ withListViewController:(PhotoListViewController *)controller {
 }
 
 - (void) refreshPhotos {
-  
+
+  onRefresh = YES;
+  hasErrorInDownloading = NO;
+  hasErrorInInsertingThumbnail = NO;
   //
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   //  NSArray *objects = [fetchedPhotosController fetchedObjects];
@@ -900,7 +925,8 @@ withListViewController:(PhotoListViewController *)controller {
   picasaFetchController.userId = settings.userId;
   picasaFetchController.password = settings.password;
   [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
-                                        user:[self.album.user valueForKey:@"userId"]];
+                                        user:[self.album.user valueForKey:@"userId"]
+                               withPhotoSize:[NSNumber numberWithInt:settings.imageSize]];
   downloader = [[QueuedURLDownloader alloc] 
                 initWithMaxAtSameTime:kDownloadMaxAtSameTime];
   downloader.delegate = self;
@@ -914,6 +940,56 @@ withListViewController:(PhotoListViewController *)controller {
   infoButton.enabled = enable;
 }
 
+- (NSInteger)minutesBetween:(NSDate *)d1 and:(NSDate *)d2 {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  if(!d1) {
+    d1 = [NSDate date];
+  }
+  if(!d2) {
+    d2 = [NSDate date];
+  }
+  NSTimeInterval t  = [d2 timeIntervalSinceDate:d1];
+  NSInteger n = (NSInteger)(t  / 60);
+  [pool drain];
+  return n;
+}
+
+- (BOOL)mustLoad {
+
+  if([modelController photoCount] == 0) {
+    // Network接続確認
+    if(![NetworkReachability reachable]) {
+      NSString *title = NSLocalizedString(@"Notice","Notice");
+      NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
+                                            "not reacable");
+      UIAlertView *alertView = [[UIAlertView alloc] 
+                                initWithTitle:title
+                                message:message
+                                delegate:nil
+                                cancelButtonTitle:@"OK" 
+                                otherButtonTitles:nil];
+      [alertView show];
+      [alertView release];
+      return NO;
+    }
+    onRefresh = YES;
+		return YES;
+  }
+    
+  if ( [self minutesBetween:album.lastAddPhotoAt and:[NSDate date] ] > 15 && 
+      [NetworkReachability reachableByWifi]) {
+    return YES;
+  }
+  return NO;
+}
+
+- (BOOL)mustRefresh {
+  if([modelController photoCount] == 0) {
+    return YES;
+  }
+  return NO;
+}
+     
 
 
 #pragma mark - 
@@ -992,6 +1068,8 @@ withListViewController:(PhotoListViewController *)controller {
   [progressView removeFromSuperview];
   [downloader release];
   downloader = nil;
+  // albumのphotoに対する最後の保存処理実行日時を記録
+  [modelController setLastAdd];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
   //

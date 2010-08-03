@@ -40,4 +40,32 @@
   return result;
 }
 
++ (BOOL)reachableByWifi {
+  BOOL result = NO;
+  // Part 1 - Create Internet socket addr of zero
+	struct sockaddr_in zeroAddr;
+  memset(&zeroAddr, 0, sizeof(zeroAddr));
+	zeroAddr.sin_len = sizeof(zeroAddr);
+	zeroAddr.sin_family = AF_INET;
+  
+	// Part 2- Create target in format need by SCNetwork
+	SCNetworkReachabilityRef target = 
+  SCNetworkReachabilityCreateWithAddress(NULL, (struct sockaddr *) &zeroAddr);
+  
+	// Part 3 - Get the flags
+	SCNetworkReachabilityFlags flags;
+	SCNetworkReachabilityGetFlags(target, &flags);
+  
+	// Part 4 - Create output
+	if ( (flags & kSCNetworkFlagsReachable ) && 
+      (flags & kSCNetworkReachabilityFlagsIsDirect))
+    result = YES;
+	else
+    result = NO;
+  
+  
+  return result;
+  
+}
+
 @end

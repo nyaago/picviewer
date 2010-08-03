@@ -71,6 +71,12 @@
 - (void)removePhotos;
 
 /*!
+ @method selectPhoto:hasError:
+ @discussion 指定したPhotoのphoto model オブジェクトを得る
+ */
+- (Photo *)selectPhoto:(GDataEntryPhoto *)photo  hasError:(BOOL *)f;
+
+/*!
  @method photoCount
  @discussion 写真数を返す
  */
@@ -83,6 +89,7 @@
  */
 - (Photo *)photoAt:(NSUInteger)index;
 
+- (void) setLastAdd;
 
 
 @end

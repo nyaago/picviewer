@@ -71,7 +71,7 @@
   [service release];
 }
 
-- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)targetUserId {
+- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)targetUserId withPhotoSize:(NSNumber *)photoSize {
   completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   
@@ -88,7 +88,9 @@
   GDataQueryGooglePhotos *query = [GDataQueryGooglePhotos queryWithFeedURL:feedURL];
   //  [query setMaxResults:25];
   [query setThumbsize:64];
-  //[query setImageSize:800];
+  if(photoSize) {
+  	[query setImageSize:[photoSize intValue  ]];
+  }
   NSLog(@"queryAlbumAndPhotos URL =  %@", [query URL]);
   [service 	fetchFeedWithURL:[query URL]
                     delegate:self 
