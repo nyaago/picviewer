@@ -22,6 +22,9 @@
 "Settings.Account" = "アカウント";
 "Settings.Account.User" = "ユーザ名";
 "Settings.Account.Password" = "パスワード";
+"Settings.Image" = "画像設定";
+"Settings.Image.Size" = "サイズ";
+
 
 // User追加View
 "NewUser.Account" = "アカウント名";

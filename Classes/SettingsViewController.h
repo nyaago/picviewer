@@ -19,6 +19,7 @@
 
   UITextField *userTextField;
   UITextField *passwordTextField;
+  UISegmentedControl *sizeControl;
 }
 
 /*!

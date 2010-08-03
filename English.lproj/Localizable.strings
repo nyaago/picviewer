@@ -19,6 +19,9 @@
 "Settings.Account" = "ACCOUNT";
 "Settings.Account.User" = "USER";
 "Settings.Account.Password" = "PASSWORD";
+"Settings.Image" = "Image";
+"Settings.Image.Size" = "Size";
+
 
 // User追加View
 "NewUser.Account" = "ACCOUNT";

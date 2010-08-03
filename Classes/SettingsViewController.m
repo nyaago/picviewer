@@ -82,13 +82,15 @@
   userTextField = nil;
   [passwordTextField release];
   passwordTextField = nil;
+  [sizeControl release];
+  sizeControl = nil;
 }
 
 
 #pragma mark Table view methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+    return 2;
 }
 
 
@@ -98,6 +100,8 @@
   switch (section) {
     case(0) :
       return 2;
+    case(1) :
+      return 1;
     default:
       return 0;
   }
@@ -113,6 +117,8 @@ titleForHeaderInSection:(NSInteger)section {
   switch (section) {
     case(0) :
       return NSLocalizedString(@"Settings.Account", @"Acount");
+    case(1) :
+      return NSLocalizedString(@"Settings.Image", @"Image");
     default:
       return @"";
   }
@@ -166,6 +172,32 @@ titleForHeaderInSection:(NSInteger)section {
             [cell addSubview:passwordTextField];
             break;
        }
+        break;
+      case(1) : // アカウントの設定
+        switch ([indexPath indexAtPosition:1]) {
+          case (0):
+            cell.textLabel.text = NSLocalizedString(@"Settings.Image.Size"
+                                                    ,@"Size");
+            frame =  CGRectMake(90.0f, 10.0f, 
+                                cell.frame.size.width - (90.0f + 20.0f) , 
+                                cell.frame.size.height - 20.0f);
+          	
+            sizeControl = [[UISegmentedControl alloc] initWithFrame:frame];
+            [sizeControl insertSegmentWithTitle:@"640" 
+                                        atIndex:0 
+                                       animated:NO];
+            [sizeControl insertSegmentWithTitle:@"1280" 
+                                        atIndex:1
+                                       animated:NO];
+            [sizeControl insertSegmentWithTitle:@"1600" 
+                                        atIndex:2 
+                                       animated:NO];
+            sizeControl.selectedSegmentIndex = [SettingsManager 
+                                                imageSizeToIndex:settings.imageSize];
+            [cell addSubview:sizeControl];
+            break;
+        }
+            
     }
   }
   
@@ -193,8 +225,10 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 - (void) completeAction:(id)sender {
   settings.userId = userTextField.text;
   settings.password = passwordTextField.text;
+  settings.imageSize = [SettingsManager 
+                        indexToImageSize:sizeControl.selectedSegmentIndex];
   
-  if([NetworkReachability reachable] ) {
+  if([NetworkReachability reachable] && [settings.userId length] > 0) {
     // 
 	  PicasaFetchController *controller = [[PicasaFetchController alloc] init];
 	  controller.delegate = self;

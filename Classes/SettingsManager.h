@@ -27,6 +27,12 @@
 @property (nonatomic, retain) NSString *password;
 
 /*!
+ @property imageSize;
+ */
+@property (nonatomic) NSInteger imageSize;
+
+
+/*!
  @method setUserId:
  @discussion
  */
@@ -49,6 +55,18 @@
  @discussion
  */
 - (NSString *) password;
+
+/*!
+ @method setImageSize
+ @discussion 画像サイズを設定
+ */
+- (void) setImageSize:(NSInteger)size;
+
+/*!
+ @method imageSize
+ @discussion 画像サイズをかえす
+ */
+- (NSInteger) imageSize;
 
 
 /*!
@@ -75,5 +93,18 @@
  @discussion 現在表示対象になっているアルバムを返す
  */
 - (NSString *)currentAlbum;
+
+/*!
+ @method imageSizeToIndex
+ @discussion 画像サイズからindex取得
+ */
++ (NSInteger)imageSizeToIndex:(NSInteger)size;
+
+
+/*!
+ @method indexToImageSize
+ @discussion indexから画像サイズを取得
+ */
++ (NSInteger)indexToImageSize:(NSInteger)index;
 
 @end

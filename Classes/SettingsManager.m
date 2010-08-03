@@ -8,6 +8,8 @@
 
 #import "SettingsManager.h"
 
+static NSInteger imageSizes[3] = {640, 1280, 1600};
+
 @interface SettingsManager (Private) 
 
 /*!
@@ -15,6 +17,14 @@
  @discussion 指定したKeyの文字列値を返す
  */
 - (NSString *)stringForKey:(NSString *)key withDefault:(NSString *)defaultValue;
+
+/*!
+ @method objectForKey:withDefault
+ @discussion 指定したKeyの値を返す
+ */
+- (NSObject *)objectForKey:(NSString *)key withDefault:(NSObject *)defaultValue;
+
+
 
 /*!
  @method setObject:forKey
@@ -61,6 +71,37 @@
 }
 
 
+- (void) setImageSize:(NSInteger)size {
+  [self setObject:[NSNumber numberWithInt:size] forKey:@"imageSize"];
+}
+
+- (NSInteger) imageSize {
+  NSNumber *n = (NSNumber *)[self objectForKey:@"imageSize" 
+                       withDefault:[NSNumber numberWithInt:1280]];
+  return [n intValue];
+}
+
+
++ (NSInteger)imageSizeToIndex:(NSInteger)size {
+  int c = sizeof(imageSizes)  / sizeof(imageSizes[0]);
+  NSInteger index = 1;
+  for(int i = 0; i < c; ++i) {
+    if(size == imageSizes[i]) {
+      index = i;
+      break;
+    }
+  }
+  return index;
+}
+
+
++ (NSInteger)indexToImageSize:(NSInteger)index {
+  int c = sizeof(imageSizes)  / sizeof(imageSizes[0]);
+  if(index >= c)
+    return 1280;
+  return imageSizes[index];
+}
+
 
 #pragma mark Private
 
@@ -75,6 +116,19 @@
   [pool drain];
 	return value;
 }
+
+- (NSObject *)objectForKey:(NSString *)key withDefault:(NSString *)defaultValue {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  NSObject *value = [userDefaults objectForKey:key];
+  if(!value)
+    value = defaultValue;
+  
+  [pool drain];
+	return value;
+}
+
 
 - (void)setObject:(id)object forKey:(NSString *)key {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
