@@ -276,6 +276,8 @@ withListViewController:(PhotoListViewController *)controller {
   }
   else {
   }
+  // Title設定
+  self.navigationItem.title = self.album.title;
   [pool drain];
 }
 
