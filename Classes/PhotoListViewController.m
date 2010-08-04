@@ -181,17 +181,32 @@ withListViewController:(PhotoListViewController *)controller {
  */
 - (void) loadView  {
   [super loadView];
+  //
+  isFromAlbumTableView = YES;
+  // scrollView の設定
   self.scrollView.scrollEnabled = YES;
   self.scrollView.userInteractionEnabled = YES;
   self.scrollView.frame = self.view.bounds;
   self.scrollView.backgroundColor = [UIColor blackColor];
   NSLog(@"load viee");
+  // thumbnailを保持するコレクションの準備
   if(thumbnails == nil) {
     thumbnails = [[NSMutableDictionary alloc] init];
   }
+  // progressView
   CGRect frame = CGRectMake(0.0f, self.view.frame.size.height - 200.0f , 
                             self.view.frame.size.width, 200.0f);
   progressView = [[LabeledProgressView alloc] initWithFrame:frame];
+  // toolbar
+  self.toolbarItems = [self toolbarButtons];
+//  self.navigationController.toolbar.translucent = YES;
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbarHidden = NO; 
+//  [self setToolbarItems: [self toolbarButtons] animated:YES];
+  // scrollViewのサイズ
+//  frame = self.scrollView.frame;
+//  frame.size.height -= self.navigationController.toolbar.frame.size.height;
+//  self.scrollView.frame = frame;
 }
 
 
@@ -261,15 +276,13 @@ withListViewController:(PhotoListViewController *)controller {
   }
   else {
   }
-  [self setToolbarItems: [self toolbarButtons] animated:YES];
   [pool drain];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
-	self.toolbarItems = [self toolbarButtons];
-  self.navigationController.toolbar.translucent = YES;
-  self.navigationController.toolbarHidden = NO; 
+  self.wantsFullScreenLayout = NO;
+
 }
 
 /*!
@@ -286,20 +299,31 @@ withListViewController:(PhotoListViewController *)controller {
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
   [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackOpaque;
   NSLog(@"thumbnail count = %d", [thumbnails count]);
-  self.wantsFullScreenLayout = YES;
+  /*
   self.navigationController.toolbarHidden = NO;
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
-  self.navigationController.toolbar.translucent = YES;
+  self.navigationController.toolbar.translucent = NO;
+  **/
+  // tool bar
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbar.translucent = NO;
   
-  
-  
-  // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
-  // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
-  // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
-  // 表示関連の操作はmain Threadでされる必要があるので)
-  [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:) 
-                           toTarget:self 
-                         withObject:nil];
+  if(isFromAlbumTableView == NO) {	// 写真画面から戻ってきた場合
+    // scrollViewのサイズ
+    CGRect frame = self.view.frame;
+    frame.size.height -= self.navigationController.toolbar.frame.size.height;
+    self.scrollView.frame = frame;
+  }
+  else {
+    // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
+    // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
+    // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
+    // 表示関連の操作はmain Threadでされる必要があるので)
+    [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:) 
+                             toTarget:self 
+                           withObject:nil];
+    isFromAlbumTableView = YES;
+  }
 }
 
 - (void) afterViewDidAppear:(id)arg {
@@ -956,6 +980,8 @@ withListViewController:(PhotoListViewController *)controller {
 
 - (BOOL)mustLoad {
 
+  if(isFromAlbumTableView == NO)
+    return NO;
   if([modelController photoCount] == 0) {
     // Network接続確認
     if(![NetworkReachability reachable]) {

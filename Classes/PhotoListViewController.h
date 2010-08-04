@@ -55,8 +55,10 @@ QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
   UIBarButtonItem *refreshButton;
   // view information Button
   UIBarButtonItem *infoButton;
-  
+  // 再ロード中ならYES
   BOOL onRefresh;
+  // album一覧Viewからの遷移の場合YES
+  BOOL isFromAlbumTableView;
 }
 
 /*!
