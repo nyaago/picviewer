@@ -65,7 +65,8 @@
   if (fetchedAlbumsController != nil) {
     return fetchedAlbumsController;
   }
-  
+  [NSFetchedResultsController deleteCacheWithName:@"Root"];
+
   /*
    Set up the fetched results controller.
    */

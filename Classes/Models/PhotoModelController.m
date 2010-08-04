@@ -136,7 +136,7 @@
 }
 
 - (void)removePhotos {
-  [NSFetchedResultsController deleteCacheWithName:@"Root"];
+  [NSFetchedResultsController deleteCacheWithName:@"Photo"];
   // Create the fetch request for the entity.
   NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
   // Edit the entity name as appropriate.
@@ -170,7 +170,7 @@
   if (fetchedPhotosController != nil) {
     return fetchedPhotosController;
   }
-  [NSFetchedResultsController deleteCacheWithName:nil];
+  [NSFetchedResultsController deleteCacheWithName:@"Root"];
   
   /*
    Set up the fetched results controller.
