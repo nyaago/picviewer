@@ -29,6 +29,9 @@
  */
 - (void)viewDidLoad {
   [super viewDidLoad];
+  // Title
+  self.navigationController.title = NSLocalizedString(@"Settings.Title", 
+                                                      @"Settings");
   // navigationBar
 	completeButton = [[UIBarButtonItem alloc] 
                     initWithBarButtonSystemItem:UIBarButtonSystemItemDone                    

@@ -19,6 +19,7 @@
 "Settings" = "設定";
 
 // 設定View
+"Settings.Title" = "設定";
 "Settings.Account" = "アカウント";
 "Settings.Account.User" = "ユーザ名";
 "Settings.Account.Password" = "パスワード";
@@ -28,7 +29,7 @@
 
 // User追加View
 "NewUser.Account" = "アカウント名";
-"NewUser.Explanation" = "閲覧したいユーザのアカウント名を入力してください";
+"NewUser.Explanation" = "閲覧したいユーザの<acount>名\nを入力してください\n以下の<acount>の部分です->\nメイルアドレス-<acount>@gmail.com\nギャラリー-http://picasaweb.google.co.jp/<acount>";
 
 // Photo List
 "PhotoList.DownloadList" = "一覧をダウンロード中です";

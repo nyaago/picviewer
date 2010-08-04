@@ -16,6 +16,7 @@
 "Settings" = "Settings";
 
 // 設定View
+"Settings.Title" = "Settings";
 "Settings.Account" = "ACCOUNT";
 "Settings.Account.User" = "USER";
 "Settings.Account.Password" = "PASSWORD";
