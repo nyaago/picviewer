@@ -31,6 +31,9 @@
 "NewUser.Account" = "アカウント名";
 "NewUser.Explanation" = "閲覧したいユーザの<acount>名\nを入力してください\n以下の<acount>の部分です->\nメイルアドレス-<acount>@gmail.com\nギャラリー-http://picasaweb.google.co.jp/<acount>";
 
+// Acounts
+"Acounts.Title" = "アカウント一覧";
+
 // Photo List
 "PhotoList.DownloadList" = "一覧をダウンロード中です";
 "PhotoList.DownloadThumb" = "サムネイルをダウンロード中です";

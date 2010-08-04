@@ -63,11 +63,14 @@
 // Navigation Bar のボタンの追加とUserデータのFetched Controllerの生成.
 - (void)viewDidLoad {
   [super viewDidLoad];
-//  self.view.backgroundColor = [UIColor blackColor];
+
+  // Title
+  self.navigationItem.title = NSLocalizedString(@"Acounts.Title", @"Acounts");
+
   // Set up the edit and add buttons.
   self.navigationItem.leftBarButtonItem = self.editButtonItem;
   self.navigationItem.rightBarButtonItem = [self addButton];
-
+  
   NSError *error = nil;
   if (![[self fetchedUsersController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);

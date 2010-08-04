@@ -28,6 +28,9 @@
 "NewUser.Account" = "ACCOUNT";
 "NewUser.Explanation" = "Please input account that you want browse.";
 
+// Acounts
+"Acounts.Title" = "Acounts";
+
 // Photo List
 "PhotoList.DownloadList" = "Downloading list..";
 "PhotoList.DownloadThumb" = "Downloading thumbnail..";
