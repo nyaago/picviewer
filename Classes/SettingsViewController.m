@@ -23,6 +23,7 @@
 }
 */
 
+
 /*!
  @method viewDidLad
  @discussion View Load時の通知.navigationBarの設定、設定情報管理Objectの生成
@@ -30,8 +31,8 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   // Title
-  self.navigationController.title = NSLocalizedString(@"Settings.Title", 
-                                                      @"Settings");
+  self.navigationItem.title = NSLocalizedString(@"Settings.Title", 
+                                                @"Settings");
   // navigationBar
 	completeButton = [[UIBarButtonItem alloc] 
                     initWithBarButtonSystemItem:UIBarButtonSystemItemDone                    
@@ -238,6 +239,9 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 	  controller.userId = settings.userId;
 	  controller.password = settings.password;
 	  [controller queryUserAndAlbums:settings.userId];
+  }
+  else {
+    [self.parentViewController dismissModalViewControllerAnimated:YES];
   }
 }
 
