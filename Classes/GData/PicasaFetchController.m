@@ -71,7 +71,8 @@
   [service release];
 }
 
-- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)targetUserId withPhotoSize:(NSNumber *)photoSize {
+- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)targetUserId 
+               withPhotoSize:(NSNumber *)photoSize {
   completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   
