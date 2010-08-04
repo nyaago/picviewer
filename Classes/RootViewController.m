@@ -31,7 +31,7 @@
 /*!
  新規ユーザをデータベースに保存
  */
-- (User *)insertNewUser:(NSString *)user;
+- (User *)insertNewUser:(NSString *)user withNickname:(NSString *)name;
 
 
 - (User *)userWithUserId:(NSString *)uid;
@@ -142,7 +142,7 @@
 
 #pragma mark Add a new object / delete object
 
-- (User *)insertNewUser:(NSString *)user {
+- (User *)insertNewUser:(NSString *)user withNickname:(NSString *)name{
   // Create a new instance of the entity managed by the fetched results controller.
   NSManagedObjectContext *context = [fetchedUsersController managedObjectContext];
   NSEntityDescription *entity = [[fetchedUsersController fetchRequest] entity];
@@ -153,6 +153,7 @@
   // If appropriate, configure the new managed object.
   [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
   [newManagedObject setValue:user forKey:@"userId"];
+  [newManagedObject setValue:name forKey:@"nickname"];
   
   // Save the context.
   NSError *error = nil;
@@ -191,6 +192,8 @@
     [alertView show];
     [alertView release];
   }
+  [self.tableView reloadData];
+
 }
 
 #pragma mark -
@@ -221,10 +224,10 @@
     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault 
                                    reuseIdentifier:CellIdentifier] autorelease];
     // Configure the cell.
-    NSManagedObject *managedObject = [fetchedUsersController objectAtIndexPath:indexPath];
-    cell.textLabel.text = [[managedObject valueForKey:@"userId"] description];
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
   }
+  NSManagedObject *managedObject = [fetchedUsersController objectAtIndexPath:indexPath];
+  cell.textLabel.text = [[managedObject valueForKey:@"nickname"] description];
   return cell;
 }
 
@@ -297,7 +300,7 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   
   // Edit the sort key as appropriate.
   NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] 
-                                      initWithKey:@"timeStamp" ascending:NO];
+                                      initWithKey:@"timeStamp" ascending:YES];
   NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
   
   [fetchRequest setSortDescriptors:sortDescriptors];
@@ -437,11 +440,25 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     [alertView release];
     
   }
-  User *user = [self insertNewUser:[feed username]];
+  NSLog(@"user name = %@", [feed username]);
+  User *user = [self insertNewUser:[feed username] withNickname:[feed nickname]];
   if(!user) {
     return ;
   }
-  
+  [NSFetchedResultsController deleteCacheWithName:@"Root"];
+  [fetchedUsersController release];
+  fetchedUsersController = nil;
+  if (![[self fetchedUsersController] performFetch:&error]) {
+    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+    UIAlertView *alertView = [[UIAlertView alloc] 
+                              initWithTitle:NSLocalizedString(@"Error",@"Error")
+                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
+                              delegate:nil
+                              cancelButtonTitle:nil 
+                              otherButtonTitles:@"OK", nil];
+    [alertView show];
+    [alertView release];
+  }
   [(UITableView *)self.view reloadData];
   [self dismissModalViewControllerAnimated:YES];
 }

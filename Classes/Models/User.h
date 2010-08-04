@@ -16,6 +16,7 @@
 }
 
 @property (retain) NSString *userId;
+@property (retain) NSString *nickname;
 @property (retain) NSDate *timeStamp;
 @property (nonatomic, retain) NSData *thumbnail;
 @property (nonatomic, retain) NSSet *album;

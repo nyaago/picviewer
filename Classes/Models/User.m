@@ -12,6 +12,6 @@
 @implementation User
 
 @dynamic album;
-@dynamic userId,timeStamp, thumbnail;
+@dynamic userId,timeStamp, thumbnail, nickname;
 
 @end
