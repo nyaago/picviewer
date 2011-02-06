@@ -14,6 +14,7 @@
 @synthesize doneButton, cancelButton;
 @synthesize userField;
 @synthesize captionLabel, explanationLabel;
+@synthesize navigationTitle;
 @synthesize delegate;
 
 /*
@@ -27,10 +28,16 @@
  }
  */
 
+- (void)loadView {
+  [super loadView];
+}
+
+
  // Implement viewDidLoad to do additional setup after loading the view, 
  //typically from a nib.
 - (void)viewDidLoad {
 	[super viewDidLoad];
+  navigationTitle.text = NSLocalizedString(@"NewUser.Title", @"Add");
   captionLabel.text = NSLocalizedString(@"NewUser.Account", @"Account");
   explanationLabel.text = NSLocalizedString(@"NewUser.Explanation", @"");
  }

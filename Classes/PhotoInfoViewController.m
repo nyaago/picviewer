@@ -104,7 +104,7 @@
   NSInteger n = 0;
   switch (section) {
     case 0:
-      n = 3;
+      n = 2;
     default:
       break;
   }
@@ -137,6 +137,7 @@
                                    NSLocalizedString(@"Location", @"Location"),
                                    self.photo.location];
             break;
+          /*  
           case(2) :
             {
             NSString *w = NSLocalizedString(@"Width", @"Width");
@@ -147,6 +148,7 @@
                                    [self.photo.height intValue] ];
             }
             break;
+           */
           default:
             break;
         }

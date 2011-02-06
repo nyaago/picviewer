@@ -27,6 +27,8 @@
 // User追加View
 "NewUser.Account" = "ACCOUNT";
 "NewUser.Explanation" = "Please input account that you want browse.";
+"NewUser.Title" = "New User";
+
 
 // Acounts
 "Acounts.Title" = "Acounts";
@@ -41,6 +43,7 @@
 "Email" = "Send By EMail";
 "SaveToLibrary" = "Save To Photo Library";
 "OK" = "OK";
+"Continue" = "Continue";
 
 
 // Album DETAIL
@@ -67,6 +70,8 @@
 "Warn.NoUser" = "The user not found.";
 "Warn.NoAlbum" = "The album not found.";
 "Warn.NetworkNotReachable" = "can't connect to network.";
+
+"Notice.WifiNotReachable" = "only 3G(can't use Wi-fi).continue?";
 
 // General
 "Width" = "Width";

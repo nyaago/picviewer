@@ -51,7 +51,6 @@
 		72EA5A571181337800065915 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 72EA5A561181337800065915 /* Localizable.strings */; };
 		72EA5A9E1181408700065915 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5A9D1181408700065915 /* User.m */; };
 		72EA5AA11181409300065915 /* Album.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5AA01181409300065915 /* Album.m */; };
-		72EA5B521181577500065915 /* URLDownload.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5B511181577500065915 /* URLDownload.m */; };
 		72EA5B5C11815C9A00065915 /* AlbumTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5B5A11815C9A00065915 /* AlbumTableViewController.m */; };
 		72FA3CB4117E9F4300AB7B1C /* libxml2.2.7.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 72FA3CB3117E9F4300AB7B1C /* libxml2.2.7.3.dylib */; };
 		72FFBD1611ABA46700E16BA4 /* AlbumInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72FFBD1411ABA46700E16BA4 /* AlbumInfoViewController.m */; };
@@ -159,8 +158,6 @@
 		72EA5A9D1181408700065915 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		72EA5A9F1181409300065915 /* Album.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Album.h; sourceTree = "<group>"; };
 		72EA5AA01181409300065915 /* Album.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Album.m; sourceTree = "<group>"; };
-		72EA5B501181577500065915 /* URLDownload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLDownload.h; sourceTree = "<group>"; };
-		72EA5B511181577500065915 /* URLDownload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLDownload.m; sourceTree = "<group>"; };
 		72EA5B5911815C9A00065915 /* AlbumTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumTableViewController.h; sourceTree = "<group>"; };
 		72EA5B5A11815C9A00065915 /* AlbumTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumTableViewController.m; sourceTree = "<group>"; };
 		72FA3CB3117E9F4300AB7B1C /* libxml2.2.7.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.7.3.dylib; path = usr/lib/libxml2.2.7.3.dylib; sourceTree = SDKROOT; };
@@ -347,8 +344,6 @@
 			children = (
 				72B4882C11C1FE3E00338152 /* NetworkReachability.h */,
 				72B4882D11C1FE3E00338152 /* NetworkReachability.m */,
-				72EA5B501181577500065915 /* URLDownload.h */,
-				72EA5B511181577500065915 /* URLDownload.m */,
 				7251548E11851B2A00B136DF /* QueuedURLDownloader.h */,
 				7251548F11851B2A00B136DF /* QueuedURLDownloader.m */,
 				72C61838118A6F52001FD7C7 /* DeviceRotation.h */,
@@ -384,6 +379,7 @@
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "PicasaViewer" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
 				English,
@@ -475,7 +471,6 @@
 				72D577E811804AAE00F687DB /* NewUserViewController.m in Sources */,
 				72EA5A9E1181408700065915 /* User.m in Sources */,
 				72EA5AA11181409300065915 /* Album.m in Sources */,
-				72EA5B521181577500065915 /* URLDownload.m in Sources */,
 				72EA5B5C11815C9A00065915 /* AlbumTableViewController.m in Sources */,
 				7251549011851B2A00B136DF /* QueuedURLDownloader.m in Sources */,
 				722D6DCB1186A0EE004F0F0D /* PhotoListViewController.m in Sources */,
@@ -538,6 +533,40 @@
 			};
 			name = Release;
 		};
+		727212DB1235F0290042F9E4 /* Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: katsuhiko kishino";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: katsuhiko kishino";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/include/libxml2;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
+				OTHER_LDFLAGS = "-all_load";
+				PREBINDING = NO;
+				PROVISIONING_PROFILE = "731B054A-11EF-4282-87C7-93CD35B5694A";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "731B054A-11EF-4282-87C7-93CD35B5694A";
+				SDKROOT = iphoneos;
+				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
+			};
+			name = Distribution;
+		};
+		727212DC1235F0290042F9E4 /* Distribution */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = PicasaViewer_Prefix.pch;
+				INFOPLIST_FILE = "PicasaViewer-Info.plist";
+				PRODUCT_NAME = PicViewer;
+			};
+			name = Distribution;
+		};
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -552,8 +581,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
 				OTHER_LDFLAGS = "-all_load";
 				PREBINDING = NO;
-				SDKROOT = iphoneos4.0;
+				SDKROOT = iphoneos;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
+				TARGETED_DEVICE_FAMILY = 1;
 				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
 			};
 			name = Debug;
@@ -562,7 +592,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer: katsuhiko kishino (3Q3CXNAW7D)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: katsuhiko kishino (3Q3CXNAW7D)";
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -572,8 +602,9 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 3.1.3;
 				OTHER_LDFLAGS = "-all_load";
 				PREBINDING = NO;
+				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "5A905269-681A-45B5-A5E1-D817DE5CFB3F";
-				SDKROOT = iphoneos4.0;
+				SDKROOT = iphoneos;
 				STANDARD_C_PLUS_PLUS_LIBRARY_TYPE = dynamic;
 				USER_HEADER_SEARCH_PATHS = "/Users/nyaago/develop/gdata-objectivec-client/Source/**";
 			};
@@ -587,6 +618,7 @@
 			buildConfigurations = (
 				1D6058940D05DD3E006BFB54 /* Debug */,
 				1D6058950D05DD3E006BFB54 /* Release */,
+				727212DC1235F0290042F9E4 /* Distribution */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -596,6 +628,7 @@
 			buildConfigurations = (
 				C01FCF4F08A954540054247B /* Debug */,
 				C01FCF5008A954540054247B /* Release */,
+				727212DB1235F0290042F9E4 /* Distribution */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

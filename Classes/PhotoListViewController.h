@@ -17,7 +17,8 @@
 
 @interface PhotoListViewController : UIViewController 
 <PicasaFetchControllerDelegate, 
-QueuedURLDownloaderDelegate, PageControlViewControllerDataSource> {
+QueuedURLDownloaderDelegate, PageControlViewControllerDataSource,
+UIAlertViewDelegate> {
   
   @private
   

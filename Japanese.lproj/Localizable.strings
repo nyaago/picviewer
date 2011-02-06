@@ -11,7 +11,6 @@
 "Warn" = "警告";
 "Notice" = "注意";
 
-
 // Navigation Bar - Title
 "Accounts" = "アカウント";
 "Albums" = "アルバム";
@@ -30,6 +29,7 @@
 // User追加View
 "NewUser.Account" = "アカウント名";
 "NewUser.Explanation" = "閲覧したいユーザの<acount>名\nを入力してください\n以下の<acount>の部分です->\nメイルアドレス-<acount>@gmail.com\nギャラリー-http://picasaweb.google.co.jp/<acount>";
+"NewUser.Title" = "閲覧アカウント追加";
 
 // Acounts
 "Acounts.Title" = "アカウント一覧";
@@ -40,10 +40,12 @@
 
 // ボタンキャプション
 "Completed" = "完了";
-"Cancel" = "取消";
+"Cancel" = "中止";
 "Email" = "EMailで送信";
 "SaveToLibrary" = "Photoライブラリへ保存";
 "OK" = "OK";
+"Continue" = "続行";
+
 
 // Album詳細
 "AlbumInfo.PhotosUsed" = "写真 %d 枚";
@@ -70,6 +72,8 @@
 "Warn.NoUser" = "ユーザがみつかりません.";
 "Warn.NoAlbum" = "アルバムがみつかりません.";
 "Warn.NetworkNotReachable" = "ネットワークに接続できません.";
+
+"Notice.WifiNotReachable" = "3G回線へ接続中ですが(Wi-fi接続できません)続行しますか";
 
 // General
 "Width" = "幅";

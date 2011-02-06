@@ -1,0 +1,10 @@
+2010/6/14
+･アカウント設定時 - ネットワーク接続ない場合は、アカウントチェックをおこなわない
+･Album一覧,Photo一覧 - Picasa問い合わせ中に前画面にもどっだとき、Activty表示をOff
+･Album一覧,Photo一覧 - サーバーからのLoad中は、refresh,infoボタンを選択不可に
+･Album一覧,Photo一覧 - Serverからの結果受信時にLocal DBのデータ削除処理を行う
+2010/6/14 - 2
+･PregressView - メッセージ付加
+･アカウント削除時-ProgressView
+ 
+

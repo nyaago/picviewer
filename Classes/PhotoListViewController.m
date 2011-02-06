@@ -199,14 +199,10 @@ withListViewController:(PhotoListViewController *)controller {
   progressView = [[LabeledProgressView alloc] initWithFrame:frame];
   // toolbar
   self.toolbarItems = [self toolbarButtons];
-//  self.navigationController.toolbar.translucent = YES;
+  self.navigationController.toolbar.translucent = NO;
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbarHidden = NO; 
 //  [self setToolbarItems: [self toolbarButtons] animated:YES];
-  // scrollViewのサイズ
-//  frame = self.scrollView.frame;
-//  frame.size.height -= self.navigationController.toolbar.frame.size.height;
-//  self.scrollView.frame = frame;
 }
 
 
@@ -283,7 +279,7 @@ withListViewController:(PhotoListViewController *)controller {
 
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
-  self.wantsFullScreenLayout = NO;
+//  self.wantsFullScreenLayout = NO;
 
 }
 
@@ -311,12 +307,13 @@ withListViewController:(PhotoListViewController *)controller {
   self.navigationController.toolbar.translucent = NO;
   
   if(isFromAlbumTableView == NO) {	// 写真画面から戻ってきた場合
-    // scrollViewのサイズ
+    // viewのサイズ, 前画面(写真)がtoolbar部分を含んでいたので、そのtoolbar分マイナス
     CGRect frame = self.view.frame;
     frame.size.height -= self.navigationController.toolbar.frame.size.height;
-    self.scrollView.frame = frame;
+    self.view.frame = frame;
   }
-  else {
+
+  if(isFromAlbumTableView == YES) {
     // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
     // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
     // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
@@ -324,7 +321,6 @@ withListViewController:(PhotoListViewController *)controller {
     [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:) 
                              toTarget:self 
                            withObject:nil];
-    isFromAlbumTableView = YES;
   }
 }
 
@@ -346,6 +342,11 @@ withListViewController:(PhotoListViewController *)controller {
   // Release any cached data, images, etc that aren't in use.
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+  // 
+
+}
+
 - (void)viewDidDisappear:(BOOL)animated {
   // Google問い合わせ中の場合,停止を要求、完了するまで待つ
   if(picasaFetchController) {
@@ -359,6 +360,7 @@ withListViewController:(PhotoListViewController *)controller {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   }
   [self stopToAddThumbnails];
+  isFromAlbumTableView = NO;
 }
 
 - (void)viewDidUnload {
@@ -440,7 +442,7 @@ withListViewController:(PhotoListViewController *)controller {
 - (void)setContentSizeWithImageCount:(id)n {
   
   NSNumber *number = (NSNumber *)n;
-  CGPoint point = [self pointForThumb:[number intValue]];
+  CGPoint point = [self pointForThumb:[number intValue] - 1];
   self.scrollView.contentSize =  CGSizeMake(self.scrollView.frame.size.width, 
                                             point.y + 80.0f);
 }
@@ -1121,17 +1123,32 @@ withListViewController:(PhotoListViewController *)controller {
 #pragma mark Action
 
 - (void) refreshAction:(id)sender {
-  // Network接続確認
   if(![NetworkReachability reachable]) {
     NSString *title = NSLocalizedString(@"Notice","Notice");
-    NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
+    NSString *message = NSLocalizedString(@"Notice.NetworkNotReachable",
                                           "not reacable");
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:title
                               message:message
                               delegate:nil
-                              cancelButtonTitle:@"OK" 
+                              cancelButtonTitle:NSLocalizedString(@"Ok", @"Ok")
                               otherButtonTitles:nil];
+    [alertView show];
+    [alertView release];
+    return;
+  }
+  // Network接続確認
+  if(![NetworkReachability reachableByWifi]) {
+    NSString *title = NSLocalizedString(@"Notice","Notice");
+    NSString *message = NSLocalizedString(@"Notice.WifiNotReachable",
+                                          "only 3G");
+    UIAlertView *alertView = [[UIAlertView alloc] 
+                              initWithTitle:title
+                              message:message
+                              delegate:self
+                              cancelButtonTitle:NSLocalizedString(@"Cancel", @"Cancel")
+                              otherButtonTitles:NSLocalizedString(@"Continue", @"Continue"),
+                              nil];
     [alertView show];
     [alertView release];
     return;
@@ -1170,8 +1187,29 @@ withListViewController:(PhotoListViewController *)controller {
   [navigationController release];
 }
 
+#pragma mark -
+
+#pragma mark UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+  if(alertView.cancelButtonIndex == buttonIndex) {
+  }
+  else {	// データダウンロード処理を実行
+    progressView.progress = 0.0f;
+    [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
+                                               @"download")];
+    [self discardTumbnails];
+    [self.view addSubview:progressView];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [self performSelectorOnMainThread:@selector(refreshPhotos) 
+                           withObject:nil 
+                        waitUntilDone:NO];
+    
+  }
+}
 
 #pragma mark -
+
 - (NSUInteger) pageCount {
   return [modelController photoCount];
   

@@ -22,6 +22,7 @@
 @interface NewUserViewController : UIViewController {
   UIBarButtonItem *doneButton;
   UIBarButtonItem *cancelButton;
+  UILabel *navigationTitle;
   UITextField *userField;
   UILabel *captionLabel;
   UILabel *explanationLabel;
@@ -39,6 +40,11 @@
 /*!
  */
 @property (nonatomic, retain) IBOutlet UITextField *userField;
+
+/*!
+ @property navigationTitle
+ */
+@property (nonatomic, retain) IBOutlet UILabel *navigationTitle;
 
 /*!
  @property captionLabel
