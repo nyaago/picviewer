@@ -6,6 +6,7 @@
 //  Copyright 2010 __MyCompanyName__. All rights reserved.
 //
 
+#import "PicasaViewerAppDelegate.h"
 #import "AlbumTableViewController.h"
 #import "PhotoListViewController.h"
 #import "Album.h"
@@ -46,6 +47,9 @@
 - (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)album 
                                 withUser:(User *)userObject
                                 hasError:(BOOL *)f;
+
+
+- (PhotoListViewController *)photoListViewControllerWithAlbum:(Album *)album;
 
 @end
 
@@ -382,24 +386,22 @@
     return;
   }
   [onLoadLock unlock];
-  // 選択行のAlbumのPhoto一覧へ
-  if([self splitViewController] == nil) {
-    // iPhone
-    PhotoListViewController *photoViewController =
-    [[PhotoListViewController alloc] initWithNibName:@"PhotoListViewController" bundle:nil];
-    self.navigationItem.backBarButtonItem =  [photoViewController backButton];
 
-    Album *selectedObject = [modelController albumAt:indexPath];
-    photoViewController.managedObjectContext = self.managedObjectContext;
-    photoViewController.album = (Album *)selectedObject;
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+  // 選択行のAlbumのPhoto一覧へ
+  Album *selectedObject = [modelController albumAt:indexPath];
+  PhotoListViewController *photoViewController
+  = [self photoListViewControllerWithAlbum:(Album *) selectedObject];
+  self.navigationItem.backBarButtonItem =  [photoViewController backButton];
+
+  
     // Pass the selected object to the new view controller.
+  if([self splitViewController] == nil) {
     [self.navigationController pushViewController:photoViewController animated:YES];
-    [photoViewController release];
   }
-  else {
-    // iPad
-    
-  }
+
+  [pool drain];
 }
 
 
@@ -633,6 +635,33 @@
 
 - (void) enableToolbar:(BOOL)enable {
   refreshButton.enabled = enable;
+}
+
+- (PhotoListViewController *)photoListViewControllerWithAlbum:(Album *)album {
+  PhotoListViewController *photoViewController = nil;
+  
+  
+  if([self splitViewController] == nil) {
+    // iPhone
+    photoViewController =[[[PhotoListViewController alloc]
+                          initWithNibName:@"PhotoListViewController" bundle:nil]
+                          autorelease];
+    photoViewController.album = album;
+    photoViewController.managedObjectContext = self.managedObjectContext;
+    // Pass the selected object to the new view controller.
+  }
+  else {
+    // iPad
+    PicasaViewerAppDelegate *delegate
+    = (PicasaViewerAppDelegate *) [[UIApplication sharedApplication] delegate];
+    photoViewController = delegate.photoListViewController;
+    photoViewController.managedObjectContext = self.managedObjectContext;
+    [photoViewController albumTableViewControll:self selectAlbum:album];
+  }
+  
+  self.navigationItem.backBarButtonItem =  [photoViewController backButton];
+  
+  return photoViewController;
 }
 
 

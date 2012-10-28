@@ -14,7 +14,7 @@
 
 @synthesize window;
 @synthesize navigationController;
-
+@synthesize photoListViewController;
 
 #pragma mark -
 #pragma mark Application lifecycle
@@ -26,7 +26,7 @@
   window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds] ];
   window.backgroundColor = UIColor.blackColor;
   //
-  CGRect bounds = [[UIScreen mainScreen] bounds];
+  //CGRect bounds = [[UIScreen mainScreen] bounds];
   /*
   NSLog(@"window - x => %f,y => %f, width => %f, height => %f", 
         bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
@@ -43,15 +43,15 @@
   rootViewController.managedObjectContext = self.managedObjectContext;
                                      
   if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-    PhotoListViewController *listViewController =
-    [[PhotoListViewController alloc] initWithNibName:@"PhotoListViewController-iPad"
-                                               bundle:nil];
+    photoListViewController = [[PhotoListViewController alloc]
+                               initWithNibName:@"PhotoListViewController-iPad"
+                                        bundle:nil];
 
     UINavigationController *detailNav = [[UINavigationController alloc]
-                                         initWithRootViewController:listViewController];
+                                         initWithRootViewController:photoListViewController];
     NSArray *controllers = [NSArray arrayWithObjects:navigationController, detailNav, nil];
     UISplitViewController *splitController = [[UISplitViewController alloc] init];
-    [splitController setDelegate:listViewController];
+    [splitController setDelegate:photoListViewController];
     [splitController setViewControllers:controllers];
     [window setRootViewController:splitController];
   }

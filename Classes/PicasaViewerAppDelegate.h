@@ -10,6 +10,7 @@
  @class PicasaViewerAppDelegate
  ApplicationのDelegate
  */
+#import "PhotoListViewController.h"
 @interface PicasaViewerAppDelegate : NSObject <UIApplicationDelegate> {
   
   NSManagedObjectModel *managedObjectModel;
@@ -18,6 +19,8 @@
   
   UIWindow *window;
   UINavigationController *navigationController;
+  PhotoListViewController *photoListViewController;
+  
 }
 
 /*!
@@ -49,6 +52,10 @@
 
 - (NSString *)applicationDocumentsDirectory;
 
+/*!
+ @property photoListViewContriller
+ */
+@property (nonatomic,retain) PhotoListViewController *photoListViewController;
 
 
 @end

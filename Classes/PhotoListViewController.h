@@ -10,15 +10,17 @@
 #import "PicasaFetchController.h"
 #import "QueuedURLDownloader.h"
 #import "PageControlViewController.h"
+#import "AlbumTableViewController.h"
+#import "AlbumTableViewControllerDelegate.h"
 #import "Album.h"
 #import "Photo.h"
 #import "PhotoModelController.h"
 #import "LabeledProgressView.h"
 
-@interface PhotoListViewController : UIViewController 
+@interface PhotoListViewController : UIViewController
 <PicasaFetchControllerDelegate, 
 QueuedURLDownloaderDelegate, PageControlViewControllerDataSource,
-UIAlertViewDelegate,UISplitViewControllerDelegate> {
+UIAlertViewDelegate,UISplitViewControllerDelegate,AlbumTableViewControllerDelegate> {
   
   @private
   
@@ -138,6 +140,7 @@ UIAlertViewDelegate,UISplitViewControllerDelegate> {
  @discussion thumbnail処理を中断させる,中断されるまでLockされる
  */
 - (void) stopToAddThumbnails;
+
 
 
 

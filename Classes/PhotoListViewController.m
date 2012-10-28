@@ -160,6 +160,18 @@ withListViewController:(PhotoListViewController *)controller {
  */
 - (BOOL)mustRefresh;
 
+/*!
+ @method loadPhotos
+ @discussion 選択されている写真データのロード
+ */
+- (BOOL) loadPhotos;
+
+
+
+- (void) removeProgressView;
+
+- (LabeledProgressView *)progressView;
+
 @end
 
 
@@ -188,15 +200,7 @@ withListViewController:(PhotoListViewController *)controller {
   self.scrollView.userInteractionEnabled = YES;
   self.scrollView.frame = self.view.bounds;
   self.scrollView.backgroundColor = [UIColor blackColor];
-  NSLog(@"load viee");
-  // thumbnailを保持するコレクションの準備
-  if(thumbnails == nil) {
-    thumbnails = [[NSMutableDictionary alloc] init];
-  }
-  // progressView
-  CGRect frame = CGRectMake(0.0f, self.view.frame.size.height - 200.0f , 
-                            self.view.frame.size.width, 200.0f);
-  progressView = [[LabeledProgressView alloc] initWithFrame:frame];
+  NSLog(@"load view");
   // toolbar
   self.toolbarItems = [self toolbarButtons];
   self.navigationController.toolbar.translucent = NO;
@@ -219,65 +223,14 @@ withListViewController:(PhotoListViewController *)controller {
     return;
   }
   lockSave = [[NSLock alloc] init];
-  modelController = [[PhotoModelController alloc] 
-                     initWithContext:self.managedObjectContext 
-                     withAlbum:self.album];
-  modelController.managedObjectContext = self.managedObjectContext;
-  
-  NSLog(@"fetchedPhotosController");
-  NSError *error = nil;
-  if (![[modelController fetchedPhotosController] performFetch:&error]) {
-    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"Error",@"Error")
-                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
-                              delegate:nil
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
-    return;
-  }
-  // Photoが0件であれば、Googleへの問い合わせを起動.
-  // 問い合わせ結果は、albumAndPhotoWithTicket:finishedWithUserFeed:errorで受け
-  // CoreDataへの登録を行う
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  if([self mustLoad]) {
 
-    // クリア + 全ロードか?
-    onRefresh = [self mustRefresh];
-      
-    // toolbarのButtonを無効に
-    [self enableToolbar:NO];
-    // progress View
-    progressView.progress = 0.0f;
-    [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
-                                               @"download")];
-    if(onRefresh) {
-      [self.view addSubview:progressView];
-    }
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    
-    // 
-    SettingsManager *settings = [[SettingsManager alloc] init];
-    picasaFetchController = [[PicasaFetchController alloc] init];
-    picasaFetchController.delegate = self;
-    picasaFetchController.userId = settings.userId;
-    picasaFetchController.password = settings.password;
-    [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
-                                          user:[self.album.user valueForKey:@"userId"] 
-                                 withPhotoSize:[NSNumber numberWithInt:settings.imageSize]];
-    
-    downloader = [[QueuedURLDownloader alloc] 
-                  initWithMaxAtSameTime:kDownloadMaxAtSameTime];
-    downloader.delegate = self;
-    [settings release];
-  }
-  else {
-  }
+  [self loadPhotos];
+  
+  
+  
   // Title設定
   self.navigationItem.title = self.album.title;
-  [pool drain];
+  
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -373,6 +326,7 @@ withListViewController:(PhotoListViewController *)controller {
 - (void)viewDidUnload {
   // Release any retained subviews of the main view.
   // e.g. self.myOutlet = nil;
+  /*
   NSLog(@"PhotoListViewController viewDidUnload ");
   NSLog(@"lockSave retain count = %d", [lockSave retainCount]);
   NSLog(@"backBUtton retain count = %d", [backButton retainCount]);
@@ -380,12 +334,14 @@ withListViewController:(PhotoListViewController *)controller {
   NSLog(@"managedObjectContext retain count = %d", [managedObjectContext retainCount]);
   NSLog(@"thumbnails count = %d", [thumbnails count]);
   NSLog(@"thumbnails retain count = %d", [thumbnails retainCount]);
-  
+  */
   [super viewDidUnload];
   [lockSave release];
   lockSave = nil;
-  [downloader release];
-  downloader = nil;
+  if(downloader) {
+    [downloader release];
+    downloader = nil;
+  }
   [self discardTumbnails];
   NSLog(@"discard thumbnails count = %d", [thumbnails count]);
   
@@ -457,6 +413,11 @@ withListViewController:(PhotoListViewController *)controller {
 #pragma mark -
 
 - (void)loadThumbnails {
+  // thumbnailを保持するコレクションの準備
+  if(thumbnails == nil) {
+    thumbnails = [[NSMutableDictionary alloc] init];
+  }
+
   [onAddingThumbnailsLock lock];
   onAddingThumbnails = YES;
   stoppingToAddingThumbnailsRequred = NO;
@@ -524,11 +485,21 @@ withListViewController:(PhotoListViewController *)controller {
 
 
 - (void)discardTumbnails {
-  NSInteger n = [modelController photoCount];
+  
+  NSArray  *views  = [thumbnails allValues];
+  NSUInteger n = [views count];
+  
   for(NSUInteger i = 0; i < n; ++i) {
-    [self discardTumbnailAt:i];
+    UIView *view = (UIView *)[views objectAtIndex:i];
+    if([view superview]) {
+      [view removeFromSuperview];
+    }
+    [view release];
+    
+    //[self discardTumbnailAt:i];
   }
-  //  [thumbnails removeAllObjects];
+  [thumbnails removeAllObjects];
+  
 }
 
 - (void)discardTumbnailAt:(NSUInteger)index {
@@ -621,6 +592,53 @@ withListViewController:(PhotoListViewController *)controller {
 
 #pragma mark -
 
+#pragma mark AlbumTableViewControllerDelegate
+
+- (void) albumTableViewControll:(AlbumTableViewController *)controller
+                    selectAlbum:(Album *)selectedAlbum {
+  
+  isFromAlbumTableView = YES;
+//  [self discardTumbnails];
+
+
+  self.album = selectedAlbum;
+  // Title設定
+  self.navigationItem.title = self.album.title;
+  BOOL load = [self loadPhotos];
+//  [self loadThumbnails];
+  // navigationbar,  statusbar
+  self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+  [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackOpaque;
+  NSLog(@"thumbnail count = %d", [thumbnails count]);
+  // tool bar
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbar.translucent = NO;
+  
+  if(self.album == nil) {
+    return;
+  }
+  
+  if(isFromAlbumTableView == NO) {	// 写真画面から戻ってきた場合
+    // viewのサイズ, 前画面(写真)がtoolbar部分を含んでいたので、そのtoolbar分マイナス
+    CGRect frame = self.view.frame;
+    frame.size.height -= self.navigationController.toolbar.frame.size.height;
+    self.view.frame = frame;
+  }
+  
+  if( load == NO) {
+    // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
+    // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
+    // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
+    // 表示関連の操作はmain Threadでされる必要があるので)
+    [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
+                             toTarget:self
+                           withObject:nil];
+  }
+
+}
+
+
+#pragma mark -
 
 #pragma mark PicasaFetchControllerDelegate
 
@@ -751,8 +769,8 @@ withListViewController:(PhotoListViewController *)controller {
   // Google接続コントローラーをclean
   [picasaFetchController release];
   picasaFetchController = nil;
-  // 
-  [progressView removeFromSuperview];
+  //
+  [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
 }
@@ -776,8 +794,8 @@ withListViewController:(PhotoListViewController *)controller {
   // Google接続コントローラーをclean
   [picasaFetchController release];
   picasaFetchController = nil;
-  // 
-  [progressView removeFromSuperview];
+  //
+  [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
 }
@@ -802,8 +820,8 @@ withListViewController:(PhotoListViewController *)controller {
   // Google接続コントローラーをclean
   [picasaFetchController release];
   picasaFetchController = nil;
-  // 
-  [progressView removeFromSuperview];
+  //
+  [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
 }
@@ -959,6 +977,7 @@ withListViewController:(PhotoListViewController *)controller {
   picasaFetchController.delegate = self;
   picasaFetchController.userId = settings.userId;
   picasaFetchController.password = settings.password;
+  [self.view addSubview:[self progressView]];
   [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
                                         user:[self.album.user valueForKey:@"userId"]
                                withPhotoSize:[NSNumber numberWithInt:settings.imageSize]];
@@ -990,7 +1009,6 @@ withListViewController:(PhotoListViewController *)controller {
 }
 
 - (BOOL)mustLoad {
-
   if(isFromAlbumTableView == NO)
     return NO;
   if([modelController photoCount] == 0) {
@@ -1026,9 +1044,86 @@ withListViewController:(PhotoListViewController *)controller {
   }
   return NO;
 }
-     
 
 
+- (BOOL) loadPhotos {
+  
+  downloader = [[QueuedURLDownloader alloc]
+                initWithMaxAtSameTime:kDownloadMaxAtSameTime];
+  downloader.delegate = self;
+
+  modelController = [[PhotoModelController alloc]
+                     initWithContext:self.managedObjectContext
+                     withAlbum:self.album];
+  modelController.managedObjectContext = self.managedObjectContext;
+  
+  NSLog(@"fetchedPhotosController");
+  NSError *error = nil;
+  if (![[modelController fetchedPhotosController] performFetch:&error]) {
+    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+    UIAlertView *alertView = [[UIAlertView alloc]
+                              initWithTitle:NSLocalizedString(@"Error",@"Error")
+                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
+                              delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil];
+    [alertView show];
+    [alertView release];
+    return NO;
+  }
+  // Photoが0件であれば、Googleへの問い合わせを起動.
+  // 問い合わせ結果は、albumAndPhotoWithTicket:finishedWithUserFeed:errorで受け
+  // CoreDataへの登録を行う
+  BOOL ret = NO;
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  if([self mustLoad]) {
+    
+    // クリア + 全ロードか?
+    onRefresh = [self mustRefresh];
+    
+    // toolbarのButtonを無効に
+    [self enableToolbar:NO];
+    // progress View
+    progressView.progress = 0.0f;
+    [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
+                                               @"download")];
+    if(onRefresh) {
+      [self.view addSubview:[self progressView]];
+    }
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    
+    //
+    SettingsManager *settings = [[SettingsManager alloc] init];
+    picasaFetchController = [[PicasaFetchController alloc] init];
+    picasaFetchController.delegate = self;
+    picasaFetchController.userId = settings.userId;
+    picasaFetchController.password = settings.password;
+    [picasaFetchController queryAlbumAndPhotos:self.album.albumId
+                                          user:[self.album.user valueForKey:@"userId"]
+                                 withPhotoSize:[NSNumber numberWithInt:settings.imageSize]];
+    [settings release];
+    ret = YES;
+  }
+  [pool drain];
+  return ret;
+}
+
+- (LabeledProgressView *)progressView {
+  if(progressView) {
+    return progressView;
+  }
+  // progressView
+  CGRect frame = CGRectMake(0.0f, self.view.frame.size.height - 200.0f ,
+                            self.view.frame.size.width, 200.0f);
+  progressView = [[LabeledProgressView alloc] initWithFrame:frame];
+  return progressView;
+}
+
+- (void) removeProgressView {
+  [progressView removeFromSuperview];
+  [progressView release];
+  progressView = nil;
+}
 #pragma mark - 
 
 #pragma mark QueuedURLDownloaderDelegate
@@ -1107,6 +1202,8 @@ withListViewController:(PhotoListViewController *)controller {
   downloader = nil;
   // albumのphotoに対する最後の保存処理実行日時を記録
   [modelController setLastAdd];
+  //
+  
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
   //
