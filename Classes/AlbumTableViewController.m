@@ -79,6 +79,9 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   self.navigationItem.leftBarButtonItem = nil;
+  if(user == nil) {
+    return;
+  }
   modelController = [[AlbumModelController alloc] 
                      initWithContext:self.managedObjectContext 
                      withUser:self.user];
@@ -380,16 +383,23 @@
   }
   [onLoadLock unlock];
   // 選択行のAlbumのPhoto一覧へ
-  PhotoListViewController *photoViewController = 
-  [[PhotoListViewController alloc] initWithNibName:@"PhotoListViewController" bundle:nil];
-  self.navigationItem.backBarButtonItem =  [photoViewController backButton];
-  
-  Album *selectedObject = [modelController albumAt:indexPath];
-  photoViewController.managedObjectContext = self.managedObjectContext;
-  photoViewController.album = (Album *)selectedObject;
-  // Pass the selected object to the new view controller.
-  [self.navigationController pushViewController:photoViewController animated:YES];
-  [photoViewController release];
+  if([self splitViewController] == nil) {
+    // iPhone
+    PhotoListViewController *photoViewController =
+    [[PhotoListViewController alloc] initWithNibName:@"PhotoListViewController" bundle:nil];
+    self.navigationItem.backBarButtonItem =  [photoViewController backButton];
+
+    Album *selectedObject = [modelController albumAt:indexPath];
+    photoViewController.managedObjectContext = self.managedObjectContext;
+    photoViewController.album = (Album *)selectedObject;
+    // Pass the selected object to the new view controller.
+    [self.navigationController pushViewController:photoViewController animated:YES];
+    [photoViewController release];
+  }
+  else {
+    // iPad
+    
+  }
 }
 
 

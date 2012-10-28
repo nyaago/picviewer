@@ -92,8 +92,6 @@
       AlbumTableViewController *albumViewController = 
       [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" 
                                                  bundle:nil];
-      //  AlbumTableViewController *albumViewController = 
-      //  [[AlbumTableViewController alloc] init];
       self.navigationItem.backBarButtonItem =  [albumViewController backButton];
       albumViewController.managedObjectContext = self.managedObjectContext;
       albumViewController.user = user;
@@ -395,8 +393,16 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 
 - (void)addButtonAction:(id)sender {
   self.editing = NO;
-  NewUserViewController *controller = [[NewUserViewController alloc] 
-                                       initWithNibName:@"NewUserViewController" 
+  NSString *nibName = nil;
+  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    nibName = @"NewUserViewController-iPad";
+  }
+  else {
+    nibName = @"NewUserViewController";
+  }
+
+  NewUserViewController *controller = [[NewUserViewController alloc]
+                                       initWithNibName:nibName
                                        bundle:nil];
   controller.delegate = self;
   [self presentModalViewController:controller animated:YES];

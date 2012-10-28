@@ -215,6 +215,9 @@ withListViewController:(PhotoListViewController *)controller {
   NSLog(@"load did load");
   NSLog(@"photo view  viewDidLoad");
   [super viewDidLoad];
+  if(self.album == nil) {
+    return;
+  }
   lockSave = [[NSLock alloc] init];
   modelController = [[PhotoModelController alloc] 
                      initWithContext:self.managedObjectContext 
@@ -306,6 +309,10 @@ withListViewController:(PhotoListViewController *)controller {
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = NO;
   
+  if(self.album == nil) {
+    return;
+  }
+
   if(isFromAlbumTableView == NO) {	// 写真画面から戻ってきた場合
     // viewのサイズ, 前画面(写真)がtoolbar部分を含んでいたので、そのtoolbar分マイナス
     CGRect frame = self.view.frame;

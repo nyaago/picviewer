@@ -8,7 +8,7 @@
 
 #import "PicasaViewerAppDelegate.h"
 #import "RootViewController.h"
-
+#import "PhotoListViewController.h"
 
 @implementation PicasaViewerAppDelegate
 
@@ -26,15 +26,10 @@
   window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds] ];
   window.backgroundColor = UIColor.blackColor;
   //
-  
-  //
   CGRect bounds = [[UIScreen mainScreen] bounds];
+  /*
   NSLog(@"window - x => %f,y => %f, width => %f, height => %f", 
         bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
-  /*
-  RootViewController *rootViewController = [[RootViewController alloc] 
-                                            initWithNibName:@"RootViewController"
-                                            bundle:nil];
    */
   RootViewController *rootViewController = [[RootViewController alloc] init];
   
@@ -43,25 +38,27 @@
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = YES;
-  bounds =navigationController.view.frame;
-  NSLog(@"navigation - x => %f,y => %f, width => %f, height => %f", 
-        bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
-  /* 
-   // xibから読み込む場合
-   RootViewController *rootViewController 
-   = (RootViewController *)[navigationController topViewController];
-   */
-//	rootViewController.toolbarItems = [rootViewController toolbarButtons];
   rootViewController.navigationController.navigationBarHidden = NO;
   rootViewController.navigationController.toolbarHidden = NO;
   rootViewController.managedObjectContext = self.managedObjectContext;
                                      
-                                
+  if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    PhotoListViewController *listViewController =
+    [[PhotoListViewController alloc] initWithNibName:@"PhotoListViewController-iPad"
+                                               bundle:nil];
+
+    UINavigationController *detailNav = [[UINavigationController alloc]
+                                         initWithRootViewController:listViewController];
+    NSArray *controllers = [NSArray arrayWithObjects:navigationController, detailNav, nil];
+    UISplitViewController *splitController = [[UISplitViewController alloc] init];
+    [splitController setDelegate:listViewController];
+    [splitController setViewControllers:controllers];
+    [window setRootViewController:splitController];
+  }
+  else {
+    [window setRootViewController:navigationController];
+  }
   
-  [window addSubview:[navigationController view]];
-  bounds =rootViewController.view.frame;
-  NSLog(@"root view - x => %f,y => %f, width => %f, height => %f", 
-        bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
   [window makeKeyAndVisible];
 }
 
@@ -192,8 +189,6 @@
 #pragma mark Memory management
 
 - (void)dealloc {
-  NSLog(@"AppDelegate dealloc");
-  NSLog(@"retain count = %d", [managedObjectContext retainCount] );
   [managedObjectContext release];
   [managedObjectModel release];
   [persistentStoreCoordinator release];
