@@ -193,16 +193,6 @@
                                 initWithFrame:scrollViewBounds];
   pageView.delegate = self;
   self.view = pageView;
-  // backボタンがない場合(iPadの場合）
-  if(self.navigationItem.backBarButtonItem == nil) {
-    UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
-                                   initWithTitle:NSLocalizedString(@"Photos", @"Photos")
-                                   style:UIBarButtonItemStyleDone
-                                   target:self
-                                   action:@selector(backAction:) ];
-    self.navigationItem.leftBarButtonItem = backButton;
-    [backButton  autorelease];
-  }
 
 }
 
@@ -213,6 +203,7 @@
 - (void)viewDidLoad {
   NSLog(@"PageControllerViewController view Did Load ratain count = %d", 
         [self retainCount]);
+  // backボタンがない場合(iPadの場合）
 }
 
 /*!
@@ -269,8 +260,21 @@
  機器回転の関知開始、navigation/status/tool - barの設定,各ページの追加/設定
  */
 - (void)viewDidAppear:(BOOL)animated {
+  
   [super viewDidAppear:animated];
-  NSLog(@"PageControllerViewController view Did Appear ratain count = %d", 
+  
+  // navigationのtopでない場合は、backボタン追加
+  if([[self.navigationController viewControllers] count] == 1 && self.parentViewController != nil) {
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
+                                   initWithTitle:NSLocalizedString(@"Photos", @"Photos")
+                                   style:UIBarButtonItemStyleDone
+                                   target:self
+                                   action:@selector(backAction:) ];
+    self.navigationItem.leftBarButtonItem = backButton;
+    [backButton  autorelease];
+  }
+
+  NSLog(@"PageControllerViewController view Did Appear ratain count = %d",
         [self retainCount]);
   
   //  [super viewDidLoad];

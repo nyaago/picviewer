@@ -155,9 +155,6 @@ static NSLock *lockFetchedResultsController;
 - (void)viewDidDisappear:(BOOL)animated {
   // Download実行中の場合,停止を要求、完了するまで待つ
   if(downloader) {
-    [downloader requireStopping];
-    [downloader waitCompleted];
-    downloader = nil;
   }
 }
 

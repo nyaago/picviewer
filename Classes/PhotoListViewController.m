@@ -868,6 +868,7 @@ withListViewController:(PhotoListViewController *)controller {
       [self.splitViewController presentViewController:navController
                                              animated:YES
                                            completion:^{
+                                             
                                            }];
     }
     else {
