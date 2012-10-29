@@ -841,6 +841,7 @@ withListViewController:(PhotoListViewController *)controller {
     onScroll = NO;
     return;
   }
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   UITouch *touch = [touches anyObject];
   UIView *touchView = touch.view;
   //  if([touchView is: UIImageView.class]) {
@@ -848,15 +849,33 @@ withListViewController:(PhotoListViewController *)controller {
   NSInteger index = [self indexForPhoto:touchView];
   if(index >= 0 && index < [modelController photoCount]) {
     PageControlViewController *pageController = 
-    [[PageControlViewController alloc] init];
-    self.navigationItem.backBarButtonItem = [PhotoViewController backButton];
+    [[[PageControlViewController alloc] init] autorelease];
+    
     NSLog(@"init PageControllerView retain count = %d",[pageController retainCount]);
     pageController.source = self;
     pageController.curPageNumber = index;
     NSLog(@"begore push PageControllerView retain count = %d",[pageController retainCount]);
-    [self.navigationController pushViewController:pageController animated:YES];
-    [pageController release];
+    if([self splitViewController]) {
+
+      self.navigationItem.backBarButtonItem = [PhotoViewController backButton];
+      [self.navigationController pushViewController:pageController animated:YES];
+
+      
+      UINavigationController *navController = [[[UINavigationController alloc]
+                                               initWithRootViewController:pageController]
+                                               autorelease];
+      [[navController navigationBar] setHidden:NO];
+      [self.splitViewController presentViewController:navController
+                                             animated:YES
+                                           completion:^{
+                                           }];
+    }
+    else {
+      self.navigationItem.backBarButtonItem = [PhotoViewController backButton];
+      [self.navigationController pushViewController:pageController animated:YES];
+    }
     NSLog(@"push PageControllerView retain count = %d",[pageController retainCount]);
+    [pool drain];
   }
 }
 

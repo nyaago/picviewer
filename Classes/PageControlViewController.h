@@ -95,6 +95,12 @@
  */
 - (NSUInteger) pageCount;
 
+/*!
+ @method backAction:
+ @discussion 前頁へ戻る(iPad）
+ */
+- (void) backAction:(PageControlViewController *)sender;
+
 
 @end
 
@@ -131,6 +137,7 @@
  @discuttion PageViewのコントローラーを設定
  */
 - (void) setPageController:(PageControlViewController *)controller;
+
 
 
 @optional

@@ -193,6 +193,17 @@
                                 initWithFrame:scrollViewBounds];
   pageView.delegate = self;
   self.view = pageView;
+  // backボタンがない場合(iPadの場合）
+  if(self.navigationItem.backBarButtonItem == nil) {
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
+                                   initWithTitle:NSLocalizedString(@"Photos", @"Photos")
+                                   style:UIBarButtonItemStyleDone
+                                   target:self
+                                   action:@selector(backAction:) ];
+    self.navigationItem.leftBarButtonItem = backButton;
+    [backButton  autorelease];
+  }
+
 }
 
 /*!
@@ -486,6 +497,8 @@
   CGRect frame = self.navigationController.navigationBar.frame;
   frame.origin.y = statusBarHeight;
   self.navigationController.navigationBar.frame = frame;
+//  [[self.navigationController navigationBar] setHidden:hidden];
+  [self.navigationController setNavigationBarHidden:hidden animated:hidden];
   [self.navigationController setToolbarHidden:hidden];
   // View階層のConsole出力
   /*
@@ -575,6 +588,10 @@
     return [source pageCount];
   }
   return 0;
+}
+
+- (void) backAction:(PageControlViewController *)sender {
+  [self dismissViewControllerAnimated:YES completion:^{}];
 }
 
 #pragma mark -
@@ -777,6 +794,8 @@
     self.showsHorizontalScrollIndicator = NO;  
     self.showsVerticalScrollIndicator = NO;  
     self.backgroundColor = [UIColor blackColor];
+    
+
   }
   return self;
 }

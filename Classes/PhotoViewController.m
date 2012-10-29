@@ -131,6 +131,11 @@ static NSLock *lockFetchedResultsController;
   self.view.backgroundColor = [UIColor blackColor];
   [self.view addSubview:scrollView];
   self.wantsFullScreenLayout = YES;
+  self.navigationItem.rightBarButtonItem = [PhotoViewController backButton];
+  self.navigationItem.title = @"aaaa";
+  //.navigationItem.backBarButtonItem = [PhotoViewController backButton];
+
+  
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -143,6 +148,7 @@ static NSLock *lockFetchedResultsController;
 - (void)viewDidAppear:(BOOL)animated {
   [super viewDidAppear:animated];
   NSLog(@"photo view controller view will apear");
+  
   
 }
 

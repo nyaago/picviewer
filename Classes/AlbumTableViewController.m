@@ -648,6 +648,7 @@
                           autorelease];
     photoViewController.album = album;
     photoViewController.managedObjectContext = self.managedObjectContext;
+    self.navigationItem.backBarButtonItem =  [photoViewController backButton];
     // Pass the selected object to the new view controller.
   }
   else {
@@ -659,7 +660,7 @@
     [photoViewController albumTableViewControll:self selectAlbum:album];
   }
   
-  self.navigationItem.backBarButtonItem =  [photoViewController backButton];
+  
   
   return photoViewController;
 }
