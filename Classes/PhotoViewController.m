@@ -351,9 +351,11 @@ static NSLock *lockFetchedResultsController;
   [photo setPhotoImage:photoImageObject];
   NSError *error;
   //  photo.content = data;
+  [managedObjectContext lock];
   if(![managedObjectContext save:&error] ) {
     NSLog(@"Unresolved error %@", error);
   }
+  [managedObjectContext unlock];
   [lockFetchedResultsController unlock];
   imageView = [self photoImageAt:indexForPhoto];
   
