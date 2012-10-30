@@ -10,6 +10,16 @@
 #import "RootViewController.h"
 #import "PhotoListViewController.h"
 
+@interface PicasaViewerAppDelegate(Private)
+
+/*!
+ @method createNavigationController
+ @discussion
+ */
+- (UINavigationController *) createNavigationController;
+
+@end
+
 @implementation PicasaViewerAppDelegate
 
 @synthesize window;
@@ -31,32 +41,25 @@
   NSLog(@"window - x => %f,y => %f, width => %f, height => %f", 
         bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
    */
-  RootViewController *rootViewController = [[RootViewController alloc] init];
-  
-  navigationController = [[UINavigationController alloc] 
-                          initWithRootViewController:rootViewController];
-  self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
-  self.navigationController.toolbar.translucent = YES;
-  rootViewController.navigationController.navigationBarHidden = NO;
-  rootViewController.navigationController.toolbarHidden = NO;
-  rootViewController.managedObjectContext = self.managedObjectContext;
                                      
   if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
     photoListViewController = [[PhotoListViewController alloc]
                                initWithNibName:@"PhotoListViewController-iPad"
                                         bundle:nil];
 
-    UINavigationController *detailNav = [[UINavigationController alloc]
-                                         initWithRootViewController:photoListViewController];
-    NSArray *controllers = [NSArray arrayWithObjects:navigationController, detailNav, nil];
-    UISplitViewController *splitController = [[UISplitViewController alloc] init];
+    UINavigationController *detailNav = [[[UINavigationController alloc]
+                                         initWithRootViewController:photoListViewController]
+                                         autorelease];
+    NSArray *controllers = [NSArray arrayWithObjects:[self createNavigationController],
+                            detailNav,
+                            nil];
+    UISplitViewController *splitController = [[[UISplitViewController alloc] init] autorelease];
     [splitController setDelegate:photoListViewController];
     [splitController setViewControllers:controllers];
     [window setRootViewController:splitController];
   }
   else {
-    [window setRootViewController:navigationController];
+    [window setRootViewController:[self createNavigationController]];
   }
   
   [window makeKeyAndVisible];
@@ -173,8 +176,28 @@
 
 
 #pragma mark -
-#pragma mark Application's Documents directory
+#pragma mark UI
 
+- (UINavigationController *) createNavigationController {
+  
+  if(navigationController == nil) {
+    RootViewController *rootViewController = [[[RootViewController alloc] init] autorelease];
+    
+    navigationController = [[UINavigationController alloc]
+                            initWithRootViewController:rootViewController];
+    navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+    navigationController.toolbar.barStyle = UIBarStyleBlack;
+    navigationController.toolbar.translucent = YES;
+    rootViewController.navigationController.navigationBarHidden = NO;
+    rootViewController.navigationController.toolbarHidden = NO;
+    rootViewController.managedObjectContext = self.managedObjectContext;
+  }
+  return navigationController;
+}
+
+
+#pragma mark -
+#pragma mark Application's Documents directory
 /**
  Returns the path to the application's Documents directory.
  */
@@ -194,6 +217,7 @@
   [persistentStoreCoordinator release];
   
   [navigationController release];
+  [photoListViewController release];
   [window release];
   [super dealloc];
 }

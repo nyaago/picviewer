@@ -393,7 +393,6 @@
   Album *selectedObject = [modelController albumAt:indexPath];
   PhotoListViewController *photoViewController
   = [self photoListViewControllerWithAlbum:(Album *) selectedObject];
-  self.navigationItem.backBarButtonItem =  [photoViewController backButton];
 
   
     // Pass the selected object to the new view controller.

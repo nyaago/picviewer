@@ -172,6 +172,8 @@ withListViewController:(PhotoListViewController *)controller {
 
 - (LabeledProgressView *)progressView;
 
+
+
 @end
 
 
@@ -200,12 +202,12 @@ withListViewController:(PhotoListViewController *)controller {
   self.scrollView.userInteractionEnabled = YES;
   self.scrollView.frame = self.view.bounds;
   self.scrollView.backgroundColor = [UIColor blackColor];
-  NSLog(@"load view");
   // toolbar
   self.toolbarItems = [self toolbarButtons];
   self.navigationController.toolbar.translucent = NO;
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
-  self.navigationController.toolbarHidden = NO; 
+  self.navigationController.toolbarHidden = NO;
+
 //  [self setToolbarItems: [self toolbarButtons] animated:YES];
 }
 
@@ -218,6 +220,8 @@ withListViewController:(PhotoListViewController *)controller {
 - (void)viewDidLoad {
   NSLog(@"load did load");
   NSLog(@"photo view  viewDidLoad");
+  self.navigationItem.backBarButtonItem.title = @"album0";
+
   [super viewDidLoad];
   if(self.album == nil) {
     return;
@@ -236,6 +240,8 @@ withListViewController:(PhotoListViewController *)controller {
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
 //  self.wantsFullScreenLayout = NO;
+  // 戻る
+
 
 }
 
@@ -248,6 +254,7 @@ withListViewController:(PhotoListViewController *)controller {
 - (void) viewDidAppear:(BOOL)animated {
   NSLog(@"photo view  viewDidAppear");
   [super viewDidAppear:animated];
+  
   
   // navigationbar,  statusbar
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
@@ -378,6 +385,8 @@ withListViewController:(PhotoListViewController *)controller {
     [progressView release];
   if(backButton)
     [backButton release];
+  if(indexButton)
+    [indexButton release];
   if(infoButton)
     [infoButton release];
   if(refreshButton)
@@ -856,11 +865,6 @@ withListViewController:(PhotoListViewController *)controller {
     pageController.curPageNumber = index;
     NSLog(@"begore push PageControllerView retain count = %d",[pageController retainCount]);
     if([self splitViewController]) {
-
-      self.navigationItem.backBarButtonItem = [PhotoViewController backButton];
-      [self.navigationController pushViewController:pageController animated:YES];
-
-      
       UINavigationController *navController = [[[UINavigationController alloc]
                                                initWithRootViewController:pageController]
                                                autorelease];
@@ -979,6 +983,18 @@ withListViewController:(PhotoListViewController *)controller {
     
   }
   return backButton;
+}
+
+- (UIBarButtonItem *)indexButton {
+ if(!indexButton) {
+   indexButton = [[UIBarButtonItem alloc]
+                 initWithTitle:NSLocalizedString(@"Albums", @"Albums")
+                 style:UIBarButtonItemStyleDone
+                 target:nil
+                 action:nil ];
+   
+ }
+ return indexButton;
 }
 
 - (void) refreshPhotos {
@@ -1331,6 +1347,31 @@ withListViewController:(PhotoListViewController *)controller {
     
   }
 }
+
+#pragma mark -
+#pragma mark UISplitViewControllerDelegate
+
+- (void)splitViewController:(UISplitViewController *)svc
+     willHideViewController:(UIViewController *)aViewController
+          withBarButtonItem:(UIBarButtonItem *)barButtonItem
+       forPopoverController:(UIPopoverController *)pc {
+  barButtonItem.title = NSLocalizedString(@"Album", @"Album");
+  
+  [[self navigationItem] setLeftBarButtonItem:barButtonItem];
+}
+
+- (void)splitViewController:(UISplitViewController *)svc
+     willShowViewController:(UIViewController *)aViewController
+  invalidatingBarButtonItem:(UIBarButtonItem *)barButtonItem {
+  
+  if(barButtonItem == [[self navigationItem] leftBarButtonItem]) {
+    barButtonItem.title = nil;
+    [[self navigationItem] setLeftBarButtonItem:nil];
+  }
+}
+
+
+
 
 #pragma mark -
 

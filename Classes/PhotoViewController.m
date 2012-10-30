@@ -161,12 +161,6 @@ static NSLock *lockFetchedResultsController;
 - (void)viewDidUnload {
   NSLog(@"PhotoViewCOntroller unload");
   [super viewDidUnload];
-  /*
-   if(fetchedPhotosController) {
-   [fetchedPhotosController release];
-   fetchedPhotosController = nil;
-   }
-   */
 }
 
 /*

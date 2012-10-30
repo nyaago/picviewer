@@ -23,6 +23,7 @@
   
 }
 
+
 /*!
  @property managedObjectModel
  @discussion CoreDataのObectModel(Entity,Relationの定義）
@@ -44,18 +45,18 @@
 /*!
  @property window
  */
-@property (nonatomic, retain) IBOutlet UIWindow *window;
+@property (nonatomic, retain, readonly) IBOutlet UIWindow *window;
 /*!
  @property navigationController
  */
-@property (nonatomic, retain) IBOutlet UINavigationController *navigationController;
+@property (nonatomic, retain, readonly) IBOutlet UINavigationController *navigationController;
 
 - (NSString *)applicationDocumentsDirectory;
 
 /*!
  @property photoListViewContriller
  */
-@property (nonatomic,retain) PhotoListViewController *photoListViewController;
+@property (nonatomic,retain, readonly) PhotoListViewController *photoListViewController;
 
 
 @end

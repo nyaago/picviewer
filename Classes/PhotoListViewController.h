@@ -32,6 +32,7 @@ UIAlertViewDelegate,UISplitViewControllerDelegate,AlbumTableViewControllerDelega
   QueuedURLDownloader *downloader;
   
   UIBarButtonItem *backButton;
+  UIBarButtonItem *indexButton;
   UIScrollView *scrollView;
   LabeledProgressView *progressView;
   // ローカルDB保存時の Lock Object
@@ -121,6 +122,12 @@ UIAlertViewDelegate,UISplitViewControllerDelegate,AlbumTableViewControllerDelega
  @discussion 戻るボタン返す
  */
 - (UIBarButtonItem *)backButton;
+
+/*!
+ @method indexButton
+ @discussion インデックス表示ボタン返す
+ */
+- (UIBarButtonItem *)indexButton;
 
 /*
  @method toolBarButtons
