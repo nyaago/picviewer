@@ -23,7 +23,6 @@
   
 }
 
-
 /*!
  @property managedObjectModel
  @discussion CoreDataのObectModel(Entity,Relationの定義）

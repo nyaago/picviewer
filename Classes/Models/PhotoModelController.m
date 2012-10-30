@@ -171,7 +171,7 @@
     return fetchedPhotosController;
   }
   [NSFetchedResultsController deleteCacheWithName:@"Root"];
-  
+  [lockSave lock];
   /*
    Set up the fetched results controller.
    */
@@ -210,7 +210,7 @@
   [fetchRequest release];
   [sortDescriptor release];
   [sortDescriptors release];
-  
+  [lockSave unlock];
   return fetchedPhotosController;
 }    
 
@@ -266,6 +266,21 @@
 
 - (void) setLastAdd {
   self.album.lastAddPhotoAt = [NSDate date];
+  NSError *error = nil;
+  [lockSave lock];
+  if (![managedObjectContext save:&error]) {
+  }
+  [lockSave unlock];
 }
+
+- (void) clearLastAdd {
+  self.album.lastAddPhotoAt = nil;
+  NSError *error = nil;
+  [lockSave lock];
+  if (![managedObjectContext save:&error]) {
+  }
+  [lockSave unlock];
+}
+
 
 @end

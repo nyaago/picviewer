@@ -262,12 +262,23 @@ didReceiveResponse:(NSURLResponse *)response {
   [lock lock];
   stoppingRequired = YES;
   [lock unlock];
+  if([delegate respondsToSelector:@selector(dowloadCanceled:)] ) {
+    [delegate dowloadCanceled:self];
+  }
 }
 
 - (BOOL) isCompleted {
   BOOL ret;
   [lock lock];
   ret = completed;
+  [lock unlock];
+  return ret;
+}
+
+- (BOOL) isStarted {
+  BOOL ret;
+  [lock lock];
+  ret = started;
   [lock unlock];
   return ret;
 }
@@ -280,8 +291,8 @@ didReceiveResponse:(NSURLResponse *)response {
     [lock unlock];
     if(ret == YES) {
       if(stoppingRequired && started && 
-         [delegate respondsToSelector:@selector(dowloadCanceled)] ) {
-        [delegate dowloadCanceled];
+         [delegate respondsToSelector:@selector(dowloadCanceled:)] ) {
+        [delegate dowloadCanceled:self];
       }
       break;
     }
@@ -296,15 +307,18 @@ didReceiveResponse:(NSURLResponse *)response {
   [lock unlock];
   while (1) {
     BOOL downloading = NO;
+    NSLog(@"download running..");
     [lock lock];
-    if([waitingQueue  count] == 0 && [runningDict count] == 0 && queuingFinished || 
+    if(([waitingQueue  count] == 0 && [runningDict count] == 0 && queuingFinished) ||
        stoppingRequired == YES) {
       [lock unlock];
+      NSLog(@"dowload break..");
       break;
     }
     if([waitingQueue count] > 0 && [runningDict count] < maxAtSameTime) {
       // 未実行のもののうちで一番先にQueueに登録されたものを得る
       // autoreleaseのObjectがLeakするので AutoReleasePool
+      NSLog(@"download execute..");
       NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
       QueuedURLDownloaderElem *elem = [waitingQueue objectAtIndex:0];
       [waitingQueue removeObjectAtIndex:0];
@@ -319,32 +333,41 @@ didReceiveResponse:(NSURLResponse *)response {
       [elem.con start];
       downloading = YES;
       [lock unlock];
+      NSLog(@"download on execute..run loop");
       [[NSRunLoop currentRunLoop] run];
+      NSLog(@"download on execute..run loop end");
       [pool drain];
+      NSLog(@"download executed..");
     }
     else {
+      NSLog(@"download skip..");
       [lock unlock];
     }
     if(downloading == NO) {	// LoopでCPU率があがらないように少しsleep
       [NSThread sleepForTimeInterval:0.01f];
     }
   }
+  NSLog(@"download finishied..");
   // 完了の通知
   if(delegate == nil)
     return;
-  if([delegate respondsToSelector:@selector(didAllCompleted)] ) {
+  [lock lock];
+  completed = YES;
+  [lock unlock];
+  NSLog(@"completed delegate ..");
+  if([delegate respondsToSelector:@selector(didAllCompleted:)] ) {
+    NSLog(@"completed delegate end..");
     [lock lock];
     if(stoppingRequired) {
       [lock unlock];
     }
     else {
       [lock unlock];
-      [delegate didAllCompleted];
+      NSLog(@"didAllCompleted");
+      [delegate didAllCompleted:self];
     }
   }
-  [lock lock];
-  completed = YES;
-  [lock unlock];
+  NSLog(@"run download end..");
 }
 
 - (void) finishDownload:(QueuedURLDownloaderElem *)elem {
@@ -377,6 +400,15 @@ didReceiveResponse:(NSURLResponse *)response {
 
 
 - (void) dealloc {
+  while(1) {
+    [lock lock];
+    if([runningDict count] == 0) {
+      [lock unlock];
+      break;
+    }
+    [lock unlock];
+    [NSThread sleepForTimeInterval:0.01f];
+  }
   if(delegate) {
     [delegate release];
     delegate = nil;

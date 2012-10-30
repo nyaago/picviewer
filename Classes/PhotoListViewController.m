@@ -152,19 +152,19 @@ withListViewController:(PhotoListViewController *)controller {
  @method mustLoad
  @discussion データロードを行うかどうかの判定
  */
-- (BOOL)mustLoad;
+- (BOOL)mustLoad:(Album *)curAlbum;
 
 /*!
  @method mustRefresh
  @discussion データの全ロードを行うがどうかの判定
  */
-- (BOOL)mustRefresh;
+- (BOOL)mustRefresh:(Album *)curAlbum;
 
 /*!
  @method loadPhotos
  @discussion 選択されている写真データのロード
  */
-- (BOOL) loadPhotos;
+- (BOOL) loadPhotos:(Album *)curAlbum;
 
 
 
@@ -173,6 +173,16 @@ withListViewController:(PhotoListViewController *)controller {
 - (LabeledProgressView *)progressView;
 
 
+- (void) downloadCompleted;
+
+- (void) downloadCanceled;
+
+
+/*!
+ @method discardTumbnail:
+ @discussion サムネイルViewの削除
+ */
+- (void)discardTumbnail:(UIView *)view;
 
 @end
 
@@ -208,6 +218,7 @@ withListViewController:(PhotoListViewController *)controller {
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbarHidden = NO;
 
+  thumbnailLock = [[NSLock alloc] init];
 //  [self setToolbarItems: [self toolbarButtons] animated:YES];
 }
 
@@ -228,7 +239,7 @@ withListViewController:(PhotoListViewController *)controller {
   }
   lockSave = [[NSLock alloc] init];
 
-  [self loadPhotos];
+  [self loadPhotos:self.album];
   
   
   
@@ -321,11 +332,12 @@ withListViewController:(PhotoListViewController *)controller {
   }
   
   // Download実行中の場合,停止を要求、完了するまで待つ
+  /*
   if(downloader) {
     [downloader requireStopping];
-    [downloader waitCompleted];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   }
+   */
   [self stopToAddThumbnails];
   isFromAlbumTableView = NO;
 }
@@ -345,10 +357,15 @@ withListViewController:(PhotoListViewController *)controller {
   [super viewDidUnload];
   [lockSave release];
   lockSave = nil;
+  [thumbnailLock release];
+  thumbnailLock = nil;
+
+  /*
   if(downloader) {
     [downloader release];
     downloader = nil;
   }
+   */
   [self discardTumbnails];
   NSLog(@"discard thumbnails count = %d", [thumbnails count]);
   
@@ -372,6 +389,7 @@ withListViewController:(PhotoListViewController *)controller {
   }
   
   // ダウンロード中であれば、ダウンロード停止要求をして、停止するまで待つ
+  /*
   if(downloader) {
     [downloader requireStopping];
     [downloader waitCompleted];
@@ -379,6 +397,7 @@ withListViewController:(PhotoListViewController *)controller {
     [downloader release];
     downloader = nil;
   }
+   */
   [self discardTumbnails];
   [thumbnails release];
   if(progressView)
@@ -401,6 +420,8 @@ withListViewController:(PhotoListViewController *)controller {
     [managedObjectContext release];
   if(lockSave)
     [lockSave release];
+  if(thumbnailLock)
+    [thumbnailLock release];
   [super dealloc];
 }
 
@@ -423,6 +444,7 @@ withListViewController:(PhotoListViewController *)controller {
 
 - (void)loadThumbnails {
   // thumbnailを保持するコレクションの準備
+  [thumbnailLock lock];
   if(thumbnails == nil) {
     thumbnails = [[NSMutableDictionary alloc] init];
   }
@@ -469,11 +491,12 @@ withListViewController:(PhotoListViewController *)controller {
   // scrollViewのcontent sizeを設定(main threadで行う必要がある)
   [self performSelectorOnMainThread:@selector(setContentSizeWithImageCount:) 
                          withObject:[NSNumber numberWithInt:[modelController photoCount]] 
-                      waitUntilDone:NO];
+                      waitUntilDone:YES];
   [onAddingThumbnailsLock lock];
   onAddingThumbnails = NO;
   stoppingToAddingThumbnailsRequred = NO;
   [onAddingThumbnailsLock unlock];
+  [thumbnailLock unlock];
   [pool drain];
 }
 
@@ -495,20 +518,30 @@ withListViewController:(PhotoListViewController *)controller {
 
 - (void)discardTumbnails {
   
+  [thumbnailLock lock];
   NSArray  *views  = [thumbnails allValues];
   NSUInteger n = [views count];
+
+  
   
   for(NSUInteger i = 0; i < n; ++i) {
     UIView *view = (UIView *)[views objectAtIndex:i];
-    if([view superview]) {
-      [view removeFromSuperview];
-    }
-    [view release];
-    
-    //[self discardTumbnailAt:i];
+    // Main(UI)スレッドでViewの削除
+    [self performSelectorOnMainThread:@selector(discardTumbnail:)
+                           withObject:view
+                        waitUntilDone:NO];
   }
   [thumbnails removeAllObjects];
+  [thumbnailLock unlock];
   
+}
+
+- (void)discardTumbnail:(UIView *)view {
+  if([view superview]) {
+    
+    [view removeFromSuperview];
+  }
+  [view release];
 }
 
 - (void)discardTumbnailAt:(NSUInteger)index {
@@ -607,13 +640,17 @@ withListViewController:(PhotoListViewController *)controller {
                     selectAlbum:(Album *)selectedAlbum {
   
   isFromAlbumTableView = YES;
-//  [self discardTumbnails];
+  //[self discardTumbnails];
 
+  if(downloader != nil && ![downloader isCompleted] && [downloader isStarted]) {
+    [modelController clearLastAdd];
+    [downloader requireStopping];
+  }
 
   self.album = selectedAlbum;
   // Title設定
   self.navigationItem.title = self.album.title;
-  BOOL load = [self loadPhotos];
+  BOOL load = [self loadPhotos:self.album];
 //  [self loadThumbnails];
   // navigationbar,  statusbar
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
@@ -1044,9 +1081,12 @@ withListViewController:(PhotoListViewController *)controller {
   return n;
 }
 
-- (BOOL)mustLoad {
+- (BOOL) mustLoad:(Album *)curAlbum {
   if(isFromAlbumTableView == NO)
     return NO;
+  if([modelController album].albumId != curAlbum.albumId) {
+    return YES;
+  }
   if([modelController photoCount] == 0) {
     // Network接続確認
     if(![NetworkReachability reachable]) {
@@ -1067,22 +1107,30 @@ withListViewController:(PhotoListViewController *)controller {
 		return YES;
   }
     
-  if ( [self minutesBetween:album.lastAddPhotoAt and:[NSDate date] ] > 15 && 
+  if ( ( curAlbum.lastAddPhotoAt == nil ||
+        [self minutesBetween:curAlbum.lastAddPhotoAt and:[NSDate date] ] > 15)
+        &&
       [NetworkReachability reachableByWifi]) {
     return YES;
   }
   return NO;
 }
 
-- (BOOL)mustRefresh {
+- (BOOL)mustRefresh:(Album *)curAlbum {
+  if([modelController album].albumId != curAlbum.albumId) {
+    return YES;
+  }
   if([modelController photoCount] == 0) {
+    return YES;
+  }
+  if(curAlbum != nil && [curAlbum lastAddPhotoAt] == nil) {
     return YES;
   }
   return NO;
 }
 
 
-- (BOOL) loadPhotos {
+- (BOOL) loadPhotos:(Album *)curAlbum {
   
   downloader = [[QueuedURLDownloader alloc]
                 initWithMaxAtSameTime:kDownloadMaxAtSameTime];
@@ -1090,7 +1138,7 @@ withListViewController:(PhotoListViewController *)controller {
 
   modelController = [[PhotoModelController alloc]
                      initWithContext:self.managedObjectContext
-                     withAlbum:self.album];
+                     withAlbum:curAlbum];
   modelController.managedObjectContext = self.managedObjectContext;
   
   NSLog(@"fetchedPhotosController");
@@ -1107,15 +1155,15 @@ withListViewController:(PhotoListViewController *)controller {
     [alertView release];
     return NO;
   }
+  NSLog(@"fetchedPhotosController completed");
   // Photoが0件であれば、Googleへの問い合わせを起動.
   // 問い合わせ結果は、albumAndPhotoWithTicket:finishedWithUserFeed:errorで受け
   // CoreDataへの登録を行う
   BOOL ret = NO;
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  if([self mustLoad]) {
-    
+  if([self mustLoad:curAlbum]) {
     // クリア + 全ロードか?
-    onRefresh = [self mustRefresh];
+    onRefresh = [self mustRefresh:curAlbum];
     
     // toolbarのButtonを無効に
     [self enableToolbar:NO];
@@ -1134,8 +1182,8 @@ withListViewController:(PhotoListViewController *)controller {
     picasaFetchController.delegate = self;
     picasaFetchController.userId = settings.userId;
     picasaFetchController.password = settings.password;
-    [picasaFetchController queryAlbumAndPhotos:self.album.albumId
-                                          user:[self.album.user valueForKey:@"userId"]
+    [picasaFetchController queryAlbumAndPhotos:curAlbum.albumId
+                                          user:[curAlbum.user valueForKey:@"userId"]
                                  withPhotoSize:[NSNumber numberWithInt:settings.imageSize]];
     [settings release];
     ret = YES;
@@ -1160,6 +1208,66 @@ withListViewController:(PhotoListViewController *)controller {
   [progressView release];
   progressView = nil;
 }
+
+
+/*!
+ すべてダウンロード完了時の通知
+ */
+- (void)downloadCompleted {
+  // 表示をリフレッシュ
+  //  [(UITableView *)self.view reloadData];
+  if(hasErrorInDownloading) {  // Thumbnail ダウンロードエラーがある場合.
+    UIAlertView *alertView = [[UIAlertView alloc]
+                              initWithTitle:NSLocalizedString(@"Error", @"Error")
+                              message:NSLocalizedString(@"Error.DownloadThumb",
+                                                        @"Error IN Downloading")
+                              delegate:self
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil];
+    [alertView show];
+    [alertView release];
+  }
+  if(hasErrorInInsertingThumbnail) {  // Thumbnail 登録エラーがある場合.
+    UIAlertView *alertView = [[UIAlertView alloc]
+                              initWithTitle:NSLocalizedString(@"Error", @"Error")
+                              message:NSLocalizedString(@"Error.InsertThumb",
+                                                        @"Error IN Saving")
+                              delegate:self
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil];
+    [alertView show];
+    [alertView release];
+  }
+  
+  [progressView removeFromSuperview];
+  // albumのphotoに対する最後の保存処理実行日時を記録
+  [modelController setLastAdd];
+  //
+  [self removeProgressView];
+
+  // toolbarのボタンを有効に
+  [self enableToolbar:YES];
+  //
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
+                           toTarget:self
+                         withObject:nil];
+}
+
+/*!
+ ダウンロードキャンセル時の通知
+ */
+- (void)downloadCanceled {
+
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  //
+  [self removeProgressView];
+  // toolbarのボタンを有効に
+  [self enableToolbar:YES];
+  
+}
+
+
 #pragma mark - 
 
 #pragma mark QueuedURLDownloaderDelegate
@@ -1207,55 +1315,32 @@ withListViewController:(PhotoListViewController *)controller {
 /*!
  すべてダウンロード完了時の通知
  */
-- (void)didAllCompleted {
+- (void)didAllCompleted:(QueuedURLDownloader *)urlDownloader {
   // 表示をリフレッシュ
   //  [(UITableView *)self.view reloadData];
-  if(hasErrorInDownloading) {  // Thumbnail ダウンロードエラーがある場合.
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"Error", @"Error")
-                              message:NSLocalizedString(@"Error.DownloadThumb", 
-                                                        @"Error IN Downloading")
-                              delegate:self 
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
-  }
-  if(hasErrorInInsertingThumbnail) {  // Thumbnail 登録エラーがある場合.
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"Error", @"Error")
-                              message:NSLocalizedString(@"Error.InsertThumb", 
-                                                        @"Error IN Saving")
-                              delegate:self 
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
-  }
-  
-  [progressView removeFromSuperview];
-  [downloader release];
+  [urlDownloader release];
+  urlDownloader = nil;
   downloader = nil;
-  // albumのphotoに対する最後の保存処理実行日時を記録
-  [modelController setLastAdd];
   //
-  
-  // toolbarのボタンを有効に
-  [self enableToolbar:YES];
-  //
-  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:) 
-                           toTarget:self 
-                         withObject:nil];
+  [self performSelectorOnMainThread:@selector(downloadCompleted)
+                         withObject:nil
+                      waitUntilDone:YES];
+
 }
 
 /*!
  ダウンロードキャンセル時の通知
  */
-- (void)dowloadCanceled {
+- (void)dowloadCanceled:(QueuedURLDownloader *)urlDownloader {
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  // toolbarのボタンを有効に
-  [self enableToolbar:YES];
+  [urlDownloader release];
+  urlDownloader = nil;
+  downloader = nil;
+  //
+  [self performSelectorOnMainThread:@selector(downloadCanceled)
+                         withObject:nil
+                      waitUntilDone:YES];
+
 }
 
 

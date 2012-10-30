@@ -63,6 +63,8 @@ UIAlertViewDelegate,UISplitViewControllerDelegate,AlbumTableViewControllerDelega
   BOOL onRefresh;
   // album一覧Viewからの遷移の場合YES
   BOOL isFromAlbumTableView;
+  // サムネイル処理のLock
+  NSLock *thumbnailLock;
 }
 
 /*!

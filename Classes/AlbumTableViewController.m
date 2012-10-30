@@ -130,9 +130,11 @@
     picasaFetchController.userId = settings.userId;
     picasaFetchController.password = settings.password;
     [picasaFetchController queryUserAndAlbums:self.user.userId];
+    [settings release];
+    
     downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:3];
     downloader.delegate = self;
-    [settings release];
+
   }
 }
 
@@ -464,6 +466,7 @@
   }
   
   // ダウンロード中であれば、ダウンロード停止要求をして、停止するまで待つ
+  /*
   if(downloader) {
     [downloader requireStopping];
     [downloader waitCompleted];
@@ -471,6 +474,7 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     downloader = nil;
   }
+   */
   
   if(modelController)
     [modelController release];
@@ -532,6 +536,7 @@
 
 - (void) downloadThumbnail:(GDataEntryPhotoAlbum *)album withAlbumModel:(Album *)model {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
   if([[[album mediaGroup] mediaThumbnails] count] > 0) {
     GDataMediaThumbnail *thumbnail = [[[album mediaGroup] mediaThumbnails]  
                                       objectAtIndex:0];
@@ -686,18 +691,21 @@
  ダウンロード完了時の通知
  */
 - (void)didFinishLoading:(NSData *)data withUserInfo:(NSDictionary *)info {
+  NSLog(@"didFinishLoading");
   Album *model = (Album *)[info objectForKey:@"album"];
   if(model) {
+    NSLog(@"updateThumbnail");
     if([modelController updateThumbnail:data forAlbum:model] == nil) {
       hasErrorInInsertingThumbnail = YES;
     }
+    NSLog(@"updatedThumbnail");
   }
 }
 
 /*!
  すべてダウンロード完了時の通知
  */
-- (void)didAllCompleted {
+- (void)didAllCompleted:(QueuedURLDownloader *)urlDownloader {
   if(hasErrorInDownloading) {  // Thumbnail ダウンロードエラーがある場合.
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error", @"Error")
@@ -728,8 +736,8 @@
   // toolbarのボタンをenable
   [self enableToolbar:YES];
   // downloaderのそうじ
-  [downloader release];
-  downloader = nil;
+  [urlDownloader release];
+  urlDownloader = nil;
 
   [pool drain];
 }
@@ -737,10 +745,12 @@
 /*!
  ダウンロードキャンセル時の通知
  */
-- (void)dowloadCanceled {
+- (void)dowloadCanceled:(QueuedURLDownloader *)urlDownloader {
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   // toolbarのボタンをenable
   [self enableToolbar:YES];
+  [urlDownloader release];
+  urlDownloader = nil;
 }
 
 

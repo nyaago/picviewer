@@ -91,5 +91,6 @@
 
 - (void) setLastAdd;
 
+- (void) clearLastAdd;
 
 @end

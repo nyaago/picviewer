@@ -134,6 +134,12 @@
 - (BOOL) isCompleted;
 
 /*!
+ @method isStarted
+ @discussion Download処理が開始されているかの判定
+ */
+- (BOOL) isStarted;
+
+/*!
  @method waitCompleted
  @discussion Download処理が完了するまで待つ,まだ開始されていない場合は、すぐに返る。
  */
@@ -217,13 +223,13 @@
  @method didAllCompleted
  @discussion すべてのダウンロードが完了したときの通知
  */
-- (void)didAllCompleted;
+- (void)didAllCompleted:(QueuedURLDownloader *)downloader;
 
 /*!
  @method dowloadCanceled
  @discussion ダウンロードがキャンセルされたときの通知
  */
-- (void)dowloadCanceled;
+- (void)dowloadCanceled:(QueuedURLDownloader *)downloader;
 
 @end
 
