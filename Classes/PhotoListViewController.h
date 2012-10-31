@@ -11,6 +11,7 @@
 #import "QueuedURLDownloader.h"
 #import "PageControlViewController.h"
 #import "AlbumTableViewController.h"
+#import "ThumbImageView.h"
 #import "AlbumTableViewControllerDelegate.h"
 #import "Album.h"
 #import "Photo.h"
@@ -20,7 +21,8 @@
 @interface PhotoListViewController : UIViewController
 <PicasaFetchControllerDelegate, 
 QueuedURLDownloaderDelegate, PageControlViewControllerDataSource,
-UIAlertViewDelegate,UISplitViewControllerDelegate,AlbumTableViewControllerDelegate> {
+UIAlertViewDelegate,UISplitViewControllerDelegate,AlbumTableViewControllerDelegate,
+ThumbImageViewDelegate> {
   
   @private
   

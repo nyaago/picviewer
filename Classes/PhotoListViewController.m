@@ -8,6 +8,7 @@
 
 #import "PhotoListViewController.h"
 #import "PhotoViewController.h"
+#import "ThumbImageView.h"
 #import "Photo.h"
 #import "Album.h"
 #import "PageControlViewController.h"
@@ -16,42 +17,6 @@
 #import "NetworkReachability.h"
 
 #define kDownloadMaxAtSameTime 5
-
-@interface PhotoImageView : UIImageView
-{
-  PhotoListViewController *listViewController;
-}
-
-- (id) initWithImage:(UIImage *)image 
-withListViewController:(PhotoListViewController *)controller;
-
-@end
-
-@implementation PhotoImageView
-
-- (id) initWithImage:(UIImage *)image 
-withListViewController:(PhotoListViewController *)controller {
-  self = [super initWithImage:image];
-  if(self) {
-    listViewController = controller;
-    //	[listViewController retain];
-  }
-  return self;
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-  if(listViewController)
-    [listViewController touchesEnded:touches withEvent:event];
-}
-
-
-- (void) dealloc {
-  //  if(listViewController)
-  //	[listViewController release];
-  [super dealloc];
-}
-
-@end
 
 
 
@@ -480,7 +445,7 @@ withListViewController:(PhotoListViewController *)controller {
     UIView *imageView = [self thumbnailAt:i];
     // ImageViewのView階層への追加を行う(main threadで行う必要がある)
     if(imageView) {
-      [self performSelectorOnMainThread:@selector(addImageView:) 
+      [self performSelectorOnMainThread:@selector(addImageView:)
                              withObject:imageView 
                           waitUntilDone:NO];
     }
@@ -580,11 +545,11 @@ withListViewController:(PhotoListViewController *)controller {
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
-  UIView *imageView = nil;
-  imageView = (UIImageView *)[thumbnails objectForKey:[NSNumber numberWithInt:index]];
+  ThumbImageView *imageView = nil;
+  imageView = (ThumbImageView *)[thumbnails objectForKey:[NSNumber numberWithInt:index]];
   NSUInteger indexes[2];
   indexes[0] = 0;
-  
+  CGRect bounds = self.view.bounds;
   if(!imageView) {
     // 画像データを取得してUIImageViewを生成
     indexes[1] = index;
@@ -592,15 +557,17 @@ withListViewController:(PhotoListViewController *)controller {
     UIImage *image = nil;
     if(photoObject.thumbnail) {
       image  = [UIImage imageWithData:photoObject.thumbnail];
-      imageView = [[PhotoImageView alloc] initWithImage:image withListViewController:self];
+      imageView = [ThumbImageView viewWithImage:image
+                                      withIndex:[NSNumber numberWithInt:index]
+                                  withContainer:self.view ];
       imageView.userInteractionEnabled = YES;
+      imageView.delegate = self;
       [thumbnails setObject:imageView forKey:[NSNumber numberWithInt:index]];
     }
     else {
       imageView = nil;
     }
-    imageView.frame = [self frameForThums:index];
-    // UIImageViewをDictinaryに登録しておく
+//    imageView.frame = [self frameForThums:index];
   }
   
   [pool drain];
@@ -891,25 +858,16 @@ withListViewController:(PhotoListViewController *)controller {
 
 #pragma mark -
 
+#pragma mark ThumbImageViewDelegate
 
-#pragma mark Touch
-
-/*
- touch終了
- */
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-  if(onScroll == YES) {
-    onScroll = NO;
-    return;
-  }
+- (void)photoTouchesEnded:(ThumbImageView *)imageView
+                  touches:(NSSet *)touches
+                withEvent:(UIEvent *)event {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  UITouch *touch = [touches anyObject];
-  UIView *touchView = touch.view;
-//    if([touchView isKindOfClass:UIImageView.class]) {
   // 写真表示Viewへ
-  NSInteger index = [self indexForPhoto:touchView];
+  NSInteger index = [imageView.index integerValue];
   if(index >= 0 && index < [modelController photoCount]) {
-    PageControlViewController *pageController = 
+    PageControlViewController *pageController =
     [[[PageControlViewController alloc] init] autorelease];
     
     NSLog(@"init PageControllerView retain count = %d",[pageController retainCount]);
@@ -918,7 +876,7 @@ withListViewController:(PhotoListViewController *)controller {
     NSLog(@"begore push PageControllerView retain count = %d",[pageController retainCount]);
     if([self splitViewController]) {
       UINavigationController *navController = [[[UINavigationController alloc]
-                                               initWithRootViewController:pageController]
+                                                initWithRootViewController:pageController]
                                                autorelease];
       [[navController navigationBar] setHidden:NO];
       [self.splitViewController presentViewController:navController
@@ -934,19 +892,43 @@ withListViewController:(PhotoListViewController *)controller {
     NSLog(@"push PageControllerView retain count = %d",[pageController retainCount]);
     [pool drain];
   }
-    //}
+
+
+}
+
+
+
+#pragma mark -
+
+#pragma mark Touch
+
+/*
+ touch終了
+ */
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+  // Scroll 操作から手を果たした場合は、scrollView の既定の動作
+  if(onScroll == YES) {
+    onScroll = NO;
+    return;
+  }
+  // Thumbnail のViewタッチの場合
+  UITouch *touch = [touches anyObject];
+  UIView *touchView = touch.view;
+  if([touchView isKindOfClass:UIImageView.class]) {
+    [touchView touchesEnded:touches withEvent:event];
+  }
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
   onScroll = NO;
   [super touchesBegan:touches withEvent:event];
-  //  [[self nextResponder] touchesBegan:touches withEvent:event];
+ // [[self nextResponder] touchesBegan:touches withEvent:event];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
   onScroll = YES;
   [super touchesMoved:touches withEvent:event];
-  //  [[self nextResponder] touchesMoved:touches withEvent:event];
+  //[[self nextResponder] touchesMoved:touches withEvent:event];
 }
 
 
@@ -961,7 +943,7 @@ withListViewController:(PhotoListViewController *)controller {
                                       objectAtIndex:0];
     NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
     NSString *urlForThumbnail = [thumbnail URLString];
-    NSDictionary *dict = [[NSDictionary alloc] 
+    NSDictionary *dict = [[NSDictionary alloc]
                           initWithObjectsAndKeys:model, @"photo", nil] ;
     [downloader addURL:[NSURL URLWithString:urlForThumbnail ]
           withUserInfo:dict];

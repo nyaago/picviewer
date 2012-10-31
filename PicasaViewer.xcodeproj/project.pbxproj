@@ -45,6 +45,13 @@
 		72C4AC8F119AED2200F4B664 /* PhotoImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C4AC8E119AED2200F4B664 /* PhotoImage.m */; };
 		72C6183A118A6F52001FD7C7 /* DeviceRotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61839118A6F52001FD7C7 /* DeviceRotation.m */; };
 		72C61C32118AECF8001FD7C7 /* PageControlViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */; };
+		72D224691640CC08004E84B2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72D224681640CC08004E84B2 /* QuartzCore.framework */; };
+		72D2246C1640CF64004E84B2 /* ThumbImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D2246B1640CF64004E84B2 /* ThumbImageView.m */; };
+		72D2246D1640CF64004E84B2 /* ThumbImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D2246B1640CF64004E84B2 /* ThumbImageView.m */; };
+		72D224701640E9FD004E84B2 /* IPhoneThumbImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D2246F1640E9FD004E84B2 /* IPhoneThumbImageView.m */; };
+		72D224711640E9FD004E84B2 /* IPhoneThumbImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D2246F1640E9FD004E84B2 /* IPhoneThumbImageView.m */; };
+		72D224741640EA1D004E84B2 /* IPadThumbImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D224731640EA1C004E84B2 /* IPadThumbImageView.m */; };
+		72D224751640EA1D004E84B2 /* IPadThumbImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D224731640EA1C004E84B2 /* IPadThumbImageView.m */; };
 		72D577881180357300F687DB /* PicasaFetchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577871180357300F687DB /* PicasaFetchController.m */; };
 		72D577E811804AAE00F687DB /* NewUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577E611804AAE00F687DB /* NewUserViewController.m */; };
 		72D577E911804AAE00F687DB /* NewUserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D577E711804AAE00F687DB /* NewUserViewController.xib */; };
@@ -211,6 +218,13 @@
 		72C61839118A6F52001FD7C7 /* DeviceRotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceRotation.m; sourceTree = "<group>"; };
 		72C61C2E118AECF8001FD7C7 /* PageControlViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PageControlViewController.h; sourceTree = "<group>"; };
 		72C61C2F118AECF8001FD7C7 /* PageControlViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PageControlViewController.m; sourceTree = "<group>"; };
+		72D224681640CC08004E84B2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		72D2246A1640CF64004E84B2 /* ThumbImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThumbImageView.h; sourceTree = "<group>"; };
+		72D2246B1640CF64004E84B2 /* ThumbImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThumbImageView.m; sourceTree = "<group>"; };
+		72D2246E1640E9FD004E84B2 /* IPhoneThumbImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPhoneThumbImageView.h; sourceTree = "<group>"; };
+		72D2246F1640E9FD004E84B2 /* IPhoneThumbImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IPhoneThumbImageView.m; sourceTree = "<group>"; };
+		72D224721640EA1C004E84B2 /* IPadThumbImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IPadThumbImageView.h; sourceTree = "<group>"; };
+		72D224731640EA1C004E84B2 /* IPadThumbImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IPadThumbImageView.m; sourceTree = "<group>"; };
 		72D577861180357300F687DB /* PicasaFetchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PicasaFetchController.h; sourceTree = "<group>"; };
 		72D577871180357300F687DB /* PicasaFetchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasaFetchController.m; sourceTree = "<group>"; };
 		72D577E511804AAE00F687DB /* NewUserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewUserViewController.h; sourceTree = "<group>"; };
@@ -247,6 +261,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72D224691640CC08004E84B2 /* QuartzCore.framework in Frameworks */,
 				72589F7C162BF46800BC3D9F /* Security.framework in Frameworks */,
 				721BDD841611B0D600401E21 /* libxml2.2.dylib in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
@@ -314,6 +329,12 @@
 				72BFE60E11C716FD00A7990C /* LabeledActivityIndicator.h */,
 				72BFE60F11C716FD00A7990C /* LabeledActivityIndicator.m */,
 				72276A64163D5B4800510BF2 /* AlbumTableViewControllerDelegate.h */,
+				72D2246A1640CF64004E84B2 /* ThumbImageView.h */,
+				72D2246B1640CF64004E84B2 /* ThumbImageView.m */,
+				72D2246E1640E9FD004E84B2 /* IPhoneThumbImageView.h */,
+				72D2246F1640E9FD004E84B2 /* IPhoneThumbImageView.m */,
+				72D224721640EA1C004E84B2 /* IPadThumbImageView.h */,
+				72D224731640EA1C004E84B2 /* IPadThumbImageView.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -330,6 +351,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				72D224681640CC08004E84B2 /* QuartzCore.framework */,
 				72589F7B162BF46800BC3D9F /* Security.framework */,
 				721BDD831611B0D600401E21 /* libxml2.2.dylib */,
 				7234E9CA117E7C6400D7AC45 /* Library */,
@@ -657,6 +679,9 @@
 				72BFE61011C716FD00A7990C /* LabeledActivityIndicator.m in Sources */,
 				7238233412068EF60046D754 /* PhotoModelController.m in Sources */,
 				723823A61206A3C70046D754 /* AlbumModelController.m in Sources */,
+				72D2246C1640CF64004E84B2 /* ThumbImageView.m in Sources */,
+				72D224701640E9FD004E84B2 /* IPhoneThumbImageView.m in Sources */,
+				72D224741640EA1D004E84B2 /* IPadThumbImageView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -690,6 +715,9 @@
 				72F502ED163901F20070DA5E /* LabeledActivityIndicator.m in Sources */,
 				72F502EE163901F20070DA5E /* PhotoModelController.m in Sources */,
 				72F502EF163901F20070DA5E /* AlbumModelController.m in Sources */,
+				72D2246D1640CF64004E84B2 /* ThumbImageView.m in Sources */,
+				72D224711640E9FD004E84B2 /* IPhoneThumbImageView.m in Sources */,
+				72D224751640EA1D004E84B2 /* IPadThumbImageView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
