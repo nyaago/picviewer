@@ -171,7 +171,6 @@
     return fetchedPhotosController;
   }
   [NSFetchedResultsController deleteCacheWithName:@"Root"];
-  [lockSave lock];
   /*
    Set up the fetched results controller.
    */
@@ -210,7 +209,6 @@
   [fetchRequest release];
   [sortDescriptor release];
   [sortDescriptors release];
-  [lockSave unlock];
   return fetchedPhotosController;
 }    
 
@@ -266,11 +264,16 @@
 
 - (void) setLastAdd {
   self.album.lastAddPhotoAt = [NSDate date];
+  //NSLog(@"setLastAdd lock");
   NSError *error = nil;
   [lockSave lock];
-  if (![managedObjectContext save:&error]) {
-  }
+  //NSLog(@"setLastAdd locked");
+  // @TODO - フリーズする が保存したい...
+  //if (![managedObjectContext save:&error]) {
+  //}
+  //NSLog(@"setLastAdd saved");
   [lockSave unlock];
+  //NSLog(@"setLastAdd unlocked");
 }
 
 - (void) clearLastAdd {
