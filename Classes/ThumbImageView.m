@@ -14,6 +14,8 @@
 @class IPadThumbImageView;
 @implementation ThumbImageView
 
+static NSMutableDictionary *thumbViewMap = nil;
+
 @synthesize index;
 @synthesize delegate;
 @synthesize containerView;
@@ -29,6 +31,64 @@
   
 }
 
+/*!
+ @method findByPoint:
+ @discussion Pointよりサムネイルを探す
+ */
++ (ThumbImageView *)findByPoint:(CGPoint) point {
+  NSArray *views = [thumbViewMap allValues];
+  for(int i = 0; i < [views count]; ++i) {
+    ThumbImageView *view = (ThumbImageView *)[views objectAtIndex:i];
+    CGRect frame = view.frame;
+    if(!(point.x >= frame.origin.x && point.x <= frame.origin.x + frame.size.width)) {
+      continue;
+    }
+    if(!(point.y >= frame.origin.y && point.y <= frame.origin.y + frame.size.height)) {
+      continue;
+    }
+    return view;
+  }
+  return nil;
+}
+
+
+/*!
+ @method
+ @discussion すべてのサムネイルの削除
+ */
++ (void) cleanup {
+  NSArray *views = [thumbViewMap allValues];
+  for(int i = 0; i < [views count]; ++i) {
+    ThumbImageView *view = (ThumbImageView *)[views objectAtIndex:i];
+    if(view.superview) {
+      [view performSelectorOnMainThread:@selector(removeFromSuperview)
+                             withObject:nil
+                          waitUntilDone:NO];
+    }
+  }
+  [thumbViewMap removeAllObjects];
+}
+
++ (CGPoint) bottomRight {
+  NSArray *views = [thumbViewMap allValues];
+  CGPoint result = CGPointMake(0.0f, 0.0f);
+  for(int i = 0; i < [views count]; ++i) {
+    ThumbImageView *view = (ThumbImageView *)[views objectAtIndex:i];
+    CGRect frame = view.frame;
+    CGPoint point = CGPointMake(frame.origin.x + frame.size.width,
+                                frame.origin.y + frame.size.height);
+    if(point.x > result.x) {
+      result.x = point.x;
+    }
+    
+    if(point.y > result.y) {
+      result.y = point.y;
+    }
+  }
+  return result;
+ 
+}
+
 - (id) initWithImage:(UIImage *)image withIndex:(NSNumber *)i withContainer:(UIView *)container;
 {
   self = [super initWithImage:image];
@@ -38,6 +98,15 @@
     containerView = [container retain];
     self.frame = [self frameForThumb:index.integerValue];
   }
+  if(thumbViewMap == nil) {
+    thumbViewMap = [[NSMutableDictionary alloc] init];
+  }
+  UIView *oldView = (UIView *)[thumbViewMap objectForKey:i];
+  if(oldView != nil) {
+    [oldView release];
+    oldView = nil;
+  }
+  [thumbViewMap setObject:self forKey:i];
   return self;
 }
 

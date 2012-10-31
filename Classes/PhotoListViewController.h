@@ -43,8 +43,6 @@ ThumbImageViewDelegate> {
   BOOL hasErrorInDownloading;
   // Thumbnailの登録中にエラーが発生したか?
   BOOL hasErrorInInsertingThumbnail;
-  // thumbnailコレクション
-  NSMutableDictionary *thumbnails;
   BOOL onScroll;
   
   // Thumbnail表示処理中にOnになるフラグ

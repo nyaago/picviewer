@@ -6,13 +6,21 @@
 //
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import "IPadThumbImageView.h"
 
 @implementation IPadThumbImageView
 
+#define kBorderWidth 3.0f
+#define kPadding 5.0f
+#define kMargin 6.0f
+
 - (id) initWithImage:(UIImage *)image withIndex:(NSNumber *)i withContainer:(UIView *)container
 {
   self = [super initWithImage:image withIndex:i withContainer:container];
+  self.layer.borderWidth = kBorderWidth;
+  self.layer.borderColor = [[UIColor colorWithRed:0.1f green:0.0f blue:0.3f alpha:0.5f]
+                            CGColor];
   return self;
 }
 
@@ -26,43 +34,33 @@
 */
 
 - (CGPoint) pointForThumb:(NSUInteger)n {
-  //  NSLog(@"width = %f, height = %f", self.scrollView.bounds.size.width,
-  //        self.scrollView.bounds.size.height);
+   NSLog(@"width = %f, height = %f", self.containerView.bounds.size.width,
+          self.containerView.bounds.size.height);
   NSUInteger w = [self thumbWidth];
   NSUInteger h = [self thumbHeight];
-  NSUInteger padding = 2.0f;
+  NSUInteger padding = kPadding;
   NSUInteger cols = self.containerView.bounds.size.width / w;
   NSUInteger row = n / cols;	// base - 0
   NSUInteger col = n % cols;	// base - 0
-  return CGPointMake(col * h + padding, row * w + padding);
+  return CGPointMake(col * h + padding, row * w + padding + kPadding);
 }
 
 - (CGRect) frameForThumb:(NSUInteger)n {
   NSUInteger w = [self thumbWidth];
   NSUInteger h = [self thumbHeight];
-  NSUInteger padding = 2.0f;
+  NSUInteger padding = 4.0f;
   CGPoint point = [self pointForThumb:n];
   return CGRectMake(point.x, point.y, w - padding * 2, h - padding *2);
 }
 
 - (NSUInteger) thumbWidth {
   NSInteger w = self.containerView.frame.size.width;
-  if(w > 640) {
-    return w / 6;
-  }
-  else {
-    return w / 4;
-  }
+  return (w - kMargin * 2) / 4;
 }
 
 - (NSUInteger) thumbHeight {
   NSInteger w = self.containerView.frame.size.width;
-  if(w > 640) {
-    return w / 6;
-  }
-  else {
-    return w / 4;
-  }
+  return w / 4;
 }
 
 @end

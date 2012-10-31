@@ -28,10 +28,30 @@
   NSObject <ThumbImageViewDelegate> *delegate;
   UIView *containerView;
   NSNumber *index;
+  // key => Index, value => ThumbImageView
   
 }
 
 + (id) viewWithImage:(UIImage *)image withIndex:(NSNumber *)i withContainer:(UIView *)container;
+
+/*!
+ @method findByPoint:
+ @discussion Pointよりサムネイルを探す
+ */
++ (ThumbImageView *)findByPoint:(CGPoint) point;
+
+
+/*!
+ @method
+ @discussion すべてのサムネイルの削除
+ */
++ (void) cleanup;
+
+/*!
+ @method
+ @discussion すべてのサムネイルの右下の座標
+ */
++ (CGPoint) bottomRight ;
 
 /*!
  @method:
@@ -58,7 +78,6 @@
 - (CGRect) frameForThumb:(NSUInteger)n;
 
 - (CGPoint) pointForThumb:(NSUInteger)n;
-
 
 @property (readonly, nonatomic) NSNumber *index;
 

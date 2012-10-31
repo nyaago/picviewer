@@ -29,10 +29,8 @@
 
 
 - (CGPoint) pointForThumb:(NSUInteger)n {
-    NSLog(@"width = %f, height = %f", self.containerView.bounds.size.width,
+  NSLog(@"width = %f, height = %f", self.containerView.bounds.size.width,
           self.containerView.bounds.size.height);
-  CGRect frame = self.containerView.frame;
-  CGRect bounds = self.containerView.bounds;
   NSUInteger w = [self thumbWidth];
   NSUInteger h = [self thumbHeight];
   NSUInteger padding = 2.0f;
@@ -52,22 +50,12 @@
 
 - (NSUInteger) thumbWidth {
   NSInteger w = self.containerView.frame.size.width;
-  if(w > 640) {
-    return w / 6;
-  }
-  else {
-    return w / 4;
-  }
+  return w / 4;
 }
 
 - (NSUInteger) thumbHeight {
   NSInteger w = self.containerView.frame.size.width;
-  if(w > 640) {
-    return w / 6;
-  }
-  else {
-    return w / 4;
-  }
+  return w / 4;
 }
 
 

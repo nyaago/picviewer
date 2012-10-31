@@ -23,33 +23,6 @@
 @interface  PhotoListViewController (Private)
 
 
-/*!
- Thumbnailを表示する座標
- */
-- (CGPoint) pointForThumb:(NSUInteger)n;
-
-/*!
- Thumbnailを表示するImageViewのFrameのRectを返す
- */
-- (CGRect) frameForThums:(NSUInteger)n;
-
-/*!
- Viewが何番目のIndexの写真であるかを返す
- */
-- (NSUInteger) indexForPhoto:(UIView *)targetView;
-
-/*!
- @method thumbWidth
- @discussion thumbnailの幅
- */
-- (NSUInteger) thumbWidth;
-
-/*!
- @method thumbHeigth
- @discussion thumbnailの高さ
- */
-- (NSUInteger) thumbHeight;
-
 
 /*!
  @method downloadThumbnail:withPhotoModel
@@ -78,7 +51,7 @@
  必要があるため、メソッドとして定義。
  @param n scrollViewに表示されるImageView(thumbnail)の数(NSNumber *)
  */
-- (void)setContentSizeWithImageCount:(id)n;
+- (void)setContentSizeWithImageCount;
 
 /*!
  @method refreshAction:
@@ -192,6 +165,7 @@
   self.scrollView.userInteractionEnabled = YES;
   self.scrollView.frame = self.view.bounds;
   self.scrollView.backgroundColor = [UIColor blackColor];
+  self.scrollView.contentSize = CGSizeMake(720.0f, 100.0f);
   // toolbar
   self.toolbarItems = [self toolbarButtons];
   self.navigationController.toolbar.translucent = NO;
@@ -250,7 +224,6 @@
   // navigationbar,  statusbar
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
   [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackOpaque;
-  NSLog(@"thumbnail count = %d", [thumbnails count]);
   /*
   self.navigationController.toolbarHidden = NO;
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
@@ -285,9 +258,7 @@
 - (void) afterViewDidAppear:(id)arg {
   
   
-  if([thumbnails count] != 0) {
-    [self discardTumbnails];
-  }
+  [self discardTumbnails];
   [self loadThumbnails];
 }
 
@@ -347,7 +318,6 @@
   }
    */
   [self discardTumbnails];
-  NSLog(@"discard thumbnails count = %d", [thumbnails count]);
   
 }
 
@@ -359,8 +329,6 @@
   NSLog(@"backBUtton retain count = %d", [backButton retainCount]);
   NSLog(@"album retain count = %d", [album retainCount]);
   NSLog(@"managedObjectContext retain count = %d", [managedObjectContext retainCount]);
-  NSLog(@"thumbnails count = %d", [thumbnails count]);
-  NSLog(@"thumbnails retain count = %d", [thumbnails retainCount]);
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
   if(picasaFetchController) {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -379,7 +347,6 @@
   }
    */
   [self discardTumbnails];
-  [thumbnails release];
   if(progressView)
     [progressView release];
   if(backButton)
@@ -412,12 +379,11 @@
   [self.scrollView addSubview:v];
 }
 
-- (void)setContentSizeWithImageCount:(id)n {
+- (void)setContentSizeWithImageCount {
   
-  NSNumber *number = (NSNumber *)n;
-  CGPoint point = [self pointForThumb:[number intValue] - 1];
+  CGPoint point = [ThumbImageView bottomRight];
   self.scrollView.contentSize =  CGSizeMake(self.scrollView.frame.size.width, 
-                                            point.y + 80.0f);
+                                            point.y + 0.0f);
 }
 
 #pragma mark -
@@ -425,9 +391,6 @@
 - (void)loadThumbnails {
   // thumbnailを保持するコレクションの準備
   [thumbnailLock lock];
-  if(thumbnails == nil) {
-    thumbnails = [[NSMutableDictionary alloc] init];
-  }
 
   [onAddingThumbnailsLock lock];
   onAddingThumbnails = YES;
@@ -469,8 +432,8 @@
         [date3 timeIntervalSinceDate:date0]);
   */
   // scrollViewのcontent sizeを設定(main threadで行う必要がある)
-  [self performSelectorOnMainThread:@selector(setContentSizeWithImageCount:) 
-                         withObject:[NSNumber numberWithInt:[modelController photoCount]] 
+  [self performSelectorOnMainThread:@selector(setContentSizeWithImageCount)
+                         withObject:nil
                       waitUntilDone:YES];
   [onAddingThumbnailsLock lock];
   onAddingThumbnails = NO;
@@ -499,19 +462,7 @@
 - (void)discardTumbnails {
   
   [thumbnailLock lock];
-  NSArray  *views  = [thumbnails allValues];
-  NSUInteger n = [views count];
-
-  
-  
-  for(NSUInteger i = 0; i < n; ++i) {
-    UIView *view = (UIView *)[views objectAtIndex:i];
-    // Main(UI)スレッドでViewの削除
-    [self performSelectorOnMainThread:@selector(discardTumbnail:)
-                           withObject:view
-                        waitUntilDone:NO];
-  }
-  [thumbnails removeAllObjects];
+  [ThumbImageView cleanup];
   [thumbnailLock unlock];
   
 }
@@ -524,50 +475,26 @@
   [view release];
 }
 
-- (void)discardTumbnailAt:(NSUInteger)index {
-  NSLog(@"discard imageView - %@", [thumbnails 
-                                    objectForKey:[NSNumber numberWithInt:index]]);
-  
-  UIImageView *imageView 
-  = (UIImageView *)[thumbnails objectForKey:[NSNumber numberWithInt:index]];
-  if(imageView != nil) {
-    NSLog(@"do discad view ");
-    if([imageView superview] ) {
-      [imageView removeFromSuperview];
-    }
-    [imageView release];
-  }
-  [thumbnails removeObjectForKey:[NSNumber numberWithInt:index]];
-}
-
 
 - (UIView *)thumbnailAt:(NSUInteger)index {
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
   ThumbImageView *imageView = nil;
-  imageView = (ThumbImageView *)[thumbnails objectForKey:[NSNumber numberWithInt:index]];
   NSUInteger indexes[2];
   indexes[0] = 0;
   CGRect bounds = self.view.bounds;
-  if(!imageView) {
-    // 画像データを取得してUIImageViewを生成
-    indexes[1] = index;
-    Photo *photoObject = [modelController photoAt:index];
-    UIImage *image = nil;
-    if(photoObject.thumbnail) {
-      image  = [UIImage imageWithData:photoObject.thumbnail];
-      imageView = [ThumbImageView viewWithImage:image
-                                      withIndex:[NSNumber numberWithInt:index]
-                                  withContainer:self.view ];
-      imageView.userInteractionEnabled = YES;
-      imageView.delegate = self;
-      [thumbnails setObject:imageView forKey:[NSNumber numberWithInt:index]];
-    }
-    else {
-      imageView = nil;
-    }
-//    imageView.frame = [self frameForThums:index];
+  // 画像データを取得してUIImageViewを生成
+  indexes[1] = index;
+  Photo *photoObject = [modelController photoAt:index];
+  UIImage *image = nil;
+  if(photoObject.thumbnail) {
+    image  = [UIImage imageWithData:photoObject.thumbnail];
+    imageView = [ThumbImageView viewWithImage:image
+                                    withIndex:[NSNumber numberWithInt:index]
+                                withContainer:self.view ];
+    imageView.userInteractionEnabled = YES;
+    imageView.delegate = self;
   }
   
   [pool drain];
@@ -636,7 +563,6 @@
   // navigationbar,  statusbar
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
   [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackOpaque;
-  NSLog(@"thumbnail count = %d", [thumbnails count]);
   // tool bar
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = NO;
@@ -913,8 +839,8 @@
   }
   // Thumbnail のViewタッチの場合
   UITouch *touch = [touches anyObject];
-  UIView *touchView = touch.view;
-  if([touchView isKindOfClass:UIImageView.class]) {
+  ThumbImageView *touchView = [ThumbImageView findByPoint:[touch locationInView:self.scrollView]];
+  if(touchView != nil) {
     [touchView touchesEnded:touches withEvent:event];
   }
 }
@@ -963,54 +889,6 @@
   NSUInteger row = n / cols;	// base - 0
   NSUInteger col = n % cols;	// base - 0
   return CGPointMake(col * h + padding, row * w + padding);
-}
-
-- (CGRect) frameForThums:(NSUInteger)n {
-  NSUInteger w = [self thumbWidth];
-  NSUInteger h = [self thumbHeight];
-  NSUInteger padding = 2.0f;
-  CGPoint point = [self pointForThumb:n];
-  return CGRectMake(point.x, point.y, w - padding * 2, h - padding *2);
-}
-
-- (NSUInteger) indexForPhoto:(UIView *)targetView {
-  NSUInteger w = [self thumbWidth];
-  NSUInteger h = [self thumbHeight];
-  CGRect frame = [targetView frame];
-  CGPoint point = frame.origin;
-  NSInteger x = (NSInteger)point.x;
-  NSInteger y = (NSInteger)point.y;
-  NSInteger col = x / (NSInteger)h;
-  NSInteger row = y / (NSInteger)w;
-  NSInteger colByRow = 
-  				(NSInteger)self.scrollView.bounds.size.width / (NSInteger)w;
-  NSUInteger result =  row * colByRow + col;
-  [thumbnailLock lock];
-  if(result >= [thumbnails count]) {
-    result = -1;
-  }
-  [thumbnailLock unlock];
-  return result;
-}
-
-- (NSUInteger) thumbWidth {
-  NSInteger w = self.view.frame.size.width;
-  if(w > 640) {
-    return w / 6;
-  }
-  else {
-    return w / 4;
-  }
-}
-
-- (NSUInteger) thumbHeight {
-  NSInteger w = self.view.frame.size.width;
-  if(w > 640) {
-    return w / 6;
-  }
-  else {
-    return w / 4;
-  }
 }
 
 
@@ -1262,6 +1140,8 @@
                            toTarget:self
                          withObject:nil];
   self.view.userInteractionEnabled = YES;
+  self.scrollView.scrollEnabled = YES;
+  self.scrollView.userInteractionEnabled = YES;
 }
 
 /*!
@@ -1275,7 +1155,9 @@
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
   self.view.userInteractionEnabled = YES;
-  
+  self.scrollView.scrollEnabled = YES;
+  self.scrollView.userInteractionEnabled = YES;
+
 }
 
 
