@@ -166,15 +166,30 @@ withListViewController:(PhotoListViewController *)controller {
  */
 - (BOOL) loadPhotos:(Album *)curAlbum;
 
-
-
+/*!
+ @method removeProgressView
+ @discussiom Progress Bar をView階層から削除（破棄はしない）
+ */
 - (void) removeProgressView;
 
+/*!
+ @method progressView
+ @discussion Progress Bar View を返す
+ */
 - (LabeledProgressView *)progressView;
 
-
+/*!
+ @method downloadCompleted
+ @discussion サムネイル画像がダウンロードされた後の処理。UI部品の状態変更。サムネイルのViewの追加。
+              Main(UI)スレッドで実行させる。
+ */
 - (void) downloadCompleted;
 
+/*!
+ @method downloadCanceled
+ @discussion サムネイル画像ダウンロードがキャンセルされた後の処理。UI部品の状態変更。
+ Main(UI)スレッドで実行させる。
+ */
 - (void) downloadCanceled;
 
 
@@ -640,8 +655,7 @@ withListViewController:(PhotoListViewController *)controller {
                     selectAlbum:(Album *)selectedAlbum {
   
   isFromAlbumTableView = YES;
-  //[self discardTumbnails];
-
+  [self discardTumbnails];
   if(downloader != nil && ![downloader isCompleted] && [downloader isStarted]) {
     [modelController clearLastAdd];
     [downloader requireStopping];
@@ -680,7 +694,8 @@ withListViewController:(PhotoListViewController *)controller {
                              toTarget:self
                            withObject:nil];
   }
-
+  self.view.userInteractionEnabled = YES;
+  
 }
 
 
@@ -758,7 +773,7 @@ withListViewController:(PhotoListViewController *)controller {
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error","Error")
                               message:NSLocalizedString(@"Error.Fetch", 
-                                                        @"Error in ng")
+                                                        @"Error IN Saving")
                               delegate:nil
                               cancelButtonTitle:@"OK" 
                               otherButtonTitles:nil];
@@ -890,7 +905,7 @@ withListViewController:(PhotoListViewController *)controller {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   UITouch *touch = [touches anyObject];
   UIView *touchView = touch.view;
-  //  if([touchView is: UIImageView.class]) {
+//    if([touchView isKindOfClass:UIImageView.class]) {
   // 写真表示Viewへ
   NSInteger index = [self indexForPhoto:touchView];
   if(index >= 0 && index < [modelController photoCount]) {
@@ -919,6 +934,7 @@ withListViewController:(PhotoListViewController *)controller {
     NSLog(@"push PageControllerView retain count = %d",[pageController retainCount]);
     [pool drain];
   }
+    //}
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -986,7 +1002,13 @@ withListViewController:(PhotoListViewController *)controller {
   NSInteger row = y / (NSInteger)w;
   NSInteger colByRow = 
   				(NSInteger)self.scrollView.bounds.size.width / (NSInteger)w;
-  return row * colByRow + col;
+  NSUInteger result =  row * colByRow + col;
+  [thumbnailLock lock];
+  if(result >= [thumbnails count]) {
+    result = -1;
+  }
+  [thumbnailLock unlock];
+  return result;
 }
 
 - (NSUInteger) thumbWidth {
@@ -1167,6 +1189,7 @@ withListViewController:(PhotoListViewController *)controller {
     
     // toolbarのButtonを無効に
     [self enableToolbar:NO];
+    self.scrollView.userInteractionEnabled = NO;
     // progress View
     progressView.progress = 0.0f;
     [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
@@ -1215,6 +1238,7 @@ withListViewController:(PhotoListViewController *)controller {
  */
 - (void)downloadCompleted {
   // 表示をリフレッシュ
+  NSLog(@"downloadCompleted");
   //  [(UITableView *)self.view reloadData];
   if(hasErrorInDownloading) {  // Thumbnail ダウンロードエラーがある場合.
     UIAlertView *alertView = [[UIAlertView alloc]
@@ -1238,20 +1262,24 @@ withListViewController:(PhotoListViewController *)controller {
     [alertView show];
     [alertView release];
   }
-  
-  [progressView removeFromSuperview];
   // albumのphotoに対する最後の保存処理実行日時を記録
+  NSLog(@"downloadCompleted - set last add");
   [modelController setLastAdd];
   //
+  NSLog(@"downloadCompleted - remove progress");
   [self removeProgressView];
 
   // toolbarのボタンを有効に
+  NSLog(@"downloadCompleted - enable tool bar");
   [self enableToolbar:YES];
   //
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+   //
+  NSLog(@"downloadCompleted - afterViewDidAppear");
   [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
                            toTarget:self
                          withObject:nil];
+  self.view.userInteractionEnabled = YES;
 }
 
 /*!
@@ -1264,6 +1292,7 @@ withListViewController:(PhotoListViewController *)controller {
   [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
+  self.view.userInteractionEnabled = YES;
   
 }
 
