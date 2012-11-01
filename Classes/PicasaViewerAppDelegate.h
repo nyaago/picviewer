@@ -44,7 +44,7 @@
 /*!
  @property window
  */
-@property (nonatomic, retain, readonly) IBOutlet UIWindow *window;
+@property (nonatomic, retain) IBOutlet UIWindow *window;
 /*!
  @property navigationController
  */

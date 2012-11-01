@@ -101,21 +101,21 @@
  @param newView 設定するViewController
  @param n ページ番号(0起点)
  */
-- (void)setCurPage:(UIViewController *)newView withPageNumber:(NSUInteger)n;
+- (void)setCurPage:(UIViewController<PageViewDelegate> *)newView withPageNumber:(NSUInteger)n;
 
 /*!
  @method setNextPage:
  @discussion 次ページのViewControllerを設定
  @param newView 設定するViewController
  */
-- (void)setNextPage:(UIViewController *)newView;
+- (void)setNextPage:(UIViewController<PageViewDelegate> *)newView;
 
 /*!
  @method setPrevPage:
  @discussion 前ページのViewControllerを設定
  @param newView 設定するViewController
  */
-- (void)setPrevPage:(UIViewController *)newView;
+- (void)setPrevPage:(UIViewController<PageViewDelegate> *)newView;
 
 /*!
  @method toCurPage
@@ -454,7 +454,7 @@
   CGPoint point = scrollView.contentOffset;
   // 次のページの移動時
   if(point.x > scrollView.bounds.size.width || 
-     view.curPageNumber == 0 && point.x >= scrollView.bounds.size.width) {
+     (view.curPageNumber == 0 && point.x >= scrollView.bounds.size.width)) {
     NSLog(@"page count = %d", [source pageCount]);
     if(view.curPageNumber + 1 < [source pageCount] ) {
    //   [view toNextPage];
@@ -841,7 +841,7 @@
   return CGPointMake(left, 0.0f);
 }
 
-- (void)setCurPage:(UIViewController *)newView withPageNumber:(NSUInteger)n {
+- (void)setCurPage:(UIViewController<PageViewDelegate> *)newView withPageNumber:(NSUInteger)n {
   curPageNumber = n;
   NSUInteger left = curPageNumber == 0 ? 0 : self.frame.size.width;
   left += 2.0f;
@@ -861,7 +861,7 @@
   self.contentOffset = CGPointMake(left, 0.0f);
 }
 
-- (void)setNextPage:(UIViewController *)newView {
+- (void)setNextPage:(UIViewController<PageViewDelegate> *)newView {
   NSUInteger left = 
   curPageNumber == 0 ? self.frame.size.width : self.frame.size.width * 2 ;
   left += 2.0f;
@@ -878,7 +878,7 @@
   [self addSubview:nextPage.view];
 }
 
-- (void)setPrevPage:(UIViewController *)newView {
+- (void)setPrevPage:(UIViewController<PageViewDelegate> *)newView {
   NSUInteger left =  0 + 2.0f;
   CGRect pageRegion = CGRectMake(left, 0.0f, 
                                  self.frame.size.width - 4.0f, 
@@ -905,7 +905,7 @@
 
 - (UIViewController *)toNextPage {
   // page入れ替え
-  UIViewController *tmp; // 交換用
+  UIViewController<PageViewDelegate> *tmp; // 交換用
   UIViewController *popedView;
   tmp = curPage;
   curPage = nextPage;
@@ -930,7 +930,7 @@
   //  NSUInteger left = 0;
   //  [scrollView setContentOffset:CGPointMake(left, 0.0f) animated:YES];
   // page入れ替え
-  UIViewController *tmp;
+  UIViewController<PageViewDelegate> *tmp;
   UIViewController *popedView;
   tmp = curPage;
   curPage = prevPage;

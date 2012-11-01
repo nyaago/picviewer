@@ -104,13 +104,6 @@ ThumbImageViewDelegate> {
 - (void)discardTumbnails;
 
 /*!
- @method discardTumbnailAt:
- @discussion 指定したインデックスのThumbnailの破棄
- @param index 0起点のindex
- */
-- (void)discardTumbnailAt:(NSUInteger)index;
-
-/*!
  @method thumbnailAt:
  @discussion 指定したIndexの画像のUIImageViewを返す
  @param index 0起点のindex

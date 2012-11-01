@@ -257,11 +257,10 @@ static NSLock *lockFetchedResultsController;
   if(photoObject.thumbnail) {
     image  = [UIImage imageWithData:photoObject.thumbnail];
     imgView = [[UIImageView alloc] initWithImage:image];
+    imgView.frame = [self viewFrameForImage:image];
   }
   else {
-    imgView = [[UIImage alloc] init];
   }
-  imgView.frame = [self viewFrameForImage:image];
   [pool drain];
   return imgView;
 }

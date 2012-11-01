@@ -524,7 +524,6 @@
   ThumbImageView *imageView = nil;
   NSUInteger indexes[2];
   indexes[0] = 0;
-  CGRect bounds = self.view.bounds;
   // 画像データを取得してUIImageViewを生成
   indexes[1] = index;
   Photo *photoObject = [modelController photoAt:index];
@@ -917,19 +916,6 @@
     [dict release];
   }
   [pool drain];
-}
-
-
-- (CGPoint) pointForThumb:(NSUInteger)n {
-//  NSLog(@"width = %f, height = %f", self.scrollView.bounds.size.width, 
-//        self.scrollView.bounds.size.height);
-  NSUInteger w = [self thumbWidth];
-  NSUInteger h = [self thumbHeight];
-  NSUInteger padding = 2.0f;
-  NSUInteger cols = self.scrollView.bounds.size.width / w;
-  NSUInteger row = n / cols;	// base - 0
-  NSUInteger col = n % cols;	// base - 0
-  return CGPointMake(col * h + padding, row * w + padding);
 }
 
 
