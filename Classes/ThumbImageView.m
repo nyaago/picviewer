@@ -51,6 +51,21 @@ static NSMutableDictionary *thumbViewMap = nil;
   return nil;
 }
 
+/*!
+ @method refresh
+ @discussion すべてのサムネイルのリフレッシュ
+ */
++ (void) refreshAll {
+  NSArray *views = [thumbViewMap allValues];
+  for(int i = 0; i < [views count]; ++i) {
+    ThumbImageView *view = (ThumbImageView *)[views objectAtIndex:i];
+    if(view.superview) {
+      [view performSelectorOnMainThread:@selector(refresh)
+                             withObject:nil
+                          waitUntilDone:NO];
+    }
+  }
+}
 
 /*!
  @method
@@ -89,7 +104,7 @@ static NSMutableDictionary *thumbViewMap = nil;
  
 }
 
-- (id) initWithImage:(UIImage *)image withIndex:(NSNumber *)i withContainer:(UIView *)container;
+- (id) initWithImage:(UIImage *)image withIndex:(NSNumber *)i withContainer:(UIView *)container
 {
   self = [super initWithImage:image];
   if(self) {
@@ -110,7 +125,11 @@ static NSMutableDictionary *thumbViewMap = nil;
   return self;
 }
 
-
+- (id) refresh {
+  
+  self.frame = [self frameForThumb:index.integerValue];
+  return self;
+}
 
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {

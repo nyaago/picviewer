@@ -65,6 +65,9 @@ ThumbImageViewDelegate> {
   BOOL isFromAlbumTableView;
   // サムネイル処理のLock
   NSLock *thumbnailLock;
+  // 現在layoutされている向き
+  UIDeviceOrientation layoutedOrientation;
+
 }
 
 /*!

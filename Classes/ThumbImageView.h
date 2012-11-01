@@ -54,10 +54,23 @@
 + (CGPoint) bottomRight ;
 
 /*!
- @method:
+ @method
+ @discussion すべてのサムネイルの右下の座標
+ */
++ (void) refreshAll;
+
+
+/*!
+ @method
  @discussion image を指定しての生成
  */
 - (id) initWithImage:(UIImage *)image withIndex:(NSNumber *)i withContainer:(UIView *)container;
+
+/*!
+ @method refresh
+ @discussion
+ */
+- (id) refresh;
 
 /*!
  @method setDelegate

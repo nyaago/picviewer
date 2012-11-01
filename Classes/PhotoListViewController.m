@@ -220,7 +220,6 @@
   NSLog(@"photo view  viewDidAppear");
   [super viewDidAppear:animated];
   
-  
   // navigationbar,  statusbar
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
   [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackOpaque;
@@ -260,6 +259,17 @@
   
   [self discardTumbnails];
   [self loadThumbnails];
+}
+
+- (void)viewDidLayoutSubviews {
+  [super viewDidLayoutSubviews];
+  if([[UIDevice currentDevice] orientation] == layoutedOrientation) {
+    return;
+  }
+  if([self shouldAutorotate]) {
+    [ThumbImageView refreshAll];
+  }
+  layoutedOrientation = [[UIDevice currentDevice] orientation];
 }
 
 
@@ -1376,6 +1386,18 @@
 }
 
 
+#pragma mark -
+
+#pragma mark DeviceRotationDelegate
+
+-(void) deviceRotated:(UIDeviceOrientation)orient {
+  NSLog(@"device ROtated");
+  // 回転処理中は、表示位置がずれないようにtoolbarを非表示にする、最後に現在の状態(表示/非表示)に戻す
+  if(layoutedOrientation == [[UIDevice currentDevice]orientation] ) {
+    return;
+  }
+  //[self refreshViewWithDiviceOrientation:[[UIDevice currentDevice]orientation]];
+}
 
 
 #pragma mark -

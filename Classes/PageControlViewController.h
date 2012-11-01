@@ -17,7 +17,6 @@
   // ページに表示するViewを提供するソースオブジェクト
   NSObject<PageControlViewControllerDataSource> *source;
   // 現在ページ - @TODO - Viewから取得する..
- // NSUInteger curPageNumber;
   // 機器回転通知の管理オブジェクト
   DeviceRotation  *deviceRotation;
   // 
