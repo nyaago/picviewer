@@ -249,7 +249,7 @@ static NSLock *lockFetchedResultsController;
   indexes[0] = 0;
   indexes[1] = index;
   [lockFetchedResultsController lock];
-  Photo *photoObject = [fetchedPhotosController 
+  Photo *photoObject = [fetchedPhotosController
                         objectAtIndexPath:[NSIndexPath 
                                            indexPathWithIndexes:indexes length:2]];
   [lockFetchedResultsController unlock];

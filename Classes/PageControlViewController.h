@@ -20,8 +20,10 @@
  // NSUInteger curPageNumber;
   // 機器回転通知の管理オブジェクト
   DeviceRotation  *deviceRotation;
-  // 現在の機器の向き
-  UIDeviceOrientation orientation;
+  // 
+  BOOL initialLayout;
+  // 現在のレイアウトの向き
+  UIDeviceOrientation layoutedOrientation;
   // Statusbarの高さ
   NSUInteger statusBarHeight;
   // toolbarのボタンの配列
@@ -30,6 +32,9 @@
   UIBarButtonItem *nextButton;
   // 前ページ表示ボタン
   UIBarButtonItem *prevButton;
+  
+  
+  
 }
 
 /*!

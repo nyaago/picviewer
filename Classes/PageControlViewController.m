@@ -38,6 +38,11 @@
  */
 - (void)setNavigationTitle;
 
+/*!
+ @method refreshView
+ */
+- (void) refreshViewWithDiviceOrientation:(UIDeviceOrientation)orientation;
+
 @end
 
 /*!
@@ -219,14 +224,25 @@
   }
 }
 
+
+- (void)viewDidLayoutSubviews {
+  [super viewDidLayoutSubviews];
+  if(initialLayout) {
+    initialLayout = NO;
+    return;
+  }
+  if([[UIDevice currentDevice] orientation] == layoutedOrientation) {
+    return;
+  }
+  [self refreshViewWithDiviceOrientation:[[UIDevice currentDevice]orientation]];
+}
+
 /*!
  @method viewWillAppear:
  @discussion viewが表示される前の通知、toolbarの表示とViewの全画面表示の設定
  */
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
-  // 機器の向き、初期は縦向きに
-  orientation = UIDeviceOrientationPortrait;
   // toolbar設定
 	self.toolbarItems = [self toolbarButtons];
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
@@ -343,6 +359,8 @@
   }
   // pageView内のviewのLayout
   [pageView layoutViews];
+  layoutedOrientation = UIDeviceOrientationPortrait;
+  initialLayout = YES;
   // Toolbarのボタンの状態設定
   [self setToolbarStatus];
   [self setNavigationTitle];
@@ -550,7 +568,7 @@
     = [source pageAt:scrollView.curPageNumber + 1];
     [scrollView setNextPage:controller];
     [controller pageDidAddWithPageViewController:self
-                                       withOrientation:orientation];
+                                       withOrientation:layoutedOrientation];
     [controller setPageController:self];
     controller.view.hidden = YES;
     [controller release];
@@ -568,7 +586,8 @@
     UIViewController<PageViewDelegate> *controller 
     = [source pageAt:scrollView.curPageNumber - 1];
     [scrollView setPrevPage:controller];
-    [controller pageDidAddWithPageViewController:self withOrientation:orientation];
+    [controller pageDidAddWithPageViewController:self
+                                 withOrientation:layoutedOrientation];
     [controller setPageController:self];
     controller.view.hidden = YES;
     [controller release];
@@ -731,13 +750,8 @@
   return toolbarButtons;
 }
 
-#pragma mark -
-
-#pragma mark DeviceRotationDelegate
-
--(void) deviceRotated:(UIDeviceOrientation)orient {
-  NSLog(@"device ROtated");
-  // 回転処理中は、表示位置がずれないようにtoolbarを非表示にする、最後に現在の状態(表示/非表示)に戻す
+- (void) refreshViewWithDiviceOrientation:(UIDeviceOrientation)orient {
+  PageView *scrollView = (PageView *)self.view;
   BOOL hidden =   self.navigationController.toolbarHidden;
   self.navigationController.toolbarHidden = YES;
   
@@ -750,44 +764,61 @@
    self.navigationController.navigationBar.frame = barFrame;
    */
   // View階層のConsole出力
-  UIView *v = self.view;
-  for(int i = 0; i < 5; ++i) {
-    CGRect rect = v.frame;
-    NSLog(@"Class = %@,Page view,x ==> %f, y => %f, width => %f, height => %f ",
-          [v class],
-          rect.origin.x , rect.origin.y, 
-          rect.size.width, rect.size.height
-          );
-    v = v.superview;
-  }
-  
+  /*
+   UIView *v = self.view;
+   for(int i = 0; i < 5; ++i) {
+   CGRect rect = v.frame;
+   NSLog(@"Class = %@,Page view,x ==> %f, y => %f, width => %f, height => %f ",
+   [v class],
+   rect.origin.x , rect.origin.y,
+   rect.size.width, rect.size.height
+   );
+   v = v.superview;
+   }
+   */
   //
-  orientation = orient;
+  
   // Page Viewのサイズ設定
-  PageView *scrollView = (PageView *)self.view;
+  
+  
   if(source) {
     NSUInteger count = [source pageCount];
     [scrollView setPageCount:count];
-  }	
+  }
   // Page View のLayout
-//  [scrollView toCurPage];
+  //  [scrollView toCurPage];
   [scrollView layoutViews];
   // Page要素への通知
   if(scrollView.curPage) {
-    [scrollView.curPage pageView:self rotated:orientation];
+    [scrollView.curPage pageView:self rotated:orient];
   }
   if(scrollView.nextPage) {
-    [scrollView.nextPage pageView:self rotated:orientation];
+    [scrollView.nextPage pageView:self rotated:orient];
   }
   if(scrollView.prevPage) {
-    [scrollView.prevPage pageView:self rotated:orientation];
+    [scrollView.prevPage pageView:self rotated:orient];
   }
   //  self.wantsFullScreenLayout = YES;
   self.navigationController.toolbarHidden = hidden;
-  [self performSelectorOnMainThread:@selector(resetScrollOffsetAndInset:) 
+  layoutedOrientation = orient;
+  [self performSelectorOnMainThread:@selector(resetScrollOffsetAndInset:)
                          withObject:[NSNumber numberWithBool:hidden]
                       waitUntilDone:NO];
   
+
+}
+
+#pragma mark -
+
+#pragma mark DeviceRotationDelegate
+
+-(void) deviceRotated:(UIDeviceOrientation)orient {
+  NSLog(@"device ROtated");
+  // 回転処理中は、表示位置がずれないようにtoolbarを非表示にする、最後に現在の状態(表示/非表示)に戻す
+  if(layoutedOrientation == [[UIDevice currentDevice]orientation] ) {
+    return;
+  }
+  //[self refreshViewWithDiviceOrientation:[[UIDevice currentDevice]orientation]];
 }
 
 
