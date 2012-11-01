@@ -321,6 +321,47 @@
   
 }
 
+/*!
+ 機器回転時に自動的にView回転を行うかの判定.
+ splitView内にある場合（iPad）は自動的に回転されるように、YESを返す。
+ */
+- (BOOL)shouldAutorotate {
+  if([self splitViewController]) {
+    return YES;
+  }
+  else {
+    return NO;
+  }
+}
+
+/*!
+ サポートされている機器の向き
+ splitView内にある場合(iPad）はすべて、層でない場合はPortraitのみ.
+ */
+- (NSUInteger)supportedInterfaceOrientations {
+  if([self splitViewController]) {
+    return UIInterfaceOrientationMaskAll;
+  }
+  else {
+    return UIInterfaceOrientationMaskPortrait;
+  }
+}
+
+/*!
+ ios5まで用.
+ splitView内にある場合(iPad）はすべて、層でない場合はPortraitのみ.
+ */
+- (BOOL)shouldAutorotateToInterfaceOrientation:
+(UIInterfaceOrientation)interfaceOrientation {
+  if([self splitViewController]) {
+    return YES;
+  }
+  else {
+    return NO;
+  }
+}
+
+
 - (void)dealloc {
   NSLog(@"PhotoListViewController dealloc");
   if(progressView) {

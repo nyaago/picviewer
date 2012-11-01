@@ -361,14 +361,30 @@
 }
 
 /*!
- @method shouldAutorotateToInterfaceOrientation:
- @discussion 機器回転時に自動的にView回転を行うかの判定.
+ 機器回転時に自動的にView回転を行うかの判定.
+ 自動的に回転されるように、常にYESを返す。
+ */
+- (BOOL)shouldAutorotate {
+  return YES;
+}
+
+/*!
+ サポートされている機器の向き
+ すべてサポート
+ */
+- (NSUInteger)supportedInterfaceOrientations {
+  return UIInterfaceOrientationMaskAll;
+}
+
+/*!
+ ios5まで用.
  自動的に回転されるように、常にYESを返す。
  */
 - (BOOL)shouldAutorotateToInterfaceOrientation:
 (UIInterfaceOrientation)interfaceOrientation {
   return YES;
 }
+
 
 
 /*

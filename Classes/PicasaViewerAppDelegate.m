@@ -225,3 +225,42 @@
 
 @end
 
+/*!
+ UINavigationController
+ */
+@implementation UINavigationController (Rotation)
+
+
+
+/*!
+ 子のviewController の定義にdelegateさせる
+ */
+- (NSUInteger)supportedInterfaceOrientations{
+  
+  return [self.viewControllers.lastObject supportedInterfaceOrientations];
+  
+}
+
+
+/*!
+ 子のviewController の定義にdelegateさせる
+*/
+- (BOOL)shouldAutorotate{
+  
+  return [self.viewControllers.lastObject shouldAutorotate];
+  
+}
+
+
+/*!
+ 子のviewController の定義にdelegateさせる
+ */
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation{
+  
+  return [self.viewControllers.lastObject preferredInterfaceOrientationForPresentation];
+  
+}
+
+
+
+@end

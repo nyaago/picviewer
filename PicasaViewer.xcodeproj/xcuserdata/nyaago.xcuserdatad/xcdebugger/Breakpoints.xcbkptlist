@@ -58,11 +58,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "567"
-         endingLineNumber = "567"
+         startingLineNumber = "590"
+         endingLineNumber = "590"
          landmarkName = "-albumTableViewControll:selectAlbum:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -71,11 +71,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "707"
-         endingLineNumber = "707"
+         startingLineNumber = "730"
+         endingLineNumber = "730"
          landmarkName = "@implementation PhotoListViewController"
          landmarkType = "3">
       </FileBreakpoint>
@@ -84,11 +84,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "645"
-         endingLineNumber = "645"
+         startingLineNumber = "668"
+         endingLineNumber = "668"
          landmarkName = "-albumAndPhotosWithTicket:finishedWithAlbumFeed:error:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -97,11 +97,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1055"
-         endingLineNumber = "1055"
+         startingLineNumber = "1078"
+         endingLineNumber = "1078"
          landmarkName = "-loadPhotos:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -123,11 +123,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "644"
-         endingLineNumber = "644"
+         startingLineNumber = "667"
+         endingLineNumber = "667"
          landmarkName = "-albumAndPhotosWithTicket:finishedWithAlbumFeed:error:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -136,11 +136,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373377308.633377"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1195"
-         endingLineNumber = "1195"
+         startingLineNumber = "1218"
+         endingLineNumber = "1218"
          landmarkName = "-didFinishLoading:withUserInfo:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -201,11 +201,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "658"
-         endingLineNumber = "658"
+         startingLineNumber = "681"
+         endingLineNumber = "681"
          landmarkName = "-albumAndPhotosWithTicket:finishedWithAlbumFeed:error:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -214,11 +214,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "561"
-         endingLineNumber = "561"
+         startingLineNumber = "584"
+         endingLineNumber = "584"
          landmarkName = "-albumTableViewControll:selectAlbum:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -227,11 +227,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "467"
-         endingLineNumber = "467"
+         startingLineNumber = "490"
+         endingLineNumber = "490"
          landmarkName = "-discardTumbnails"
          landmarkType = "5">
       </FileBreakpoint>
@@ -240,11 +240,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "468"
-         endingLineNumber = "468"
+         startingLineNumber = "491"
+         endingLineNumber = "491"
          landmarkName = "-discardTumbnails"
          landmarkType = "5">
       </FileBreakpoint>
@@ -253,11 +253,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "596"
-         endingLineNumber = "596"
+         startingLineNumber = "619"
+         endingLineNumber = "619"
          landmarkName = "@implementation PhotoListViewController"
          landmarkType = "3">
       </FileBreakpoint>
@@ -266,11 +266,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "591"
-         endingLineNumber = "591"
+         startingLineNumber = "614"
+         endingLineNumber = "614"
          landmarkName = "-albumTableViewControll:selectAlbum:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -292,24 +292,24 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373377308.633377"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1226"
-         endingLineNumber = "1226"
-         landmarkName = "-dowloadCanceled:"
-         landmarkType = "5">
+         startingLineNumber = "1249"
+         endingLineNumber = "1249"
+         landmarkName = "@implementation PhotoListViewController"
+         landmarkType = "3">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "653"
-         endingLineNumber = "653"
+         startingLineNumber = "676"
+         endingLineNumber = "676"
          landmarkName = "-albumAndPhotosWithTicket:finishedWithAlbumFeed:error:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -318,11 +318,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PageControlViewController.m"
-         timestampString = "373186618.585358"
+         timestampString = "373428289.844779"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "498"
-         endingLineNumber = "498"
+         startingLineNumber = "511"
+         endingLineNumber = "511"
          landmarkName = "-changeNavigationAndStatusBar"
          landmarkType = "5">
       </FileBreakpoint>
@@ -331,11 +331,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoViewController.m"
-         timestampString = "373187382.433871"
+         timestampString = "373428029.884519"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "728"
-         endingLineNumber = "728"
+         startingLineNumber = "731"
+         endingLineNumber = "731"
          landmarkName = "+backButton"
          landmarkType = "5">
       </FileBreakpoint>
@@ -344,11 +344,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "896"
-         endingLineNumber = "896"
+         startingLineNumber = "919"
+         endingLineNumber = "919"
          landmarkName = "-backButton"
          landmarkType = "5">
       </FileBreakpoint>
@@ -370,11 +370,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373377308.633377"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1334"
-         endingLineNumber = "1334"
+         startingLineNumber = "1357"
+         endingLineNumber = "1357"
          landmarkName = "-splitViewController:willHideViewController:withBarButtonItem:forPopoverController:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -383,11 +383,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373377308.633377"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1343"
-         endingLineNumber = "1343"
+         startingLineNumber = "1366"
+         endingLineNumber = "1366"
          landmarkName = "-splitViewController:willShowViewController:invalidatingBarButtonItem:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -396,11 +396,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PageControlViewController.m"
-         timestampString = "373263703.98674"
+         timestampString = "373428289.844779"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "598"
-         endingLineNumber = "598"
+         startingLineNumber = "611"
+         endingLineNumber = "611"
          landmarkName = "-backAction:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -474,11 +474,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1040"
-         endingLineNumber = "1040"
+         startingLineNumber = "1063"
+         endingLineNumber = "1063"
          landmarkName = "-loadPhotos:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -487,11 +487,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1039"
-         endingLineNumber = "1039"
+         startingLineNumber = "1062"
+         endingLineNumber = "1062"
          landmarkName = "-loadPhotos:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -500,11 +500,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1028"
-         endingLineNumber = "1028"
+         startingLineNumber = "1051"
+         endingLineNumber = "1051"
          landmarkName = "-loadPhotos:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -513,11 +513,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1026"
-         endingLineNumber = "1026"
+         startingLineNumber = "1049"
+         endingLineNumber = "1049"
          landmarkName = "-loadPhotos:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -526,11 +526,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "556"
-         endingLineNumber = "556"
+         startingLineNumber = "579"
+         endingLineNumber = "579"
          landmarkName = "-albumTableViewControll:selectAlbum:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -539,11 +539,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "992"
-         endingLineNumber = "992"
+         startingLineNumber = "1015"
+         endingLineNumber = "1015"
          landmarkName = "-mustLoad:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -565,11 +565,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "558"
-         endingLineNumber = "558"
+         startingLineNumber = "581"
+         endingLineNumber = "581"
          landmarkName = "-albumTableViewControll:selectAlbum:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -578,11 +578,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "586"
-         endingLineNumber = "586"
+         startingLineNumber = "609"
+         endingLineNumber = "609"
          landmarkName = "-albumTableViewControll:selectAlbum:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -591,11 +591,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "581"
-         endingLineNumber = "581"
+         startingLineNumber = "604"
+         endingLineNumber = "604"
          landmarkName = "-albumTableViewControll:selectAlbum:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -643,11 +643,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "464"
-         endingLineNumber = "464"
+         startingLineNumber = "487"
+         endingLineNumber = "487"
          landmarkName = "-discardTumbnails"
          landmarkType = "5">
       </FileBreakpoint>
@@ -695,11 +695,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "393"
-         endingLineNumber = "393"
+         startingLineNumber = "416"
+         endingLineNumber = "416"
          landmarkName = "-loadThumbnails"
          landmarkType = "5">
       </FileBreakpoint>
@@ -708,11 +708,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "435"
-         endingLineNumber = "435"
+         startingLineNumber = "458"
+         endingLineNumber = "458"
          landmarkName = "-loadThumbnails"
          landmarkType = "5">
       </FileBreakpoint>
@@ -721,11 +721,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "392"
-         endingLineNumber = "392"
+         startingLineNumber = "415"
+         endingLineNumber = "415"
          landmarkName = "-loadThumbnails"
          landmarkType = "5">
       </FileBreakpoint>
@@ -812,11 +812,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "486"
-         endingLineNumber = "486"
+         startingLineNumber = "509"
+         endingLineNumber = "509"
          landmarkName = "-thumbnailAt:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -825,11 +825,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "841"
-         endingLineNumber = "841"
+         startingLineNumber = "864"
+         endingLineNumber = "864"
          landmarkName = "-touchesEnded:withEvent:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -838,11 +838,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "841"
-         endingLineNumber = "841"
+         startingLineNumber = "864"
+         endingLineNumber = "864"
          landmarkName = "-touchesEnded:withEvent:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -903,11 +903,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "438"
-         endingLineNumber = "438"
+         startingLineNumber = "461"
+         endingLineNumber = "461"
          landmarkName = "-loadThumbnails"
          landmarkType = "5">
       </FileBreakpoint>
@@ -916,11 +916,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "792"
-         endingLineNumber = "792"
+         startingLineNumber = "815"
+         endingLineNumber = "815"
          landmarkName = "-photoTouchesEnded:touches:withEvent:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -929,11 +929,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "836"
-         endingLineNumber = "836"
+         startingLineNumber = "859"
+         endingLineNumber = "859"
          landmarkName = "-touchesEnded:withEvent:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -942,11 +942,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374365.619231"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "850"
-         endingLineNumber = "850"
+         startingLineNumber = "873"
+         endingLineNumber = "873"
          landmarkName = "-touchesBegan:withEvent:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -968,11 +968,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373374396.564144"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "384"
-         endingLineNumber = "384"
+         startingLineNumber = "407"
+         endingLineNumber = "407"
          landmarkName = "-setContentSizeWithImageCount"
          landmarkType = "5">
       </FileBreakpoint>
@@ -981,11 +981,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373377435.90169"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1139"
-         endingLineNumber = "1139"
+         startingLineNumber = "1162"
+         endingLineNumber = "1162"
          landmarkName = "-downloadCompleted"
          landmarkType = "5">
       </FileBreakpoint>
@@ -994,11 +994,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373377073.912769"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "635"
-         endingLineNumber = "635"
+         startingLineNumber = "658"
+         endingLineNumber = "658"
          landmarkName = "-albumAndPhotosWithTicket:finishedWithAlbumFeed:error:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1007,11 +1007,11 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373377157.175585"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "662"
-         endingLineNumber = "662"
+         startingLineNumber = "685"
+         endingLineNumber = "685"
          landmarkName = "-albumAndPhotosWithTicket:finishedWithAlbumFeed:error:"
          landmarkType = "5">
       </FileBreakpoint>
@@ -1020,12 +1020,129 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "Classes/PhotoListViewController.m"
-         timestampString = "373377213.840084"
+         timestampString = "373425649.81443"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "1101"
-         endingLineNumber = "1101"
+         startingLineNumber = "1124"
+         endingLineNumber = "1124"
          landmarkName = "-downloadCompleted"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Classes/RootViewController.m"
+         timestampString = "373425580.282482"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "148"
+         endingLineNumber = "148"
+         landmarkName = "-shouldAutorotate"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Classes/RootViewController.m"
+         timestampString = "373425582.544854"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "157"
+         endingLineNumber = "157"
+         landmarkName = "-supportedInterfaceOrientations"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Classes/AlbumTableViewController.m"
+         timestampString = "373426475.268987"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "468"
+         endingLineNumber = "468"
+         landmarkName = "-supportedInterfaceOrientations"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Classes/AlbumTableViewController.m"
+         timestampString = "373426921.035667"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "483"
+         endingLineNumber = "483"
+         landmarkName = "-shouldAutorotateToInterfaceOrientation:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Classes/PageControlViewController.m"
+         timestampString = "373428328.694323"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "736"
+         endingLineNumber = "736"
+         landmarkName = "-deviceRotated:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Classes/Utils/DeviceRotation.m"
+         timestampString = "373428561.019407"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "77"
+         endingLineNumber = "77"
+         landmarkName = "-deviceRotated:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Classes/Utils/DeviceRotation.m"
+         timestampString = "373428563.52568"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "64"
+         endingLineNumber = "64"
+         landmarkName = "-addObserveOriantationChange"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "Yes"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Classes/PageControlViewController.m"
+         timestampString = "373428652.247376"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "762"
+         endingLineNumber = "762"
+         landmarkName = "-deviceRotated:"
+         landmarkType = "5">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "Classes/PageControlViewController.m"
+         timestampString = "373428658.095074"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "763"
+         endingLineNumber = "763"
+         landmarkName = "-deviceRotated:"
          landmarkType = "5">
       </FileBreakpoint>
    </FileBreakpoints>
