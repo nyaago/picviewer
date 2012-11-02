@@ -6,6 +6,7 @@
 //  Copyright __MyCompanyName__ 2010. All rights reserved.
 //
 
+#import "PicasaViewerAppDelegate.h"
 #import "RootViewController.h"
 #import "AlbumTableViewController.h"
 #import "NewUserViewController.h"
@@ -64,6 +65,7 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
 
+  firstAppearance = YES;
   // Title
   self.navigationItem.title = NSLocalizedString(@"Acounts.Title", @"Acounts");
 
@@ -99,23 +101,26 @@
   [super viewDidAppear:animated];
   SettingsManager *settings = [[SettingsManager alloc] init];
   NSString *userId = [settings currentUser];
-  if(userId) {
-    //	  User *user = [self selectUser:userId];
-    User *user = [self userWithUserId:userId];
-    if(user) {
-      AlbumTableViewController *albumViewController =
-      [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController"
-                                                 bundle:nil];
-      self.navigationItem.backBarButtonItem =  [albumViewController backButton];
-      albumViewController.managedObjectContext = self.managedObjectContext;
-      albumViewController.user = user;
-      // Pass the selected object to the new view controller.
-      [self.navigationController pushViewController:albumViewController animated:YES];
-      [albumViewController release];
+  if(firstAppearance) {
+    if(userId) {
+      //	  User *user = [self selectUser:userId];
+      User *user = [self userWithUserId:userId];
+      if(user) {
+        AlbumTableViewController *albumViewController =
+        [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController"
+                                                   bundle:nil];
+        self.navigationItem.backBarButtonItem =  [albumViewController backButton];
+        albumViewController.managedObjectContext = self.managedObjectContext;
+        albumViewController.user = user;
+        // Pass the selected object to the new view controller.
+        [self.navigationController pushViewController:albumViewController animated:YES];
+        [albumViewController release];
+      }
     }
-  }
-  else {
-	  [settings setCurrentUser:nil];
+    else {
+      [settings setCurrentUser:nil];
+    }
+    firstAppearance = NO;
   }
   [settings release];
 }
@@ -221,7 +226,10 @@
 - (void)deleteUser:(User *)user {
 
   [managedObjectContext deleteObject:user];
+  SettingsManager *settings = [[SettingsManager alloc] init];
+  NSString *userId = [settings currentUser];
   // Save the context.
+  NSString *savedUserId = user.userId;
   NSError *error = nil;
   if (![managedObjectContext save:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
@@ -235,8 +243,15 @@
     [alertView show];
     [alertView release];
   }
+  if(savedUserId == userId) {
+    PicasaViewerAppDelegate *appDelegate
+    = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
+    if(appDelegate.photoListViewController != nil) {
+      [appDelegate.photoListViewController discardTumbnails];
+    }
+  }
   [self.tableView reloadData];
-
+  [settings release];
 }
 
 #pragma mark -

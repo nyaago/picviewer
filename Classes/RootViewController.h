@@ -26,6 +26,8 @@ PicasaFetchControllerDelegate, LabeledActivityIndicatorDelegate> {
   NSMutableArray *toolbarButtons;
   // 削除処理中のindicator
   LabeledActivityIndicator *indicatorView;
+  // 最初の表示であればYES;
+  BOOL firstAppearance;
 }
 
 /*!
