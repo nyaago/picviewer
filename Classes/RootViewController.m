@@ -83,14 +83,28 @@
     [alertView show];
     [alertView release];
   }
+  
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
+  self.toolbarItems = [self toolbarButtons];
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbarHidden = NO; 
+  
+}
+
+
+- (void)viewDidAppear:(BOOL)animated {
+  [super viewDidAppear:animated];
   SettingsManager *settings = [[SettingsManager alloc] init];
   NSString *userId = [settings currentUser];
   if(userId) {
     //	  User *user = [self selectUser:userId];
     User *user = [self userWithUserId:userId];
     if(user) {
-      AlbumTableViewController *albumViewController = 
-      [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController" 
+      AlbumTableViewController *albumViewController =
+      [[AlbumTableViewController alloc] initWithNibName:@"AlbumTableViewController"
                                                  bundle:nil];
       self.navigationItem.backBarButtonItem =  [albumViewController backButton];
       albumViewController.managedObjectContext = self.managedObjectContext;
@@ -106,18 +120,6 @@
   [settings release];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-  [super viewWillAppear:animated];
-  self.toolbarItems = [self toolbarButtons];
-  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
-  self.navigationController.toolbarHidden = NO; 
-  
-}
-
-
-- (void)viewDidAppear:(BOOL)animated {
-  [super viewDidAppear:animated];
- }
 /*
  - (void)viewWillDisappear:(BOOL)animated {
  [super viewWillDisappear:animated];
