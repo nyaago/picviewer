@@ -19,6 +19,17 @@
 }
 */
 
++ (NSUInteger) thumbWidthForContainer:(UIView *)containerView {
+  NSInteger w = containerView.frame.size.width;
+  return w / 4;
+  
+}
+
++ (NSUInteger) thumbHeightForContainer:(UIView *)containerView {
+  NSInteger w = containerView.frame.size.height;
+  return w / 4;
+}
+
 
 - (id) initWithImage:(UIImage *)image withIndex:(NSNumber *)i withContainer:(UIView *)container;
 {
@@ -49,13 +60,11 @@
 }
 
 - (NSUInteger) thumbWidth {
-  NSInteger w = self.containerView.frame.size.width;
-  return w / 4;
+  return [[self class] thumbWidthForContainer:self.containerView];
 }
 
 - (NSUInteger) thumbHeight {
-  NSInteger w = self.containerView.frame.size.width;
-  return w / 4;
+  return [[self class] thumbHeightForContainer:self.containerView];
 }
 
 

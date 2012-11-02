@@ -972,8 +972,11 @@
   [self.view addSubview:[self progressView]];
   [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
                                         user:[self.album.user valueForKey:@"userId"]
-                               withPhotoSize:[NSNumber numberWithInt:settings.imageSize]];
-  downloader = [[QueuedURLDownloader alloc] 
+                               withPhotoSize:[NSNumber numberWithInt:settings.imageSize]
+                               withThumbSize:[NSNumber numberWithInteger:
+                                              [ThumbImageView thumbWidthForContainer:self.view] *
+                                              [[UIScreen mainScreen] scale]]];
+  downloader = [[QueuedURLDownloader alloc]
                 initWithMaxAtSameTime:kDownloadMaxAtSameTime];
   downloader.delegate = self;
   [settings release];
@@ -1104,7 +1107,10 @@
     picasaFetchController.password = settings.password;
     [picasaFetchController queryAlbumAndPhotos:curAlbum.albumId
                                           user:[curAlbum.user valueForKey:@"userId"]
-                                 withPhotoSize:[NSNumber numberWithInt:settings.imageSize]];
+                                 withPhotoSize:[NSNumber numberWithInt:settings.imageSize]
+                                 withThumbSize:[NSNumber numberWithInteger:
+                                               [ThumbImageView thumbWidthForContainer:self.view] *
+                                                [[UIScreen mainScreen] scale]]];
     [settings release];
     ret = YES;
   }

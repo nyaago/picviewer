@@ -21,11 +21,18 @@
 
 - (void) handleError:(NSError *)error;
 
+/*!
+ @method revicedThumbSize:
+ @discussion サムネイルのサイズを有効なサイズに補正
+ */
+- (NSNumber *) revicedThumbSize:(NSNumber *)size;
 
 @end
 
 
 @implementation PicasaFetchController
+
+static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
 
 @synthesize delegate;
 @synthesize userId;
@@ -72,7 +79,8 @@
 }
 
 - (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)targetUserId 
-               withPhotoSize:(NSNumber *)photoSize {
+               withPhotoSize:(NSNumber *)photoSize
+               withThumbSize:(NSNumber *)thumbSize {
   completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   
@@ -88,7 +96,7 @@
                                                             access:nil];
   GDataQueryGooglePhotos *query = [GDataQueryGooglePhotos queryWithFeedURL:feedURL];
   //  [query setMaxResults:25];
-  [query setThumbsize:64];
+  [query setThumbsize:[[self revicedThumbSize:thumbSize] intValue]];
   if(photoSize) {
   	[query setImageSize:[photoSize intValue  ]];
   }
@@ -218,6 +226,17 @@
    */
 }
 
+
+- (NSNumber *) revicedThumbSize:(NSNumber *)size {
+  NSUInteger result  = thumbSizes[sizeof(thumbSizes) / sizeof(NSUInteger) - 1];
+  for(NSUInteger  i = 0; i < sizeof(thumbSizes) / sizeof(NSUInteger); ++i) {
+    if([size integerValue] <= thumbSizes[i]) {
+      result = thumbSizes[i];
+      break;
+    }
+  }
+  return [NSNumber numberWithInteger:result];
+}
 
 - (void)requireStopping {
   [lock lock];

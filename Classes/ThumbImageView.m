@@ -104,6 +104,25 @@ static NSMutableDictionary *thumbViewMap = nil;
  
 }
 
++ (NSUInteger) thumbWidthForContainer:(UIView *)containerView {
+  if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    return [IPadThumbImageView thumbWidthForContainer:containerView];
+  }
+  else {
+    return [IPhoneThumbImageView thumbWidthForContainer:containerView];
+  }
+}
+
++ (NSUInteger) thumbHeightForContainer:(UIView *)containerView {
+  if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    return [IPadThumbImageView thumbHeightForContainer:containerView];
+  }
+  else {
+    return [IPhoneThumbImageView thumbHeightForContainer:containerView];
+  }
+}
+
+
 - (id) initWithImage:(UIImage *)image withIndex:(NSNumber *)i withContainer:(UIView *)container
 {
   self = [super initWithImage:image];

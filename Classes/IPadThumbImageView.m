@@ -15,6 +15,18 @@
 #define kPadding 5.0f
 #define kMargin 6.0f
 
+
++ (NSUInteger) thumbWidthForContainer:(UIView *)containerView {
+  NSInteger w = containerView.frame.size.width;
+  return (w - kMargin * 2) / 4;
+  
+}
+
++ (NSUInteger) thumbHeightForContainer:(UIView *)containerView {
+  NSInteger w = containerView.frame.size.height;
+  return (w - kMargin * 2) / 4;
+}
+
 - (id) initWithImage:(UIImage *)image withIndex:(NSNumber *)i withContainer:(UIView *)container
 {
   self = [super initWithImage:image withIndex:i withContainer:container];
@@ -54,13 +66,11 @@
 }
 
 - (NSUInteger) thumbWidth {
-  NSInteger w = self.containerView.frame.size.width;
-  return (w - kMargin * 2) / 4;
+  return [[self class] thumbWidthForContainer:self.containerView];
 }
 
 - (NSUInteger) thumbHeight {
-  NSInteger w = self.containerView.frame.size.width;
-  return w / 4;
+  return [[self class] thumbHeightForContainer:self.containerView];
 }
 
 @end

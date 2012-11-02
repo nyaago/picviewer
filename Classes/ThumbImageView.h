@@ -61,6 +61,20 @@
 
 
 /*!
+ @method thumbWidthForContainer:
+ @discussion サムネイルの幅を得る
+ @param containerView コンテナーとなる親View
+ */
++ (NSUInteger) thumbWidthForContainer:(UIView *)containerView;
+
+/*!
+ @method thumbHeightForContainer:
+ @discussion サムネイルの高さを得る
+ @param containerView コンテナーとなる親View
+ */
++ (NSUInteger) thumbHeightForContainer:(UIView *)containerView;
+
+/*!
  @method
  @discussion image を指定しての生成
  */

@@ -115,9 +115,10 @@
  @param albumId album id
  @param userId user id
  @param photoSize 写真のサイズ
+ @param thumbSize サムネイルのサイズ
  */
-- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)userId 
-withPhotoSize:(NSNumber *)photoSize;
+- (void) queryAlbumAndPhotos:(NSString *)albumId user:(NSString *)userId
+withPhotoSize:(NSNumber *)photoSize withThumbSize:(NSNumber *)thumbSize;
 /*!
  @method queryPhoto:album:user
  @discussion 指定したユーザ/アルバム/写真IDの写真情報を取得
