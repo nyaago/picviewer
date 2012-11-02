@@ -445,6 +445,7 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
                                        initWithNibName:nibName
                                        bundle:nil];
   controller.delegate = self;
+  [controller setModalPresentationStyle:UIModalPresentationFormSheet];
   [self presentModalViewController:controller animated:YES];
 }
 
@@ -545,7 +546,6 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   [alertView show];
   [alertView release];
   [pool drain];
-  [self dismissModalViewControllerAnimated:YES];
 }
 
 // Googleへの問い合わせの結果、エラーとなった場合の通知
@@ -563,7 +563,6 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   [alertView show];
   [alertView release];
   [pool drain];
-  [self dismissModalViewControllerAnimated:YES];
 }
 
 

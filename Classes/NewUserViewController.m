@@ -69,11 +69,10 @@
     if([delegate doneWithNewUser:userField.text] == NO)
       return;
   }
-  //  [self.parentViewController dismissModalViewControllerAnimated:YES];
 }
 
 - (void) cancelAction:(id)sender {
-  [self.parentViewController dismissModalViewControllerAnimated:YES];
+  [[self presentingViewController] dismissModalViewControllerAnimated:YES];
 }
 
 
