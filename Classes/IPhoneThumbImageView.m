@@ -26,7 +26,7 @@
 }
 
 + (NSUInteger) thumbHeightForContainer:(UIView *)containerView {
-  NSInteger w = containerView.frame.size.height;
+  NSInteger w = containerView.frame.size.width;
   return w / 4;
 }
 
