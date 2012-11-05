@@ -67,6 +67,8 @@ ThumbImageViewDelegate> {
   NSLock *thumbnailLock;
   // 現在layoutされている向き
   UIDeviceOrientation layoutedOrientation;
+  //
+  UILabel *noPhotoLabel;
 
 }
 

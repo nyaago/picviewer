@@ -49,6 +49,9 @@
 // Album DETAIL
 "AlbumInfo.PhotosUsed" = "Photo Count - %d";
 
+// Photo List
+"PhotoList.None" = "No Photos";
+
 // 写真View
 "Photo.Action" = "Select The Action";
 

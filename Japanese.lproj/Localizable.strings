@@ -46,9 +46,13 @@
 "OK" = "OK";
 "Continue" = "続行";
 
-
 // Album詳細
 "AlbumInfo.PhotosUsed" = "写真 %d 枚";
+
+
+// Photo List
+"PhotoList.None" = "写真がありません";
+
 
 // 写真View
 "Photo.Action" = "操作を選択してくだいさい";
@@ -74,6 +78,7 @@
 "Warn.NetworkNotReachable" = "ネットワークに接続できません.";
 
 "Notice.WifiNotReachable" = "3G回線へ接続中ですが(Wi-fi接続できません)続行しますか";
+
 
 // General
 "Width" = "幅";

@@ -44,6 +44,13 @@
 - (void)addImageView:(id)view;
 
 /*!
+ @method setNoPhotoMessage:
+ @discussion No Phtos のメッセージ表示
+ @param show YES/NO -> 表示/表示しない
+ */
+- (void)setNoPhotoMessage:(BOOL)show;
+
+/*!
  @method setContentSizeWithImageCount: 
  @discussion scrollViewのコンテンツサイズを設定.
  この処理は、Thread切り替えして起動する(
@@ -231,6 +238,7 @@
   // tool bar
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = NO;
+  [self setNoPhotoMessage:YES];
   
   if(self.album == nil) {
     return;
@@ -433,8 +441,39 @@
 - (void)setContentSizeWithImageCount {
   
   CGPoint point = [ThumbImageView bottomRight];
-  self.scrollView.contentSize =  CGSizeMake(self.scrollView.frame.size.width, 
-                                            point.y + 0.0f);
+  if(point.x == 0.0f && point.y == 0.0f) {
+    self.scrollView.contentSize =  CGSizeMake(self.scrollView.frame.size.width,
+                                              self.scrollView.frame.size.height);
+  }
+  else {
+    self.scrollView.contentSize =  CGSizeMake(self.scrollView.frame.size.width,
+                                              point.y + 0.0f);
+  }
+}
+
+- (void)setNoPhotoMessage:(BOOL)show {
+  
+  if(noPhotoLabel == nil && show == YES) {
+    CGRect frame = CGRectMake(0.0f, self.view.bounds.size.height / 3,
+                              self.view.bounds.size.width, 30.0f);
+    noPhotoLabel = [[UILabel alloc] initWithFrame:frame];
+    noPhotoLabel.text = NSLocalizedString(@"PhotoList.None", @"No Photos");
+    noPhotoLabel.textAlignment = UITextAlignmentCenter;
+    noPhotoLabel.opaque = NO;
+    noPhotoLabel.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0];
+    noPhotoLabel.font = [UIFont systemFontOfSize:[UIFont systemFontSize] * 1.5f];
+    noPhotoLabel.textColor = [UIColor lightGrayColor];
+  }
+  if(show == YES) {
+    if([noPhotoLabel superview] == nil) {
+      [self.scrollView addSubview:noPhotoLabel];
+    }
+  }
+  else {
+    if(noPhotoLabel != nil && [noPhotoLabel superview] != nil) {
+      [noPhotoLabel removeFromSuperview];
+    }
+  }
 }
 
 #pragma mark -
@@ -452,36 +491,32 @@
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   //NSDate *date0 = [[[NSDate alloc] init] autorelease];	  // for logging
-  for(NSUInteger i = 0; i < [modelController photoCount]; ++i) {
-    /*
-     NSDate *date1 = [[[NSDate alloc] init] autorelease];  // for logging
-     */
-    UIView *imageView = [self thumbnailAt:i];
-    // ImageViewのView階層への追加を行う(main threadで行う必要がある)
-    if(imageView) {
-      [self performSelectorOnMainThread:@selector(addImageView:)
-                             withObject:imageView 
-                          waitUntilDone:NO];
-    }
-    // 中断が要求されているかチェック
-    [onAddingThumbnailsLock lock];
-    if(stoppingToAddingThumbnailsRequred) {
-      [onAddingThumbnailsLock unlock];
-      break;
-    }
-    [onAddingThumbnailsLock unlock];
-    
-    /*
-     NSDate *date2 = [[[NSDate alloc] init] autorelease];
-     NSLog(@"interval creating imageView and adding to view layers = %f", 
-     [date2 timeIntervalSinceDate:date1]);
-     */
+  if([modelController photoCount] == 0) {
+    [self setNoPhotoMessage:YES];
   }
-  /*
-  NSDate *date3 = [[[NSDate alloc] init] autorelease];	// for logging
-  NSLog(@"interval creating all views for a thumbnail = %f", 
-        [date3 timeIntervalSinceDate:date0]);
-  */
+  else {
+    [self setNoPhotoMessage:NO];
+    for(NSUInteger i = 0; i < [modelController photoCount]; ++i) {
+      /*
+       NSDate *date1 = [[[NSDate alloc] init] autorelease];  // for logging
+       */
+      UIView *imageView = [self thumbnailAt:i];
+      // ImageViewのView階層への追加を行う(main threadで行う必要がある)
+      if(imageView) {
+        [self performSelectorOnMainThread:@selector(addImageView:)
+                               withObject:imageView 
+                            waitUntilDone:NO];
+      }
+      // 中断が要求されているかチェック
+      [onAddingThumbnailsLock lock];
+      if(stoppingToAddingThumbnailsRequred) {
+        [onAddingThumbnailsLock unlock];
+        break;
+      }
+      [onAddingThumbnailsLock unlock];
+      
+    }
+  }
   // scrollViewのcontent sizeを設定(main threadで行う必要がある)
   [self performSelectorOnMainThread:@selector(setContentSizeWithImageCount)
                          withObject:nil
