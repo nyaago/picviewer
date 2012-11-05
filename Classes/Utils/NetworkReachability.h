@@ -27,7 +27,10 @@
 
 #import <Foundation/Foundation.h>
 
-
+/*!
+ @class NetworkReachability
+ @discussion ネットワーク接続確認
+ */
 @interface NetworkReachability : NSObject {
 
 }
@@ -38,6 +41,10 @@
  */
 + (BOOL)reachable;
 
-
+/*!
+ @method reachableByWifi
+ @discussion Wifiによるネットワーク接続が可能であるかを調べる
+ */
 + (BOOL)reachableByWifi;
+
 @end

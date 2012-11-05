@@ -27,6 +27,8 @@
 
 #import <Foundation/Foundation.h>
 
+@protocol QueuedURLDownloaderDelegate;
+
 
 /*!
  @class QueuedURLDownloader
@@ -80,44 +82,63 @@
  された結果を得ることができる。
  
  */
-@protocol QueuedURLDownloaderDelegate;
-
 @interface QueuedURLDownloader : NSObject {
   NSInteger maxAtSameTime;
   NSObject<QueuedURLDownloaderDelegate>  *delegate;
 @private
+  // 処理待ちのダウンロード要素（QueuedURLDownloaderElem）のQueue
   NSMutableArray *waitingQueue;
+  // key => ダウンロードURL、value => 処理中のダウンロード要素
   NSMutableDictionary *runningDict;
   BOOL queuingFinished;
+  // すべて完了されているか?
   BOOL completed;
   // 処理が開始されている?
   BOOL started;
   // 停止が要求されている?
   BOOL stoppingRequired;
+  // 完了済みの要素数
   NSInteger completedCount;
+  //
   NSLock *lock;
+  // Timeout時間,単位:秒,Default 10.0秒
   NSTimeInterval timeoutInterval;
 }
 
+/*!
+ @property delegate
+ @discussion
+ */
 @property (nonatomic, retain) NSObject<QueuedURLDownloaderDelegate> *delegate;
+/*!
+ @property completedCount
+ @discussion 完了済みの要素数
+ */
 @property (readonly) NSInteger completedCount;
 /*!
- Timeout時間,単位:秒,Default 10.0秒
+ @property timeoutInterval
+ @discussion Timeout時間,単位:秒,Default 10.0秒
  */
 @property (nonatomic) NSTimeInterval timeoutInterval;
 
 /*!
- 同時にダウンロードする最大数を指定しての初期化
+ @method initWithMaxAtSameTime:
+ @discussion 同時にダウンロードする最大数を指定しての初期化
+ @param count 同時ダウンロード数
  */
 - (id) initWithMaxAtSameTime:(NSInteger)count;
 
 /*!
- ダウンロードするURLを追加
+ @method addURL:
+ @discussion ダウンロード先URLを追加
+ @param URL ダウンロード先URL
+ @param info
  */
 - (void) addURL:(NSURL *)URL withUserInfo:(NSDictionary *)info;
 
 /*!
- ダウンロードを開始
+ @method start
+ @discussion ダウンロードを開始
  */
 - (void) start;
 
@@ -146,39 +167,39 @@
 - (void) waitCompleted;
 
 /*!
- これ以上、ダウンロードURLするものがないことを通知.
- この通知後、ダウンロード要素の追加は受け付けられず、現在実行待ち、実行中のダウンロードの処理が完了すれば、
- ダウンロード処理のスレッドが終了する。
+ @method finishQueuing
+ @discussion これ以上、ダウンロードURLするものがないことを通知.
+        この通知後、ダウンロード要素の追加は受け付けられず、現在実行待ち、実行中のダウンロードの処理が完了すれば、
+        ダウンロード処理のスレッドが終了する。
  */
 - (void) finishQueuing;
 
 /*!
- ダウンロード実行待ち要素数
+ @method waitingCount
+ @return ダウンロード実行待ち要素数
  */
 - (NSInteger)waitingCount;
 
 
 /*!
- ダウンロード実行中の要素数
+ @method runningCount
+ @return ダウンロード実行中の要素数
  */
 - (NSInteger)runningCount;
 
 
 /*!
- 同時にダウンロード処理を行う最大数
+ @method maxAtSameTime
+ @return 同時にダウンロード処理を行う最大数
  */
 @property (nonatomic) NSInteger maxAtSameTime;
-
-/*!
- 現在のQueueの要素数
- */
-//@property (readonly) NSInteger count;
 
 @end
 
 
 /*!
- ダウンローダー(QueuedURLDownloader)のDelegate
+ @protocal QueuedURLDownloaderDelegate
+ @discussion ダウンローダー(QueuedURLDownloader)のDelegate
  didFinishLoading:withUserInfoメソッドにより、QueuedURLDownloaderのaddURL:withUserInfo
  で指定したURLからのダウンロード通知を受け、ファイルの内容を得る。
  */
@@ -217,7 +238,6 @@
  @param info QueuedURLDownloaderのaddURL:withUserInfoで渡した userInfo
  */
 - (void)didReceiveData:(NSData *)data withUserInfo:(NSDictionary *)info;
-
 
 /*!
  @method didAllCompleted

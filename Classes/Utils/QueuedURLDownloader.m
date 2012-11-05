@@ -124,7 +124,6 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)fragment {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-//  NSLog(@"connection:didReceiveData");
   if(fragment) {
     //NSLog(@"data length = %d", [fragment length]);
   }
@@ -175,7 +174,6 @@ didReceiveResponse:(NSURLResponse *)response {
     [delegate didFinishLoading:data withUserInfo:userInfo];
   [self.queuedDownloader finishDownload:self];
   [pool drain];
-//  NSLog(@"drain");
 }
 
 
@@ -307,12 +305,12 @@ didReceiveResponse:(NSURLResponse *)response {
   [lock unlock];
   while (1) {
     BOOL downloading = NO;
-    NSLog(@"download running..");
+    //NSLog(@"download running..");
     [lock lock];
     if(([waitingQueue  count] == 0 && [runningDict count] == 0 && queuingFinished) ||
        stoppingRequired == YES) {
       [lock unlock];
-      NSLog(@"dowload break..");
+      //NSLog(@"dowload break..");
       break;
     }
     if([waitingQueue count] > 0 && [runningDict count] < maxAtSameTime) {
@@ -333,14 +331,10 @@ didReceiveResponse:(NSURLResponse *)response {
       [elem.con start];
       downloading = YES;
       [lock unlock];
-      NSLog(@"download on execute..run loop");
       [[NSRunLoop currentRunLoop] run];
-      NSLog(@"download on execute..run loop end");
       [pool drain];
-      NSLog(@"download executed..");
     }
     else {
-      NSLog(@"download skip..");
       [lock unlock];
     }
     if(downloading == NO) {	// LoopでCPU率があがらないように少しsleep
@@ -354,20 +348,16 @@ didReceiveResponse:(NSURLResponse *)response {
   [lock lock];
   completed = YES;
   [lock unlock];
-  NSLog(@"completed delegate ..");
   if([delegate respondsToSelector:@selector(didAllCompleted:)] ) {
-    NSLog(@"completed delegate end..");
     [lock lock];
     if(stoppingRequired) {
       [lock unlock];
     }
     else {
       [lock unlock];
-      NSLog(@"didAllCompleted");
       [delegate didAllCompleted:self];
     }
   }
-  NSLog(@"run download end..");
 }
 
 - (void) finishDownload:(QueuedURLDownloaderElem *)elem {

@@ -28,12 +28,17 @@
 #import <Foundation/Foundation.h>
 
 /*!
- @class DeviceRotation
+ @protocol DeviceRotation
  @discussion デバイス回転の通知先Delegate.DeviceRotationクラスでこのProtocol実装クラス
 			インスタンスを通知先として登録する。
  */
 @protocol DeviceRotationDelegate
 
+/*!
+ @method deviceRotated:
+ @discussion デバイスの向きが変わった時の通知
+ @param orientation 現在のデバイスの向き
+ */
 -(void) deviceRotated:(UIDeviceOrientation)orientation;
 
 @end
@@ -59,8 +64,6 @@
  @discussion デバイス回転通知先のDelegateを指定しての初期化
  */
 - (id) initWithDelegate:(id<DeviceRotationDelegate>)delegate;
-
-
 
   
 @end
