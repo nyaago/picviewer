@@ -1341,7 +1341,7 @@
   [[UINavigationController alloc] initWithRootViewController:viewController];
   
   viewController.album = self.album;
-  [self.view.window bringSubviewToFront:self.view];
+  [navigationController setModalPresentationStyle:UIModalPresentationFormSheet];
   [[self parentViewController] presentModalViewController:navigationController 
                                                  animated:YES];
 	[viewController release];

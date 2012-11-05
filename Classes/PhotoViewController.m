@@ -632,7 +632,7 @@ static NSLock *lockFetchedResultsController;
   [[UINavigationController alloc] initWithRootViewController:viewController];
   
   viewController.photo= photo;
-  [self.view.window bringSubviewToFront:parentController.view];
+  [navigationController setModalPresentationStyle:UIModalPresentationFormSheet];
   [[parentController parentViewController] presentModalViewController:navigationController 
                                                              animated:YES];
   [viewController release];

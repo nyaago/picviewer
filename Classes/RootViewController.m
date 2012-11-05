@@ -591,7 +591,7 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
                                            bundle:nil];
   UINavigationController *navigationController  = 
   [[UINavigationController alloc] initWithRootViewController:viewController];
-  [self.view.window bringSubviewToFront:self.view];
+  [navigationController setModalPresentationStyle:UIModalPresentationFormSheet];
   [self presentModalViewController:navigationController animated:YES];
   [viewController release];
   [navigationController release];

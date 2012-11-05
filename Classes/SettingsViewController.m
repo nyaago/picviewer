@@ -151,8 +151,8 @@ titleForHeaderInSection:(NSInteger)section {
           case (0):
             cell.textLabel.text = NSLocalizedString(@"Settings.Account.User"
                                                     ,@"User");
-            frame =  CGRectMake(120.0f, 10.0f, 
-                                cell.frame.size.width - 120.0f , 
+            frame =  CGRectMake(140.0f, 10.0f,
+                                cell.frame.size.width - 140.0f ,
                                 cell.frame.size.height - 20.0f);
             userTextField = [[UITextField alloc] initWithFrame:frame];
             [userTextField addTarget:self 
@@ -164,8 +164,9 @@ titleForHeaderInSection:(NSInteger)section {
           case (1):
             cell.textLabel.text = NSLocalizedString(@"Settings.Account.Password",
                                                     @"Password");
-            frame =  CGRectMake(120.0f, 10.0f, 
-                                cell.frame.size.width - 120.0f , 
+            frame =  CGRectMake(140.0f,
+                                10.0f,
+                                cell.frame.size.width - 140.0f ,
                                 cell.frame.size.height - 20.0f);
             passwordTextField = [[UITextField alloc] initWithFrame:frame];
             [passwordTextField setSecureTextEntry:YES];
@@ -177,13 +178,14 @@ titleForHeaderInSection:(NSInteger)section {
             break;
        }
         break;
-      case(1) : // アカウントの設定
+      case(1) : // 画像サイズの設定
         switch ([indexPath indexAtPosition:1]) {
           case (0):
             cell.textLabel.text = NSLocalizedString(@"Settings.Image.Size"
                                                     ,@"Size");
-            frame =  CGRectMake(90.0f, 10.0f, 
-                                cell.frame.size.width - (90.0f + 20.0f) , 
+            frame =  CGRectMake(120.0f,
+                                10.0f,
+                                cell.frame.size.width - (120.0f + 10.0f) ,
                                 cell.frame.size.height - 20.0f);
           	
             sizeControl = [[UISegmentedControl alloc] initWithFrame:frame];

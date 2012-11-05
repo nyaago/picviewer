@@ -31,7 +31,7 @@
 {
   self = [super initWithImage:image withIndex:i withContainer:container];
   self.layer.borderWidth = kBorderWidth;
-  self.layer.borderColor = [[UIColor colorWithRed:0.1f green:0.0f blue:0.3f alpha:0.5f]
+  self.layer.borderColor = [[UIColor colorWithRed:0.5f green:0.4f blue:0.5f alpha:0.5f]
                             CGColor];
   return self;
 }

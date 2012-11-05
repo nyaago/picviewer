@@ -528,9 +528,6 @@
       instancesRespondToSelector:@selector(setStatusBarHidden:withAnimation:)]) {
   	[[UIApplication sharedApplication] setStatusBarHidden:hidden withAnimation:YES];
   }
-	else {		// OS 3.2未満用
-	  [[UIApplication sharedApplication] setStatusBarHidden:hidden animated:YES];
-  }
   self.navigationController.navigationBar.hidden = hidden;
   CGRect frame = self.navigationController.navigationBar.frame;
   frame.origin.y = statusBarHeight;
