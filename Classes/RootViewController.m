@@ -77,14 +77,15 @@
                             self.view.frame.size.width, 200.0f);
   indicatorView = [[LabeledActivityIndicator alloc] initWithFrame:frame];
   [indicatorView setMessage:NSLocalizedString(@"Root.Deleting", "on deleting")];
+  
+  firstAppearance = YES;
 }
 
 // Viewロード時の通知.
 // Navigation Bar のボタンの追加とUserデータのFetched Controllerの生成.
 - (void)viewDidLoad {
   [super viewDidLoad];
-
-  firstAppearance = YES;
+  
   // Title
   self.navigationItem.title = NSLocalizedString(@"Acounts.Title", @"Acounts");
 
@@ -120,6 +121,7 @@
   [super viewDidAppear:animated];
   SettingsManager *settings = [[SettingsManager alloc] init];
   NSString *userId = [settings currentUser];
+  // 最初の表示、user選択済みの場合はAlbum一覧へ
   if(firstAppearance) {
     if(userId) {
       //	  User *user = [self selectUser:userId];
@@ -142,26 +144,6 @@
     firstAppearance = NO;
   }
   [settings release];
-}
-
-/*
- - (void)viewWillDisappear:(BOOL)animated {
- [super viewWillDisappear:animated];
- }
- */
-/*
- - (void)viewDidDisappear:(BOOL)animated {
- [super viewDidDisappear:animated];
- }
- */
-
-- (void)viewDidUnload {
-  // Relinquish ownership of anything that can be recreated in viewDidLoad or on demand.
-  // For example: self.myOutlet = nil;
-  SettingsManager *settings = [[SettingsManager alloc] init];
-  [settings setCurrentUser:nil];
-  [settings release];
-
 }
 
 /*!
@@ -441,10 +423,14 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 
 
 - (void)dealloc {
-  [fetchedUsersController release];
-  [managedObjectContext release];
-  [addButton release];
-  [toolbarButtons release];
+  if(fetchedUsersController)
+    [fetchedUsersController release];
+  if(managedObjectContext)
+    [managedObjectContext release];
+  if(addButton)
+    [addButton release];
+  if(toolbarButtons)
+    [toolbarButtons release];
   if(indicatorView) {
     [indicatorView release];
   }
@@ -463,6 +449,42 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   }
   return addButton;
 }
+
+- (NSArray *) toolbarButtons {
+  NSString *path;
+  
+  if(!toolbarButtons) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    toolbarButtons = [[NSMutableArray alloc] init];
+    
+    // Space
+    UIBarButtonItem *spaceRight =
+    [[UIBarButtonItem alloc]
+     initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+     target:self
+     action:nil];
+    spaceRight.width = 30.0f;
+    [toolbarButtons addObject:spaceRight];
+    [spaceRight release];
+    
+    // Setting
+    UIBarButtonItem *settings = [[UIBarButtonItem alloc]
+                                 initWithTitle:@""
+                                 style:UIBarButtonItemStyleBordered
+                                 target:self
+                                 action:@selector(settingsAction:)];
+    path = [[NSBundle mainBundle] pathForResource:@"preferences" ofType:@"png"];
+    settings.image = [[UIImage alloc] initWithContentsOfFile:path];
+    [toolbarButtons addObject:settings];
+    [settings release];
+    
+    [pool drain];
+  }
+  return toolbarButtons;
+}
+
+
 #pragma mark -
 
 #pragma mark Action
@@ -621,47 +643,6 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 - (void)indicatorStoped:(LabeledActivityIndicator *)view {
   [view removeFromSuperview];
 }
-
-#pragma mark -
-
-#pragma mark -
-
-- (NSArray *) toolbarButtons {
-  NSString *path;
-  
-  if(!toolbarButtons) {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    toolbarButtons = [[NSMutableArray alloc] init];
-
-    // Space
-    UIBarButtonItem *spaceRight = 
-    [[UIBarButtonItem alloc] 
-     initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-     target:self
-     action:nil];
-    spaceRight.width = 30.0f;
-    [toolbarButtons addObject:spaceRight];
-    [spaceRight release];
-    
-    // Setting
-    UIBarButtonItem *settings = [[UIBarButtonItem alloc] 
-                                 initWithTitle:@"" 
-                                 style:UIBarButtonItemStyleBordered 
-                                 target:self
-                                 action:@selector(settingsAction:)];
-    path = [[NSBundle mainBundle] pathForResource:@"preferences" ofType:@"png"];
-    settings.image = [[UIImage alloc] initWithContentsOfFile:path];
-    [toolbarButtons addObject:settings];
-    [settings release];
-    
-    [pool drain];
-  }
-  return toolbarButtons;
-}
-
-
-
 
 #pragma mark -
 

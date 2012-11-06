@@ -145,11 +145,6 @@
  */
 - (void)setPrevPage:(UIViewController<PageViewDelegate> *)newView;
 
-/*!
- @method toCurPage
- @discussion 現在ページを表示
- */
-//- (void)toCurPage;
 
 /*!
  @method toNextPage
@@ -215,13 +210,6 @@
   // StatusBarの高さを取得しておく
   statusBarHeight = [UIApplication sharedApplication].statusBarFrame.size.height;
   
-  // Page View 生成して階層に追加
-  CGRect scrollViewBounds = [[UIScreen mainScreen] bounds];
-  PageView *pageView = [ [ PageView alloc ] 
-                                initWithFrame:scrollViewBounds];
-  pageView.delegate = self;
-  self.view = pageView;
-
 }
 
 /*!
@@ -229,31 +217,30 @@
  @discussion Viewロードの通知
  */
 - (void)viewDidLoad {
-  NSLog(@"PageControllerViewController view Did Load ratain count = %d", 
-        [self retainCount]);
-  // backボタンがない場合(iPadの場合）
+  [super viewDidLoad];
+  
+  // Page View 生成して階層に追加
+  CGRect scrollViewBounds = [[UIScreen mainScreen] bounds];
+  PageView *pageView = [ [ PageView alloc ]
+                        initWithFrame:scrollViewBounds];
+  pageView.delegate = self;
+  self.view = pageView;
 }
+
 
 /*!
- @method viewDidUnload
- @discussion view Unload時の通知
+ @method viewDidLayoutSubviews
+ @discussion sub view のレイアウトがされたときの通知
+ 機器の向きが変更されていれば、　sub view のリフレッシュ（サイズ、位置変更）を行う。
  */
-- (void)viewDidUnload {
-  [super viewDidUnload];
-  NSLog(@"PageControllerViewController view Did unload ratain count = %d", 
-        [self retainCount]);
-  if(source) {
-    NSLog(@"source retain count %d", [source retainCount]);
-  }
-}
-
-
 - (void)viewDidLayoutSubviews {
   [super viewDidLayoutSubviews];
+  // 最初のレイアウト描画時であれば何もしない
   if(initialLayout) {
     initialLayout = NO;
     return;
   }
+  // 向きが変わっていなければ何もしない
   if([[UIDevice currentDevice] orientation] == layoutedOrientation) {
     return;
   }
@@ -280,13 +267,7 @@
  @discussion viewが表示非表示になったときの通知.各ページのViewの削除
  */
 - (void)viewDidDisappear:(BOOL)animated {
-  NSLog(@"PageControllerViewController view Did Disappear ratain count = %d",
-        [self retainCount]);
   [super viewDidDisappear:animated];
-  if(source) {
-    NSLog(@"source retain count %d", [source retainCount]);
-  }
-  NSLog(@"scrollView retain count %d", [self.view retainCount]);
   PageView *scrollView = (PageView *)self.view;
   [scrollView removeCurPage];
   [scrollView removeNextPage];
@@ -302,7 +283,7 @@
   
   [super viewDidAppear:animated];
   
-  // navigationのtopでない場合は、backボタン追加
+  // navigationのtopでない場合(iPad)は、backボタン追加
   if([[self.navigationController viewControllers] count] == 1 && self.parentViewController != nil) {
     UIBarButtonItem *backButton = [[UIBarButtonItem alloc]
                                    initWithTitle:NSLocalizedString(@"Photos", @"Photos")
@@ -313,10 +294,6 @@
     [backButton  autorelease];
   }
 
-  NSLog(@"PageControllerViewController view Did Appear ratain count = %d",
-        [self retainCount]);
-  
-  //  [super viewDidLoad];
   // デバイス回転の管理開始
   if(!deviceRotation) {
     deviceRotation = [[DeviceRotation alloc] initWithDelegate:self];
@@ -333,14 +310,7 @@
   [UIApplication sharedApplication].statusBarHidden = NO;
   self.navigationController.navigationBar.hidden = NO;
   self.navigationController.toolbarHidden = NO;
-  
-  // UIViewControllerWrapperView(NavigationViewの親)-
-  // FullScreenに(StatusBarの高さ分上へ)
-  //  UIView *v = self.view.superview;
-  //  CGRect rect = [[UIScreen mainScreen] bounds];
-  //  v.frame = rect;
-  
-  //
+  // Page追加
   PageView *pageView = (PageView *)self.view;
   if(source) {
     NSUInteger count = [source pageCount];
@@ -354,8 +324,6 @@
       [controller pageDidAddWithPageViewController:self 
                                          withOrientation:UIDeviceOrientationPortrait];
       [controller release];
-      
-      //  [controller viewDidAppear:YES];
     }
     // 次ページ
     if(pageView.curPageNumber + 1 < count) {
@@ -383,7 +351,7 @@
   // pageView内のviewのLayout
   [pageView layoutViews];
   layoutedOrientation = UIDeviceOrientationPortrait;
-  initialLayout = YES;
+  initialLayout = YES;  
   // Toolbarのボタンの状態設定
   [self setToolbarStatus];
   [self setNavigationTitle];
@@ -393,12 +361,8 @@
  @method viewWillDisappear: 
  */
 - (void)viewWillDisappear:(BOOL)animated {
-  NSLog(@"PageControlView will disappear");
   [deviceRotation release];
   deviceRotation = nil;
-  if(source) {
-    NSLog(@"source retain count %d", [source retainCount]);
-  }
 }
 
 /*!
@@ -427,35 +391,37 @@
 }
 
 
-
-/*
- touch終了
- */
-/*
- - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
- NSLog(@"touches ...");
- }
- */
-
-
 - (void)didReceiveMemoryWarning {
   [ super didReceiveMemoryWarning ];
+  if(prevButton) {
+    [prevButton release];
+    prevButton = nil;
+  }
+  if(nextButton) {
+    [nextButton release];
+    nextButton = nil;
+  }
+  if(toolbarButtons) {
+    [toolbarButtons release];
+    nextButton = nil;
+  }
+  PageView *pageView = (PageView *)self.view;
+  if(pageView) {
+    [ pageView release ];
+    self.view = nil;
+  }
+
 }
 
 
 - (void)dealloc {
-  NSLog(@"PageControllerViewController dealloc");
-  NSLog(@"deviceRotation retain count = %d", [deviceRotation retainCount]);
-  NSLog(@"source retain count = %d", [source retainCount]);
   PageView *pageView = (PageView *)self.view;
+  if(pageView) {
+    [ pageView release ];
+  }
   if(deviceRotation) {
-    NSLog(@"deviceRotation retain count %d", [deviceRotation retainCount]);
     [deviceRotation release];
   }
-  NSLog(@"pageView retain count = %d", [pageView retainCount]);
-  [ pageView release ];
-  if(source)
-    [source release];
   if(prevButton)
     [prevButton release];
   if(nextButton) 
@@ -498,25 +464,16 @@
      (view.curPageNumber == 0 && point.x >= scrollView.bounds.size.width)) {
     NSLog(@"page count = %d", [source pageCount]);
     if(view.curPageNumber + 1 < [source pageCount] ) {
-   //   [view toNextPage];
       if(view.curPageNumber + 1 < [source pageCount]) {
 				[self toNextPage:self];        
-      }
-      else {
-        [view layoutViews];
-        
       }
     }
   }
   // 前のページへの移動時
   else if(point.x < scrollView.bounds.size.width) {
     if(view.curPageNumber > 0) {
-  //    [view toPrevPage];
       if(view.curPageNumber > 0) {
         [self toPrevPage:self];
-      }
-      else {
-        [view layoutViews];
       }
     }
   }
@@ -592,7 +549,6 @@
     [controller setPageController:self];
     controller.view.hidden = YES;
     [controller release];
-    //[controller viewDidAppear:YES];
   }
   [scrollView layoutViews];
   [self setToolbarStatus];
@@ -775,38 +731,12 @@
   BOOL hidden =   self.navigationController.toolbarHidden;
   self.navigationController.toolbarHidden = YES;
   
-  // Navigation barの位置設定,StatusBarの下へ
-  /*
-   CGRect barFrame = self.navigationController.navigationBar.frame;
-   CGRect frame = [[UIScreen mainScreen] bounds];
-   self.navigationController.view.frame = frame;
-   barFrame.origin.y = statusBarHeight;
-   self.navigationController.navigationBar.frame = barFrame;
-   */
-  // View階層のConsole出力
-  /*
-   UIView *v = self.view;
-   for(int i = 0; i < 5; ++i) {
-   CGRect rect = v.frame;
-   NSLog(@"Class = %@,Page view,x ==> %f, y => %f, width => %f, height => %f ",
-   [v class],
-   rect.origin.x , rect.origin.y,
-   rect.size.width, rect.size.height
-   );
-   v = v.superview;
-   }
-   */
-  //
-  
   // Page Viewのサイズ設定
-  
-  
   if(source) {
     NSUInteger count = [source pageCount];
     [scrollView setPageCount:count];
   }
   // Page View のLayout
-  //  [scrollView toCurPage];
   [scrollView layoutViews];
   // Page要素への通知
   if(scrollView.curPage) {
@@ -838,7 +768,6 @@
   if(layoutedOrientation == [[UIDevice currentDevice]orientation] ) {
     return;
   }
-  //[self refreshViewWithDiviceOrientation:[[UIDevice currentDevice]orientation]];
 }
 
 
@@ -848,7 +777,6 @@
 
 @implementation PageView
 
-//@synthesize delegate;
 @synthesize prevPage,curPage, nextPage;
 @synthesize curPageNumber;
 
@@ -944,15 +872,6 @@
   [self addSubview:prevPage.view];
 }
 
-/*
- - (void)toCurPage {
- // scrollで移動して..
- NSLog(@"to cur page start");
- NSUInteger left = curPageNumber == 0 ? 0 : self.frame.size.width * 1;
- [self setContentOffset:CGPointMake(left, 0.0f) animated:YES];
- NSLog(@"to cur page end");
- }
- */
 
 - (UIViewController *)toNextPage {
   // page入れ替え
@@ -961,9 +880,7 @@
   tmp = curPage;
   curPage = nextPage;
   curPage.view.hidden = NO;
-  //[prevPage removeFromSuperview];
   popedView = prevPage;
-  //  [prevPage release];
   prevPage = nil;
   prevPage = tmp;
   nextPage = nil;
@@ -977,24 +894,18 @@
 }
 
 - (UIViewController *)toPrevPage {
-  // scrollで移動して..
-  //  NSUInteger left = 0;
-  //  [scrollView setContentOffset:CGPointMake(left, 0.0f) animated:YES];
   // page入れ替え
   UIViewController<PageViewDelegate> *tmp;
   UIViewController *popedView;
   tmp = curPage;
   curPage = prevPage;
   curPage.view.hidden = NO;
-  //[nextPage removeFromSuperview];
   popedView = nextPage;
-  //  [nextPage release];
   nextPage = nil;
   nextPage = tmp;
   prevPage = nil;
   curPageNumber -= 1;
   // 再表示
-  //  [self layoutViews];
   NSLog(@"toPrevView poppedView retain count = %d", [popedView retainCount]);
   [popedView.view removeFromSuperview];
   [popedView release];
@@ -1033,8 +944,6 @@
 	
   //
   left = curPageNumber == 0 ? 0 : self.frame.size.width * 1;
-  //  left = 640;
-  //  left = 320;
   [self setContentOffset:CGPointMake(left, 0.0f) animated:NO];
   if(curPageNumber > 0) {
     left += self.frame.size.width;
@@ -1081,18 +990,6 @@
 
 
 - (void)dealloc {
-  NSLog(@"PageView dealloc");
-  /*
-   if(prevPage) {
-   NSLog(@"prevPage retain count = %d", [prevPage retainCount]);
-   }
-   if(curPage) {
-   NSLog(@"curPage retain count = %d", [curPage retainCount]);
-   }
-   if(nextPage)  {
-   NSLog(@"nextPage retain count = %d", [nextPage retainCount]);
-   }
-   */
   [self removeCurPage];
   [self removePrevPage];
   [self removeNextPage];

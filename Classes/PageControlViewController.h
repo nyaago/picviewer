@@ -55,15 +55,13 @@
   // 前ページ表示ボタン
   UIBarButtonItem *prevButton;
   
-  
-  
 }
 
 /*!
  @property source
  @discussion ページに表示するViewを提供するソースオブジェクト
  */
-@property (nonatomic, retain) NSObject<PageControlViewControllerDataSource> *source;
+@property (nonatomic, assign) NSObject<PageControlViewControllerDataSource> *source;
 
 
 /*!
@@ -187,7 +185,6 @@
 /*!
  @protocal PageControlViewControllerDataSource
  @discussion 各ページのViewControllerのインスタンスを提供するデータソースのProtocol
- @TODO 名称変更 PageControlViewControllerDelegate -> PageControlViewControllerSource
  */
 @protocol PageControlViewControllerDataSource
 

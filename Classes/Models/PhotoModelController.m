@@ -284,7 +284,7 @@
 - (void) setLastAdd {
   self.album.lastAddPhotoAt = [NSDate date];
   //NSLog(@"setLastAdd lock");
-  NSError *error = nil;
+  //NSError *error = nil;
   [lockSave lock];
   //NSLog(@"setLastAdd locked");
   // @TODO - フリーズする が保存したい...

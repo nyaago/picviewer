@@ -91,8 +91,6 @@
  */
 @interface PicasaFetchController : NSObject {
   NSInteger maxResults;
-  NSInteger thumbSize;
-  NSInteger imageSize;
   NSObject  <PicasaFetchControllerDelegate> *delegate;
 	// 処理が完了している  
   BOOL completed;
