@@ -147,7 +147,14 @@
   if (managedObjectModel != nil) {
     return managedObjectModel;
   }
-  managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:nil] retain];    
+  NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"PicasaViewer"
+                                            withExtension:@"momd"];
+  if(modelURL == nil) {
+    modelURL = [[NSBundle mainBundle] URLForResource:@"PicasaViewer"
+                                              withExtension:@"mom"];
+  }
+  managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+//  managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:nil] retain];
   return managedObjectModel;
 }
 
@@ -165,7 +172,7 @@
   
   NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] 
                                              stringByAppendingPathComponent: @"PicasaViewer.sqlite"]];
-  
+  NSLog(@"store url = %@", [storeUrl path]);
   NSError *error = nil;
   NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
                            [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
@@ -195,8 +202,16 @@
      Check the error message to determine what the actual problem was.
      */
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-    abort();
-  }    
+    [[NSFileManager defaultManager] removeItemAtURL:storeUrl error:nil];
+    if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
+                                                  configuration:nil
+                                                            URL:storeUrl
+                                                        options:options
+                                                          error:&error]) {
+      NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+      abort();
+    }
+  }
   
   return persistentStoreCoordinator;
 }
