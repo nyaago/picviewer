@@ -164,7 +164,7 @@
   }
   
   NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] 
-                                             stringByAppendingPathComponent: @"PicasaViewer_v2.sqlite"]];
+                                             stringByAppendingPathComponent: @"PicasaViewer.sqlite"]];
   
   NSError *error = nil;
   NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
