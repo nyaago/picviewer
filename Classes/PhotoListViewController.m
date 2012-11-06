@@ -67,7 +67,7 @@
  @discussion No Phtos のメッセージ表示
  @param show YES/NO -> 表示/表示しない
  */
-- (void)setNoPhotoMessage:(BOOL)show;
+- (void)setNoPhotoMessage:(NSNumber *)show;
 
 /*!
  @method setContentSizeWithImageCount: 
@@ -257,7 +257,7 @@
   // tool bar
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = NO;
-  [self setNoPhotoMessage:YES];
+  [self setNoPhotoMessage:[NSNumber numberWithBool:YES]];
   
   if(self.album == nil) {
     return;
@@ -470,9 +470,10 @@
   }
 }
 
-- (void)setNoPhotoMessage:(BOOL)show {
+- (void)setNoPhotoMessage:(NSNumber *)show {
   
-  if(noPhotoLabel == nil && show == YES) {
+  
+  if(noPhotoLabel == nil && [show boolValue] == YES) {
     CGRect frame = CGRectMake(0.0f, self.view.bounds.size.height / 3,
                               self.view.bounds.size.width, 30.0f);
     noPhotoLabel = [[UILabel alloc] initWithFrame:frame];
@@ -483,7 +484,7 @@
     noPhotoLabel.font = [UIFont systemFontOfSize:[UIFont systemFontSize] * 1.5f];
     noPhotoLabel.textColor = [UIColor lightGrayColor];
   }
-  if(show == YES) {
+  if([show boolValue] == YES) {
     if([noPhotoLabel superview] == nil) {
       [self.scrollView addSubview:noPhotoLabel];
     }
@@ -498,6 +499,9 @@
 #pragma mark -
 
 - (void)loadThumbnails {
+  // このMethod は Main以外のThreadで実行される.
+  // なのでUIに関する操作は、performSelectorOnMainThreadでMain Thread Queueへ移動させている。
+  
   // thumbnailを保持するコレクションの準備
   [thumbnailLock lock];
 
@@ -511,14 +515,15 @@
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   //NSDate *date0 = [[[NSDate alloc] init] autorelease];	  // for logging
   if([modelController photoCount] == 0) {
-    [self setNoPhotoMessage:YES];
+    [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
+                           withObject:[NSNumber numberWithBool:YES]
+                        waitUntilDone:NO];
   }
   else {
-    [self setNoPhotoMessage:NO];
+    [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
+                           withObject:[NSNumber numberWithBool:NO]
+                        waitUntilDone:NO];
     for(NSUInteger i = 0; i < [modelController photoCount]; ++i) {
-      /*
-       NSDate *date1 = [[[NSDate alloc] init] autorelease];  // for logging
-       */
       UIView *imageView = [self thumbnailAt:i];
       // ImageViewのView階層への追加を行う(main threadで行う必要がある)
       if(imageView) {
@@ -1368,11 +1373,6 @@
     [alertView release];
     return;
   }
-  /*
-  progressView.frame = CGRectMake(50.0f, 20.0f, 
-                                  self.view.bounds.size.width - 100.0f, 
-                                  25.0f);
-   */
   progressView.progress = 0.0f;
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
                                              @"download")];
@@ -1456,7 +1456,6 @@
   if(layoutedOrientation == [[UIDevice currentDevice]orientation] ) {
     return;
   }
-  //[self refreshViewWithDiviceOrientation:[[UIDevice currentDevice]orientation]];
 }
 
 
