@@ -11,7 +11,6 @@
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
-		28860B770F44E54D00985440 /* PicasaViewer.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 28860B760F44E54D00985440 /* PicasaViewer.xcdatamodel */; };
 		28860BE50F44EE6400985440 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28860BE40F44EE6400985440 /* CoreData.framework */; };
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
@@ -57,6 +56,9 @@
 		72D577E911804AAE00F687DB /* NewUserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D577E711804AAE00F687DB /* NewUserViewController.xib */; };
 		72D7E7D011BF5643001685AF /* PhotoInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D7E7CE11BF5643001685AF /* PhotoInfoViewController.m */; };
 		72D7E7D111BF5643001685AF /* PhotoInfoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D7E7CF11BF5643001685AF /* PhotoInfoViewController.xib */; };
+		72DA9DCD164921A50065C3BE /* PicasaViewer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 72DA9DCA164921A50065C3BE /* PicasaViewer.xcdatamodeld */; };
+		72DA9DCE164921A50065C3BE /* PicasaViewer.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 72DA9DCA164921A50065C3BE /* PicasaViewer.xcdatamodeld */; };
+		72DA9E50164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 72DA9E4F164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel */; };
 		72E28CA916390D7B0033BF9A /* AlbumTableViewController-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72F503031639020F0070DA5E /* AlbumTableViewController-iPad.xib */; };
 		72E28CAA16390E2F0033BF9A /* PhotoListViewController-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72F503041639020F0070DA5E /* PhotoListViewController-iPad.xib */; };
 		72E28CAB16390E330033BF9A /* PhotoViewController-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72F503051639020F0070DA5E /* PhotoViewController-iPad.xib */; };
@@ -79,7 +81,6 @@
 		72F502D6163901F20070DA5E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		72F502D7163901F20070DA5E /* PicasaViewerAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* PicasaViewerAppDelegate.m */; };
 		72F502D8163901F20070DA5E /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
-		72F502D9163901F20070DA5E /* PicasaViewer.xcdatamodel in Sources */ = {isa = PBXBuildFile; fileRef = 28860B760F44E54D00985440 /* PicasaViewer.xcdatamodel */; };
 		72F502DA163901F20070DA5E /* PicasaFetchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577871180357300F687DB /* PicasaFetchController.m */; };
 		72F502DB163901F20070DA5E /* NewUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D577E611804AAE00F687DB /* NewUserViewController.m */; };
 		72F502DC163901F20070DA5E /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 72EA5A9D1181408700065915 /* User.m */; };
@@ -165,7 +166,6 @@
 		1D3623250D0F684500981E51 /* PicasaViewerAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PicasaViewerAppDelegate.m; sourceTree = "<group>"; };
 		1D6058910D05DD3D006BFB54 /* PicViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PicViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		28860B760F44E54D00985440 /* PicasaViewer.xcdatamodel */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = wrapper.xcdatamodel; path = PicasaViewer.xcdatamodel; sourceTree = "<group>"; };
 		28860BE40F44EE6400985440 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		28A0AAE50D9B0CCF005BE974 /* PicasaViewer_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PicasaViewer_Prefix.pch; sourceTree = "<group>"; };
@@ -233,6 +233,9 @@
 		72D7E7CD11BF5643001685AF /* PhotoInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoInfoViewController.h; sourceTree = "<group>"; };
 		72D7E7CE11BF5643001685AF /* PhotoInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoInfoViewController.m; sourceTree = "<group>"; };
 		72D7E7CF11BF5643001685AF /* PhotoInfoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhotoInfoViewController.xib; sourceTree = "<group>"; };
+		72DA9DCB164921A50065C3BE /* PicasaViewer_v2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PicasaViewer_v2.xcdatamodel; sourceTree = "<group>"; };
+		72DA9DCC164921A50065C3BE /* PicasaViewer.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = PicasaViewer.xcdatamodel; sourceTree = "<group>"; };
+		72DA9E4F164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = Model_v1_to_v2.xcmappingmodel; sourceTree = "<group>"; };
 		72E28CAF163911300033BF9A /* NewUserViewController-iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = "NewUserViewController-iPad.xib"; path = "Resources-iPad/NewUserViewController-iPad.xib"; sourceTree = "<group>"; };
 		72EA5A541181337000065915 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		72EA5A581181338900065915 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -391,9 +394,10 @@
 				722D6D4F11869787004F0F0D /* AlbumTableViewController.xib */,
 				722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */,
 				72D577E711804AAE00F687DB /* NewUserViewController.xib */,
-				28860B760F44E54D00985440 /* PicasaViewer.xcdatamodel */,
+				72DA9DCA164921A50065C3BE /* PicasaViewer.xcdatamodeld */,
 				8D1107310486CEB800E47090 /* PicasaViewer-Info.plist */,
 				72EA5A561181337800065915 /* Localizable.strings */,
+				72DA9E4F164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -656,7 +660,6 @@
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* PicasaViewerAppDelegate.m in Sources */,
 				28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */,
-				28860B770F44E54D00985440 /* PicasaViewer.xcdatamodel in Sources */,
 				72D577881180357300F687DB /* PicasaFetchController.m in Sources */,
 				72D577E811804AAE00F687DB /* NewUserViewController.m in Sources */,
 				72EA5A9E1181408700065915 /* User.m in Sources */,
@@ -682,6 +685,8 @@
 				72D2246C1640CF64004E84B2 /* ThumbImageView.m in Sources */,
 				72D224701640E9FD004E84B2 /* IPhoneThumbImageView.m in Sources */,
 				72D224741640EA1D004E84B2 /* IPadThumbImageView.m in Sources */,
+				72DA9DCD164921A50065C3BE /* PicasaViewer.xcdatamodeld in Sources */,
+				72DA9E50164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -692,7 +697,6 @@
 				72F502D6163901F20070DA5E /* main.m in Sources */,
 				72F502D7163901F20070DA5E /* PicasaViewerAppDelegate.m in Sources */,
 				72F502D8163901F20070DA5E /* RootViewController.m in Sources */,
-				72F502D9163901F20070DA5E /* PicasaViewer.xcdatamodel in Sources */,
 				72F502DA163901F20070DA5E /* PicasaFetchController.m in Sources */,
 				72F502DB163901F20070DA5E /* NewUserViewController.m in Sources */,
 				72F502DC163901F20070DA5E /* User.m in Sources */,
@@ -718,6 +722,7 @@
 				72D2246D1640CF64004E84B2 /* ThumbImageView.m in Sources */,
 				72D224711640E9FD004E84B2 /* IPhoneThumbImageView.m in Sources */,
 				72D224751640EA1D004E84B2 /* IPadThumbImageView.m in Sources */,
+				72DA9DCE164921A50065C3BE /* PicasaViewer.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -944,6 +949,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		72DA9DCA164921A50065C3BE /* PicasaViewer.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				72DA9DCB164921A50065C3BE /* PicasaViewer_v2.xcdatamodel */,
+				72DA9DCC164921A50065C3BE /* PicasaViewer.xcdatamodel */,
+			);
+			currentVersion = 72DA9DCB164921A50065C3BE /* PicasaViewer_v2.xcdatamodel */;
+			path = PicasaViewer.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
 }

@@ -170,14 +170,28 @@
     return persistentStoreCoordinator;
   }
   
-  NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] 
+  // 互換性がなくてエラーになる？ -> data store の削除
+  /*
+  NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory]
+  
                                              stringByAppendingPathComponent: @"PicasaViewer.sqlite"]];
+  if([[NSFileManager defaultManager] isDeletableFileAtPath:[storeUrl path]]) {
+    [[NSFileManager defaultManager] removeItemAtURL:storeUrl error:nil];
+  }
+   */
+  // ----
+
+  NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory]
+                                             stringByAppendingPathComponent: @"PicasaViewer.sqlite"]];
+  //
   NSLog(@"store url = %@", [storeUrl path]);
   NSError *error = nil;
   NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
                            [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
                            [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
 
+  
+  
   persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc]
                                 initWithManagedObjectModel:[self managedObjectModel]];
   if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType 
@@ -202,15 +216,7 @@
      Check the error message to determine what the actual problem was.
      */
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-    [[NSFileManager defaultManager] removeItemAtURL:storeUrl error:nil];
-    if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
-                                                  configuration:nil
-                                                            URL:storeUrl
-                                                        options:options
-                                                          error:&error]) {
-      NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-      abort();
-    }
+    abort();
   }
   
   return persistentStoreCoordinator;
