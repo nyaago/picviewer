@@ -50,14 +50,13 @@
  */
 @interface DeviceRotation : NSObject {
   NSObject <DeviceRotationDelegate> *delegate;
-  NSLock *lock;
 }
 
 /*!
  @property delegate
  @discussion デバイス回転通知先のDelegate
  */
-@property (nonatomic, retain) id <DeviceRotationDelegate> delegate;
+@property (nonatomic, assign) id <DeviceRotationDelegate> delegate;
 
 /*!
  @method initWithDelegate:

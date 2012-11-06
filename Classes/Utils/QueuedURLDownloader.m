@@ -108,16 +108,19 @@ didReceiveResponse:(NSURLResponse *)response;
   withDelegate:(NSObject<QueuedURLDownloaderDelegate> *) myDelegate 
 withQueuedDownloader: (QueuedURLDownloader *)downloader {
   self = [super init];
+  
+  con = nil;
+  data = nil;
+  
+  delegate = myDelegate;
+  
   URL = RequestURL;
   [URL retain];
   userInfo = info;
   [userInfo retain];
-  delegate = myDelegate;
-  [delegate retain];
-  con = nil;
   queuedDownloader = downloader;
   [queuedDownloader retain];
-  data = nil;
+  
   return self;
 }
 
@@ -180,8 +183,6 @@ didReceiveResponse:(NSURLResponse *)response {
 - (void)dealloc {
   if(userInfo)
     [userInfo release];
-  if(delegate)
-    [delegate release];
   if(con)
     [con release];
   if(URL)
@@ -225,11 +226,6 @@ didReceiveResponse:(NSURLResponse *)response {
   return self;
 }
 
-/*
- - (NSInteger) count {
- return [queue count];
- }
- */
 
 - (void) addURL:(NSURL *)URL withUserInfo:(NSDictionary *)info {
   QueuedURLDownloaderElem *elem = [[QueuedURLDownloaderElem alloc] 
@@ -398,10 +394,6 @@ didReceiveResponse:(NSURLResponse *)response {
     }
     [lock unlock];
     [NSThread sleepForTimeInterval:0.01f];
-  }
-  if(delegate) {
-    [delegate release];
-    delegate = nil;
   }
   [waitingQueue release];
   [runningDict release];

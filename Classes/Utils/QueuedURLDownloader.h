@@ -109,7 +109,7 @@
  @property delegate
  @discussion
  */
-@property (nonatomic, retain) NSObject<QueuedURLDownloaderDelegate> *delegate;
+@property (nonatomic, assign) NSObject<QueuedURLDownloaderDelegate> *delegate;
 /*!
  @property completedCount
  @discussion 完了済みの要素数
@@ -252,6 +252,4 @@
 - (void)dowloadCanceled:(QueuedURLDownloader *)downloader;
 
 @end
-
-
 

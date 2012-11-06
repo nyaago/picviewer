@@ -53,7 +53,6 @@
   self = [super init];
   if(self) {
     delegate = newDelegate;
-    [delegate retain];
     [self addObserveOriantationChange];
   }
   return self;
@@ -76,15 +75,12 @@
 - (void) deviceRotated:(id)sender {
   UIDevice *device = [UIDevice currentDevice];
   UIDeviceOrientation orientation = device.orientation;
-  NSLog(@"deviceRotated");
   if(orientation == UIDeviceOrientationUnknown ||
      orientation == UIDeviceOrientationFaceUp ||
      orientation == UIDeviceOrientationFaceDown ) {
     return;
   }
-  [lock lock];
   [self.delegate deviceRotated:orientation];
-  [lock unlock];
 }
 
 
@@ -93,9 +89,6 @@
   
   [center removeObserver:self 
                     name:UIDeviceOrientationDidChangeNotification object:nil];
-  [lock lock];
-  [delegate release];
-  [lock unlock];
   [super dealloc];
 }
 
