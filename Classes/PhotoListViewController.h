@@ -44,14 +44,15 @@ UIAlertViewDelegate,UISplitViewControllerDelegate,AlbumTableViewControllerDelega
 ThumbImageViewDelegate> {
   
   @private
-  
+  // CoreData album Model
   Album *album;
   
   NSManagedObjectContext *managedObjectContext;
-  
+  // CoreData Model のController
   PhotoModelController *modelController;
+  // PhotoのDownloader
   QueuedURLDownloader *downloader;
-  
+  //
   UIBarButtonItem *backButton;
   UIBarButtonItem *indexButton;
   UIScrollView *scrollView;
@@ -62,8 +63,8 @@ ThumbImageViewDelegate> {
   BOOL hasErrorInDownloading;
   // Thumbnailの登録中にエラーが発生したか?
   BOOL hasErrorInInsertingThumbnail;
+  // スクロール中フラグ
   BOOL onScroll;
-  
   // Thumbnail表示処理中にOnになるフラグ
   BOOL onAddingThumbnails;
   // Thumbnail表示中フラグの同期変数

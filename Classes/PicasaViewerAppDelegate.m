@@ -33,7 +33,8 @@
 
 /*!
  @method createNavigationController
- @discussion
+ @discussion topの(iPadの場合は、splitViewの詳細Viewの)
+ Nagation view controller を生成
  */
 - (UINavigationController *) createNavigationController;
 
@@ -60,8 +61,10 @@
   NSLog(@"window - x => %f,y => %f, width => %f, height => %f", 
         bounds.origin.x, bounds.origin.y, bounds.size.width, bounds.size.height);
    */
+  
                                      
   if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    // iPadの場合-SplitViewを表示
     photoListViewController = [[PhotoListViewController alloc]
                                initWithNibName:@"PhotoListViewController-iPad"
                                         bundle:nil];
@@ -78,6 +81,7 @@
     [window setRootViewController:splitController];
   }
   else {
+    // iPhone
     [window setRootViewController:[self createNavigationController]];
   }
   
@@ -160,15 +164,19 @@
   }
   
   NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] 
-                                             stringByAppendingPathComponent: @"PicasaViewer.sqlite"]];
+                                             stringByAppendingPathComponent: @"PicasaViewer_v2.sqlite"]];
   
   NSError *error = nil;
-  persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] 
+  NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
+                           [NSNumber numberWithBool:YES], NSMigratePersistentStoresAutomaticallyOption,
+                           [NSNumber numberWithBool:YES], NSInferMappingModelAutomaticallyOption, nil];
+
+  persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc]
                                 initWithManagedObjectModel:[self managedObjectModel]];
   if (![persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType 
                                                 configuration:nil 
                                                           URL:storeUrl 
-                                                      options:nil 
+                                                      options:options 
                                                         error:&error]) {
     /*
      Replace this implementation with code to handle the error appropriately.
@@ -245,7 +253,8 @@
 @end
 
 /*!
- UINavigationController
+ @class UINavigationController
+ @discussion 機器回転（Rotation）のための子へのDelegationを行うためのカテゴリーを実装
  */
 @implementation UINavigationController (Rotation)
 
@@ -279,7 +288,6 @@
   return [self.viewControllers.lastObject preferredInterfaceOrientationForPresentation];
   
 }
-
 
 
 @end

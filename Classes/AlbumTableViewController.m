@@ -82,7 +82,8 @@
 
 /*
  - (id)initWithStyle:(UITableViewStyle)style {
- // Override initWithStyle: if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
+ // Override initWithStyle: if you create the controller programmatically 
+ and want to perform customization that is not appropriate for viewDidLoad.
  if (self = [super initWithStyle:style]) {
  }
  return self;
@@ -183,9 +184,6 @@
  [super viewDidDisappear:animated];
  }
 
-- (void)viewDidUnload {
-}
-
 /*
  // Override to allow orientations other than the default portrait orientation.
  - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -197,8 +195,27 @@
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
   [super didReceiveMemoryWarning];
-	
 	// Release any cached data, images, etc that aren't in use.
+  // 一覧ロード中であれば、停止要求をして、停止するまで待つ
+  if(picasaFetchController) {
+    [picasaFetchController release];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    picasaFetchController = nil;
+  }
+  if(toolbarButtons) {
+    [toolbarButtons release];
+    toolbarButtons = nil;
+  }
+  if(backButton) {
+    [backButton release];
+    backButton = nil;
+  }
+  if(refreshButton) {
+    [refreshButton release];
+    refreshButton = nil;
+  }
+
+
 }
 
 
@@ -425,50 +442,6 @@
 }
 
 
-/*
- // Override to support conditional editing of the table view.
- - (BOOL)tableView:(UITableView *)tableView 
- canEditRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the specified item to be editable.
- return YES;
- }
- */
-
-
-/*
- // Override to support editing the table view.
- - (void)tableView:(UITableView *)tableView 
- commitEditingStyle:(UITableViewCellEditingStyle)editingStyle 
- forRowAtIndexPath:(NSIndexPath *)indexPath {
- 
- if (editingStyle == UITableViewCellEditingStyleDelete) {
- // Delete the row from the data source
- [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:YES];
- }   
- else if (editingStyle == UITableViewCellEditingStyleInsert) {
- // Create a new instance of the appropriate class, insert it into the array, 
- and add a new row to the table view
- }   
- }
- */
-
-
-/*
- // Override to support rearranging the table view.
- - (void)tableView:(UITableView *)tableView 
- moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
- }
- */
-
-
-/*
- // Override to support conditional rearranging of the table view.
- - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
- // Return NO if you do not want the item to be re-orderable.
- return YES;
- }
- */
-
 /*!
  機器回転時に自動的にView回転を行うかの判定.
  splitView内にある場合（iPad）は自動的に回転されるように、YESを返す。
@@ -513,9 +486,6 @@
 
 - (void)dealloc {
   NSLog(@"AlbumTableViewController deallloc");
-  NSLog(@"managedObjectContext retain count = %d",[managedObjectContext retainCount]);
-  NSLog(@"user retain count = %d",[user retainCount]);
-  NSLog(@"backButton retain count = %d",[backButton retainCount]);
 
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
   if(picasaFetchController) {
@@ -523,17 +493,6 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     picasaFetchController = nil;
   }
-  
-  // ダウンロード中であれば、ダウンロード停止要求をして、停止するまで待つ
-  /*
-  if(downloader) {
-    [downloader requireStopping];
-    [downloader waitCompleted];
-    [downloader release];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    downloader = nil;
-  }
-   */
   
   if(modelController)
     [modelController release];
@@ -680,17 +639,6 @@
     spaceRight.width = 30.0f;
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
-  	/*  
-     // Info
-     UIBarButtonItem *info = [[UIBarButtonItem alloc] initWithTitle:@"" 
-     style:UIBarButtonItemStyleBordered 
-     target:self
-     action:nil];
-     path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
-    info.image = [[UIImage alloc] initWithContentsOfFile:path];
-    [toolbarButtons addObject:info];
-    [info release];
-    */
     [pool drain];
   }
   return toolbarButtons;
@@ -722,8 +670,6 @@
     photoViewController.managedObjectContext = self.managedObjectContext;
     [photoViewController albumTableViewControll:self selectAlbum:album];
   }
-  
-  
   
   return photoViewController;
 }

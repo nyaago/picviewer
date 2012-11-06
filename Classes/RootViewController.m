@@ -514,7 +514,7 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 - (BOOL) doneWithNewUser:(NSString *)user {
   // Network接続確認
   if(![NetworkReachability reachable]) {
-    return YES;
+    return NO;
   }
   
   PicasaFetchController *controller = [[PicasaFetchController alloc] init];

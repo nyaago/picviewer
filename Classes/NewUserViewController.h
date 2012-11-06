@@ -27,8 +27,18 @@
 
 #import <UIKit/UIKit.h>
 
+/*!
+ @protocal NewUserViewControllerDeleate
+ @discussion ユーザー追加viewControllerのDelegate
+ */
 @protocol NewUserViewControllerDeleate
 
+/*!
+ @method doneWithNewUser:
+ @discussion ユーザー追加操作されたときの通知
+ @param user user ID
+ @return 
+ */
 - (BOOL) doneWithNewUser:(NSString *)user;
 
 @end
@@ -82,7 +92,7 @@
 /*!
  @property delegate
  */
-@property (nonatomic, retain) NSObject <NewUserViewControllerDeleate> *delegate;
+@property (nonatomic, assign) NSObject <NewUserViewControllerDeleate> *delegate;
 
 
 
