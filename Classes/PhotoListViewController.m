@@ -257,9 +257,9 @@
   // tool bar
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = NO;
-  [self setNoPhotoMessage:[NSNumber numberWithBool:YES]];
   
   if(self.album == nil) {
+    [self setNoPhotoMessage:[NSNumber numberWithBool:YES]];
     return;
   }
 
@@ -271,6 +271,7 @@
   }
 
   if(isFromAlbumTableView == YES) {
+    [self setNoPhotoMessage:[NSNumber numberWithBool:YES]];
     // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
     // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
     // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
