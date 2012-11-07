@@ -130,7 +130,7 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
   if(fragment) {
     //NSLog(@"data length = %d", [fragment length]);
   }
-  if ([delegate respondsToSelector:@selector(didReceiveData:withUserInfo:)])
+  if (delegate != nil && [delegate respondsToSelector:@selector(didReceiveData:withUserInfo:)])
     [delegate didReceiveData:fragment withUserInfo:userInfo];
   if(!data) {
     data = [[NSMutableData alloc] init];
@@ -142,7 +142,7 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSLog(@"connection:didFailWithError - %@", error);
-  if ([delegate respondsToSelector:@selector(downloadDidFailWithError:withUserInfo:)])
+  if (delegate != nil && [delegate respondsToSelector:@selector(downloadDidFailWithError:withUserInfo:)])
     [delegate downloadDidFailWithError:error withUserInfo:userInfo];
   [self.queuedDownloader finishDownload:self];
   [pool drain];
@@ -152,7 +152,7 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 didReceiveResponse:(NSURLResponse *)response {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 //  NSLog(@"connection:didReceiveResponse ");
-  if ([delegate respondsToSelector:@selector(didReceiveResponse:withUserInfo:)])
+  if (delegate != nil && [ delegate respondsToSelector:@selector(didReceiveResponse:withUserInfo:)])
     [delegate didReceiveResponse:response withUserInfo:userInfo];
   [pool drain];
 }
@@ -173,7 +173,7 @@ didReceiveResponse:(NSURLResponse *)response {
      } 
      */
   }
-  if ([delegate respondsToSelector:@selector(didFinishLoading:withUserInfo:)])
+  if (delegate != nil && [ delegate respondsToSelector:@selector(didFinishLoading:withUserInfo:)])
     [delegate didFinishLoading:data withUserInfo:userInfo];
   [self.queuedDownloader finishDownload:self];
   [pool drain];
@@ -181,6 +181,7 @@ didReceiveResponse:(NSURLResponse *)response {
 
 
 - (void)dealloc {
+  delegate = nil;
   if(userInfo)
     [userInfo release];
   if(con)
@@ -280,17 +281,20 @@ didReceiveResponse:(NSURLResponse *)response {
 - (void) waitCompleted {
   BOOL ret = NO;
   while (YES) {
-    [lock lock];
-    ret = completed || !started;
-    [lock unlock];
-    if(ret == YES) {
-      if(stoppingRequired && started && 
-         [delegate respondsToSelector:@selector(dowloadCanceled:)] ) {
-        [delegate dowloadCanceled:self];
+    if([lock tryLock] == YES) {
+      ret = completed || !started;
+      [lock unlock];
+      if(ret == YES) {
+        /*
+        if(stoppingRequired && started && 
+           [delegate respondsToSelector:@selector(dowloadCanceled:)] ) {
+          [delegate dowloadCanceled:self];
+        }
+         */
+        break;
       }
-      break;
+      [NSThread sleepForTimeInterval:0.01f];
     }
-    [NSThread sleepForTimeInterval:0.01f];
   }
 }
 
@@ -302,49 +306,52 @@ didReceiveResponse:(NSURLResponse *)response {
   while (1) {
     BOOL downloading = NO;
     //NSLog(@"download running..");
-    [lock lock];
-    if(([waitingQueue  count] == 0 && [runningDict count] == 0 && queuingFinished) ||
-       stoppingRequired == YES) {
-      [lock unlock];
-      //NSLog(@"dowload break..");
-      break;
-    }
-    if([waitingQueue count] > 0 && [runningDict count] < maxAtSameTime) {
-      // 未実行のもののうちで一番先にQueueに登録されたものを得る
-      // autoreleaseのObjectがLeakするので AutoReleasePool
-      NSLog(@"download execute..");
-      NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-      QueuedURLDownloaderElem *elem = [waitingQueue objectAtIndex:0];
-      [waitingQueue removeObjectAtIndex:0];
-      NSURLRequest *request = [[NSURLRequest alloc] 
-                               initWithURL:elem.URL 
-                               cachePolicy:NSURLRequestUseProtocolCachePolicy 
-                               timeoutInterval:timeoutInterval];
-      // DownLoadを開始
-      elem.con = [[NSURLConnection alloc] initWithRequest:request delegate:elem];
-      [request release];
-      [runningDict setObject:elem forKey:elem.URL];
-      [elem.con start];
-      downloading = YES;
-      [lock unlock];
-      [[NSRunLoop currentRunLoop] run];
-      [pool drain];
+    if([lock tryLock]) {
+      if(([waitingQueue  count] == 0 && [runningDict count] == 0 && queuingFinished) ||
+         stoppingRequired == YES) {
+        [lock unlock];
+        //NSLog(@"dowload break..");
+        break;
+      }
+      if([waitingQueue count] > 0 && [runningDict count] < maxAtSameTime) {
+        // 未実行のもののうちで一番先にQueueに登録されたものを得る
+        // autoreleaseのObjectがLeakするので AutoReleasePool
+        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+        QueuedURLDownloaderElem *elem = [waitingQueue objectAtIndex:0];
+        [waitingQueue removeObjectAtIndex:0];
+        NSURLRequest *request = [[NSURLRequest alloc] 
+                                 initWithURL:elem.URL 
+                                 cachePolicy:NSURLRequestUseProtocolCachePolicy 
+                                 timeoutInterval:timeoutInterval];
+        // DownLoadを開始
+        elem.con = [[NSURLConnection alloc] initWithRequest:request delegate:elem];
+        [request release];
+        [runningDict setObject:elem forKey:elem.URL];
+        [elem.con start];
+        downloading = YES;
+        [lock unlock];
+        [[NSRunLoop currentRunLoop] run];
+        [pool drain];
+      }
+      else {
+        [lock unlock];
+      }
+      if(downloading == NO) {	// LoopでCPU率があがらないように少しsleep
+        [NSThread sleepForTimeInterval:0.01f];
+      }
     }
     else {
-      [lock unlock];
-    }
-    if(downloading == NO) {	// LoopでCPU率があがらないように少しsleep
       [NSThread sleepForTimeInterval:0.01f];
     }
   }
-  NSLog(@"download finishied..");
   // 完了の通知
-  if(delegate == nil)
+  if(delegate == nil){
     return;
+  }
   [lock lock];
   completed = YES;
   [lock unlock];
-  if([delegate respondsToSelector:@selector(didAllCompleted:)] ) {
+  if(delegate != nil && [delegate respondsToSelector:@selector(didAllCompleted:)] ) {
     [lock lock];
     if(stoppingRequired) {
       [lock unlock];
@@ -387,14 +394,19 @@ didReceiveResponse:(NSURLResponse *)response {
 
 - (void) dealloc {
   while(1) {
-    [lock lock];
-    if([runningDict count] == 0) {
+    if([lock tryLock]) {
+      if([runningDict count] == 0 && (completed || !started)) {
+        [lock unlock];
+        break;
+      }
       [lock unlock];
-      break;
+      [NSThread sleepForTimeInterval:0.01f];
     }
-    [lock unlock];
-    [NSThread sleepForTimeInterval:0.01f];
+    else {
+      [NSThread sleepForTimeInterval:0.01f];
+    }
   }
+  delegate = nil;
   [waitingQueue release];
   [runningDict release];
   [lock release];

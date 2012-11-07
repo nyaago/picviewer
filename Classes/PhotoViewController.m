@@ -292,11 +292,9 @@ static NSLock *lockFetchedResultsController;
   NSUInteger indexes[2];
   indexes[0] = 0;
   indexes[1] = index;
-  [lockFetchedResultsController lock];
-  Photo *photoObject = [fetchedPhotosController 
+  Photo *photoObject = [fetchedPhotosController
                         objectAtIndexPath:[NSIndexPath 
                                            indexPathWithIndexes:indexes length:2]];
-  [lockFetchedResultsController unlock];
   UIImage *image = nil;
   if(photoObject.photoImage) {
     PhotoImage *photoImage = (PhotoImage *)photoObject.photoImage;
@@ -315,10 +313,8 @@ static NSLock *lockFetchedResultsController;
 }
 
 - (NSUInteger)photoCount {
-  [lockFetchedResultsController lock];
   id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedPhotosController sections]
                                                   objectAtIndex:0];
-  [lockFetchedResultsController unlock];
   return [sectionInfo numberOfObjects];
 }
 
@@ -385,9 +381,7 @@ static NSLock *lockFetchedResultsController;
     }
     [self.scrollView addSubview:imageView];
   }
-  [downloader release];
-  downloader = nil;
-  // 
+  //
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
@@ -506,6 +500,7 @@ static NSLock *lockFetchedResultsController;
     [alertView release];
     return;
   }
+  downloading = YES;
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   // downloader初期化
   downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];

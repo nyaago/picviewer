@@ -179,6 +179,7 @@
  */
 - (void) doAction:(PageControlViewController *)sender;
 
+
 @end
 
 
@@ -201,7 +202,10 @@
  */
 - (UIViewController<PageViewDelegate> *) pageAt:(NSUInteger)n;
 
+
 @optional
+
+
 
 
 @end

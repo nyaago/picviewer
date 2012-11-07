@@ -58,6 +58,8 @@ PageViewDelegate> {
   
   // 最近のtap数
   NSInteger lastTapCount;
+  //
+  BOOL downloading;
 }
 
 /*!
