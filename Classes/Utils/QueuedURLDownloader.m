@@ -410,6 +410,7 @@ didReceiveResponse:(NSURLResponse *)response {
   [waitingQueue release];
   [runningDict release];
   [lock release];
+  NSLog(@"QueuedURLDownloader dealloc . completed.");
   [super dealloc];
 }
 

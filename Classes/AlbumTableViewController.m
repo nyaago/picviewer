@@ -58,6 +58,12 @@
 - (void) refreshAlbums;
 
 /*!
+ @method refreshTable
+ @discussion tableの表示リフレッシュ
+ */
+- (void) refreshTable;
+
+/*!
  @method enableToolbar:
  @discussion toolbarのButtonの有効無効の切り替え
  */
@@ -279,8 +285,6 @@
     [pool drain];
     return;
   }
-  // table の再表示
-  [(UITableView *)self.view reloadData];
   // Load中フラグをOffに
   [onLoadLock lock];
   onLoad = NO;
@@ -602,6 +606,15 @@
   [settings release];
 }
 
+- (void) refreshTable {
+  [(UITableView *)self.view reloadData];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  // toolbarのボタンをenable
+  [self enableToolbar:YES];
+  [(UITableView *)self.view reloadData];
+  
+}
+
 
 - (UIBarButtonItem *)backButton {
   if(!backButton) {
@@ -735,16 +748,12 @@
   }
   
   // 表示をリフレッシュ
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  [(UITableView *)self.view reloadData];
-  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  // toolbarのボタンをenable
-  [self enableToolbar:YES];
-  // downloaderのそうじ
   [urlDownloader release];
   urlDownloader = nil;
-
-  [pool drain];
+  [self performSelectorOnMainThread:@selector(refreshTable)
+                         withObject:nil
+                      waitUntilDone:NO];
+  [[NSRunLoop currentRunLoop] run];
 }
 
 /*!
