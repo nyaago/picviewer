@@ -41,7 +41,10 @@
 
 @interface  PhotoListViewController (Private)
 
-
+// 写真なしのメッセージタイプ - No Photos（写真がありません）
+#define kNoPhotoMessage 1
+// 写真なしのメッセージタイプ - Loding（写真を読み込み中です）
+#define kLodingPhotosMessage 2
 
 /*!
  @method downloadThumbnail:withPhotoModel
@@ -65,7 +68,7 @@
 /*!
  @method setNoPhotoMessage:
  @discussion No Phtos のメッセージ表示
- @param show YES/NO -> 表示/表示しない
+ @param show 0/kNoPhotoMessage/kLodingPhotosMessage -> 表示/No Photos/Loging Photos
  */
 - (void)setNoPhotoMessage:(NSNumber *)show;
 
@@ -257,9 +260,10 @@
   // tool bar
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = NO;
-  
+  // '写真がありませんメッセージ'表示
+  [self setNoPhotoMessage:[NSNumber numberWithInteger:kNoPhotoMessage]];
+
   if(self.album == nil) {
-    [self setNoPhotoMessage:[NSNumber numberWithBool:YES]];
     return;
   }
 
@@ -271,7 +275,7 @@
   }
 
   if(isFromAlbumTableView == YES) {
-    [self setNoPhotoMessage:[NSNumber numberWithBool:YES]];
+    [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
     // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
     // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
     // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
@@ -284,8 +288,9 @@
 
 - (void) afterViewDidAppear:(id)arg {
   
-  
+  //
   [self discardTumbnails];
+  //
   [self loadThumbnails];
 }
 
@@ -478,7 +483,6 @@
     CGRect frame = CGRectMake(0.0f, self.view.bounds.size.height / 3,
                               self.view.bounds.size.width, 30.0f);
     noPhotoLabel = [[UILabel alloc] initWithFrame:frame];
-    noPhotoLabel.text = NSLocalizedString(@"PhotoList.None", @"No Photos");
     noPhotoLabel.textAlignment = UITextAlignmentCenter;
     noPhotoLabel.opaque = NO;
     noPhotoLabel.backgroundColor = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0.0];
@@ -488,6 +492,10 @@
   if([show boolValue] == YES) {
     if([noPhotoLabel superview] == nil) {
       [self.scrollView addSubview:noPhotoLabel];
+      NSLog(@"message type  = %d", [show integerValue] );
+      noPhotoLabel.text = [show integerValue] == kLodingPhotosMessage ?
+      NSLocalizedString(@"PhotoList.Loding", @"Loging Photos") :
+      NSLocalizedString(@"PhotoList.None", @"No Photos");
     }
   }
   else {
@@ -517,7 +525,7 @@
   //NSDate *date0 = [[[NSDate alloc] init] autorelease];	  // for logging
   if([modelController photoCount] == 0) {
     [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
-                           withObject:[NSNumber numberWithBool:YES]
+                           withObject:[NSNumber numberWithInteger:kNoPhotoMessage]
                         waitUntilDone:NO];
   }
   else {
@@ -657,6 +665,8 @@
 
 - (void) albumTableViewControll:(AlbumTableViewController *)controller
                     selectAlbum:(Album *)selectedAlbum {
+  // '写真がありませんメッセージ'表示
+  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
   
   isFromAlbumTableView = YES;
   [self discardTumbnails];
@@ -1186,6 +1196,9 @@
   CGRect frame = CGRectMake(0.0f, self.view.frame.size.height - 200.0f ,
                             self.view.frame.size.width, 200.0f);
   progressView = [[LabeledProgressView alloc] initWithFrame:frame];
+  [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
+                      @"download")];
+
   return progressView;
 }
 
@@ -1375,6 +1388,7 @@
     return;
   }
   progressView.progress = 0.0f;
+  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
                                              @"download")];
   [self discardTumbnails];

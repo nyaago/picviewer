@@ -52,6 +52,7 @@
 
 // Photo List
 "PhotoList.None" = "写真がありません";
+"PhotoList.Loding" = "写真を読み込んでいます";
 
 
 // 写真View

@@ -51,6 +51,7 @@
 
 // Photo List
 "PhotoList.None" = "No Photos";
+"PhotoList.Loding" = "Loding..";
 
 // 写真View
 "Photo.Action" = "Select The Action";

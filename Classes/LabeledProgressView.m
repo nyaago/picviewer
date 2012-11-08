@@ -48,10 +48,11 @@
                        frame.size.width - 50.0f, 
                        50.0f);
     messageLabel = [[UILabel alloc] initWithFrame:rect];
-    [self addSubview:messageLabel];
-    self.backgroundColor = [UIColor grayColor];
-    messageLabel.backgroundColor = [UIColor grayColor];
     
+    [self addSubview:messageLabel];
+    self.backgroundColor = [UIColor blackColor];
+    messageLabel.backgroundColor = [UIColor blackColor];
+    messageLabel.textColor = [UIColor grayColor];
   }
   
   return self;
