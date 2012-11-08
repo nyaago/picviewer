@@ -352,8 +352,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				72D224681640CC08004E84B2 /* QuartzCore.framework */,
-				72589F7B162BF46800BC3D9F /* Security.framework */,
+				8D1107310486CEB800E47090 /* PicasaViewer-Info.plist */,
 				721BDD831611B0D600401E21 /* libxml2.2.dylib */,
 				7234E9CA117E7C6400D7AC45 /* Library */,
 				080E96DDFE201D6D7F000001 /* Classes */,
@@ -392,7 +391,6 @@
 				722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */,
 				72D577E711804AAE00F687DB /* NewUserViewController.xib */,
 				72DA9DCA164921A50065C3BE /* PicasaViewer.xcdatamodeld */,
-				8D1107310486CEB800E47090 /* PicasaViewer-Info.plist */,
 				72EA5A561181337800065915 /* Localizable.strings */,
 				72DA9E4F164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel */,
 			);
@@ -402,6 +400,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				72D224681640CC08004E84B2 /* QuartzCore.framework */,
+				72589F7B162BF46800BC3D9F /* Security.framework */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
 				2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */,
