@@ -149,10 +149,6 @@
   }
   NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"PicasaViewer"
                                             withExtension:@"momd"];
-  if(modelURL == nil) {
-    modelURL = [[NSBundle mainBundle] URLForResource:@"PicasaViewer"
-                                              withExtension:@"mom"];
-  }
   managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
 //  managedObjectModel = [[NSManagedObjectModel mergedModelFromBundles:nil] retain];
   return managedObjectModel;
@@ -167,20 +163,10 @@
 - (NSPersistentStoreCoordinator *)persistentStoreCoordinator {
   
   if (persistentStoreCoordinator != nil) {
-    return persistentStoreCoordinator;
+    return persistentStoreCoordinator;  
   }
   
-  // 互換性がなくてエラーになる？ -> data store の削除
-  /*
-  NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory]
-  
-                                             stringByAppendingPathComponent: @"PicasaViewer.sqlite"]];
-  if([[NSFileManager defaultManager] isDeletableFileAtPath:[storeUrl path]]) {
-    [[NSFileManager defaultManager] removeItemAtURL:storeUrl error:nil];
-  }
-   */
   // ----
-
   NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory]
                                              stringByAppendingPathComponent: @"PicasaViewer.sqlite"]];
   //

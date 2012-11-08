@@ -44,11 +44,10 @@
   return self;
 }
 
-- (id) initWithContext:(NSManagedObjectContext *)context withAlbum:(Album *)albumObj {
+- (id) initWithContext:(NSManagedObjectContext *)context {
   self = [self init];
   if(self) {
     managedObjectContext = [context retain];
-    album = [albumObj retain];
   }
   return self;
 }
@@ -63,6 +62,18 @@
   if(managedObjectContext) 
     [managedObjectContext release];
   [super dealloc];
+}
+
+- (void) setAlbum:(Album *)newAlbum {
+  if(album != newAlbum) {
+    [album release];
+    album = newAlbum;
+    [album retain];
+    if(fetchedPhotosController) {
+      [fetchedPhotosController release];
+      fetchedPhotosController = nil;
+    }
+  }
 }
 
 - (Photo *)insertPhoto:(GDataEntryPhoto *)photo   withAlbum:(Album *)album {

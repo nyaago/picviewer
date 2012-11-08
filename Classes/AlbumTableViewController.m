@@ -165,8 +165,6 @@
 }
 
 
-
-
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
 	self.toolbarItems = [self toolbarButtons];
@@ -181,22 +179,10 @@
   self.navigationItem.title = self.user.nickname;
 }
 
-/*
- - (void)viewWillDisappear:(BOOL)animated {
- [super viewWillDisappear:animated];
- }
- */
  - (void)viewDidDisappear:(BOOL)animated {
  [super viewDidDisappear:animated];
  }
 
-/*
- // Override to allow orientations other than the default portrait orientation.
- - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
- // Return YES for supported orientations
- return (interfaceOrientation == UIInterfaceOrientationPortrait);
- }
- */
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.

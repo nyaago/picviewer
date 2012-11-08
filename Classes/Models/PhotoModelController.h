@@ -51,7 +51,7 @@
  @param context データオブジェクトのContext
  @param album Album Model Object
  */
-- (id) initWithContext:(NSManagedObjectContext *)context withAlbum:(Album *)album;
+- (id) initWithContext:(NSManagedObjectContext *)context;
 
 /*!
  @property fetchedAlbumsController
@@ -101,6 +101,11 @@
  */
 - (NSUInteger)photoCount;
 
+/*!
+ @method setAlbum
+ @discussion アルバムModelの設定
+ */
+- (void) setAlbum:(Album *)newAlbum;
 
 /*!
  @method photoAt:

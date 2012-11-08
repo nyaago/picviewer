@@ -134,6 +134,11 @@
 - (BOOL) loadPhotos:(Album *)curAlbum;
 
 /*!
+ @metohd photoModelController
+ @discussion photo model 検索のcontrollerを返す
+ */
+- (PhotoModelController *) photoModelController;
+/*!
  @method removeProgressView
  @discussiom Progress Bar をView階層から削除（破棄はしない）
  */
@@ -187,6 +192,22 @@
  */
 - (void) loadView  {
   [super loadView];
+}
+
+
+/*!
+ @method viewDidLoad:
+ @discussion viewLoad時の通知,ロック変数,FetchedResultsControllerの初期化を行う.
+ 写真データが0件の場合は、Download処理を起動.
+ */
+- (void)viewDidLoad {
+  
+  NSLog(@"load did load");
+  NSLog(@"photo view  viewDidLoad");
+  [super viewDidLoad];
+  //
+  thumbnailLock = [[NSLock alloc] init];
+
   //
   isFromAlbumTableView = YES;
   // scrollView の設定
@@ -200,43 +221,24 @@
   self.navigationController.toolbar.translucent = NO;
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbarHidden = NO;
+  // 
+  self.navigationItem.backBarButtonItem.title = @"album";
+  //
+  
+  lockSave = [[NSLock alloc] init];
 
-  thumbnailLock = [[NSLock alloc] init];
-//  [self setToolbarItems: [self toolbarButtons] animated:YES];
-}
-
-
-/*!
- @method viewDidLoad:
- @discussion viewLoad時の通知,ロック変数,FetchedResultsControllerの初期化を行う.
- 写真データが0件の場合は、Download処理を起動.
- */
-- (void)viewDidLoad {
-  NSLog(@"load did load");
-  NSLog(@"photo view  viewDidLoad");
-  self.navigationItem.backBarButtonItem.title = @"album0";
-
-  [super viewDidLoad];
   if(self.album == nil) {
     return;
   }
-  lockSave = [[NSLock alloc] init];
 
   [self loadPhotos:self.album];
-  
-  
-  
   // Title設定
   self.navigationItem.title = self.album.title;
-  
 }
+
 
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
-//  self.wantsFullScreenLayout = NO;
-  // 戻る
-
-
 }
 
 /*!
@@ -266,8 +268,8 @@
   if(self.album == nil) {
     return;
   }
-
-  if(isFromAlbumTableView == NO) {	// 写真画面から戻ってきた場合
+  if(isFromAlbumTableView == NO && self.splitViewController == nil) {
+    // 写真画面からPopされたとき.
     // viewのサイズ, 前画面(写真)がtoolbar部分を含んでいたので、そのtoolbar分マイナス
     CGRect frame = self.view.frame;
     frame.size.height -= self.navigationController.toolbar.frame.size.height;
@@ -287,13 +289,16 @@
 }
 
 - (void) afterViewDidAppear:(id)arg {
-  
   //
   [self discardTumbnails];
   //
   [self loadThumbnails];
 }
 
+/*!
+ sub view がLayoutされたときの通知.
+ 機器回転時のレイアウト調整.
+ */
 - (void)viewDidLayoutSubviews {
   [super viewDidLayoutSubviews];
   if([[UIDevice currentDevice] orientation] == layoutedOrientation) {
@@ -312,11 +317,26 @@
   NSLog(@"didReceiveMemoryWarning");
   
   // Release any cached data, images, etc that aren't in use.
+  [lockSave release];
+  lockSave = nil;
+  [thumbnailLock release];
+  thumbnailLock = nil;
+  [toolbarButtons release];
+  toolbarButtons = nil;
+  [infoButton release];
+  infoButton = nil;
+  [refreshButton release];
+  refreshButton = nil;
+  [progressView  release];
+  progressView = nil;
+  [modelController release];
+  modelController = nil;
+  [self discardTumbnails];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-  // 
-
+  //
+  [super viewWillDisappear:animated];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -325,44 +345,10 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   }
   
-  // Download実行中の場合,停止を要求、完了するまで待つ
-  /*
-  if(downloader) {
-    [downloader requireStopping];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  }
-   */
   [self stopToAddThumbnails];
   isFromAlbumTableView = NO;
 }
 
-- (void)viewDidUnload {
-  // Release any retained subviews of the main view.
-  // e.g. self.myOutlet = nil;
-  /*
-  NSLog(@"PhotoListViewController viewDidUnload ");
-  NSLog(@"lockSave retain count = %d", [lockSave retainCount]);
-  NSLog(@"backBUtton retain count = %d", [backButton retainCount]);
-  NSLog(@"album retain count = %d", [album retainCount]);
-  NSLog(@"managedObjectContext retain count = %d", [managedObjectContext retainCount]);
-  NSLog(@"thumbnails count = %d", [thumbnails count]);
-  NSLog(@"thumbnails retain count = %d", [thumbnails retainCount]);
-  */
-  [super viewDidUnload];
-  [lockSave release];
-  lockSave = nil;
-  [thumbnailLock release];
-  thumbnailLock = nil;
-
-  /*
-  if(downloader) {
-    [downloader release];
-    downloader = nil;
-  }
-   */
-  [self discardTumbnails];
-  
-}
 
 /*!
  機器回転時に自動的にView回転を行うかの判定.
@@ -435,8 +421,6 @@
     [progressView release];
   if(backButton)
     [backButton release];
-  if(indexButton)
-    [indexButton release];
   if(infoButton)
     [infoButton release];
   if(refreshButton)
@@ -523,7 +507,7 @@
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   //NSDate *date0 = [[[NSDate alloc] init] autorelease];	  // for logging
-  if([modelController photoCount] == 0) {
+  if([[self photoModelController] photoCount] == 0) {
     [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
                            withObject:[NSNumber numberWithInteger:kNoPhotoMessage]
                         waitUntilDone:NO];
@@ -532,7 +516,7 @@
     [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
                            withObject:[NSNumber numberWithBool:NO]
                         waitUntilDone:NO];
-    for(NSUInteger i = 0; i < [modelController photoCount]; ++i) {
+    for(NSUInteger i = 0; i < [[self photoModelController] photoCount]; ++i) {
       UIView *imageView = [self thumbnailAt:i];
       // ImageViewのView階層への追加を行う(main threadで行う必要がある)
       if(imageView) {
@@ -604,7 +588,7 @@
   indexes[0] = 0;
   // 画像データを取得してUIImageViewを生成
   indexes[1] = index;
-  Photo *photoObject = [modelController photoAt:index];
+  Photo *photoObject = [[self photoModelController] photoAt:index];
   UIImage *image = nil;
   if(photoObject.thumbnail) {
     image  = [UIImage imageWithData:photoObject.thumbnail];
@@ -671,7 +655,7 @@
   isFromAlbumTableView = YES;
   [self discardTumbnails];
   if(downloader != nil && ![downloader isCompleted] && [downloader isStarted]) {
-    [modelController clearLastAdd];
+    [[self photoModelController] clearLastAdd];
     [downloader requireStopping];
   }
 
@@ -748,7 +732,7 @@
   //fetchedPhotosController = nil;
   // 削除
   if(onRefresh) {
-	  [modelController removePhotos];
+	  [[self photoModelController] removePhotos];
   }
   
   // ローカルDBへの保存
@@ -761,14 +745,14 @@
             [[photo title] contentStringValue], [photo GPhotoID], [photo feedLink]);
       //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
       BOOL f;
-      if(onRefresh || ![modelController selectPhoto:photo hasError:&f] ) {
+      if(onRefresh || ![[self photoModelController] selectPhoto:photo hasError:&f] ) {
         if([progressView subviews] != nil) {
           // toolbarのButtonを無効に
           [self enableToolbar:NO];
 					// progress 状態表示
           [self.view addSubview:progressView];
         }
-        Photo *photoModel =  [modelController insertPhoto:photo withAlbum:album];
+        Photo *photoModel =  [[self photoModelController] insertPhoto:photo withAlbum:album];
         if(photoModel) {
           [self downloadThumbnail:photo withPhotoModel:photoModel];
         }
@@ -780,7 +764,7 @@
   }	
   // Photo一覧のFetched Controllerを生成
   [NSFetchedResultsController deleteCacheWithName:@"Root"];
-  if (![modelController.fetchedPhotosController performFetch:&error]) {
+  if (![[self photoModelController].fetchedPhotosController performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     
     UIAlertView *alertView = [[UIAlertView alloc] 
@@ -808,11 +792,11 @@
   }
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadThumb",
                                              @"download")];
-  if([modelController photoCount] == 0) {
+  if([[self photoModelController] photoCount] == 0) {
     progressView.progress = 1.0f;
   }
   else {
-    progressView.progress = 1.0f / [modelController photoCount];
+    progressView.progress = 1.0f / [[self photoModelController] photoCount];
     [progressView setNeedsLayout];
   }
   [downloader start];
@@ -912,7 +896,7 @@
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   // 写真表示Viewへ
   NSInteger index = [imageView.index integerValue];
-  if(index >= 0 && index < [modelController photoCount]) {
+  if(index >= 0 && index < [[self photoModelController] photoCount]) {
     PageControlViewController *pageController =
     [[[PageControlViewController alloc] init] autorelease];
     
@@ -1011,18 +995,6 @@
   return backButton;
 }
 
-- (UIBarButtonItem *)indexButton {
- if(!indexButton) {
-   indexButton = [[UIBarButtonItem alloc]
-                 initWithTitle:NSLocalizedString(@"Albums", @"Albums")
-                 style:UIBarButtonItemStyleDone
-                 target:nil
-                 action:nil ];
-   
- }
- return indexButton;
-}
-
 - (void) refreshPhotos {
 
   onRefresh = YES;
@@ -1076,7 +1048,7 @@
 - (BOOL) mustLoad:(Album *)curAlbum {
   if(isFromAlbumTableView == NO)
     return NO;
-  if([modelController album].albumId != curAlbum.albumId) {
+  if([[self photoModelController] album].albumId != curAlbum.albumId) {
     return YES;
   }
   if([modelController photoCount] == 0) {
@@ -1109,10 +1081,10 @@
 }
 
 - (BOOL)mustRefresh:(Album *)curAlbum {
-  if([modelController album].albumId != curAlbum.albumId) {
+  if([[self photoModelController] album].albumId != curAlbum.albumId) {
     return YES;
   }
-  if([modelController photoCount] == 0) {
+  if([[self photoModelController] photoCount] == 0) {
     return YES;
   }
   if(curAlbum != nil && [curAlbum lastAddPhotoAt] == nil) {
@@ -1127,15 +1099,12 @@
   downloader = [[QueuedURLDownloader alloc]
                 initWithMaxAtSameTime:kDownloadMaxAtSameTime];
   downloader.delegate = self;
-
-  modelController = [[PhotoModelController alloc]
-                     initWithContext:self.managedObjectContext
-                     withAlbum:curAlbum];
-  modelController.managedObjectContext = self.managedObjectContext;
+  
+  [self photoModelController].album = curAlbum;
   
   NSLog(@"fetchedPhotosController");
   NSError *error = nil;
-  if (![[modelController fetchedPhotosController] performFetch:&error]) {
+  if (![[[self photoModelController] fetchedPhotosController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc]
                               initWithTitle:NSLocalizedString(@"Error",@"Error")
@@ -1186,6 +1155,17 @@
   }
   [pool drain];
   return ret;
+}
+
+- (PhotoModelController *) photoModelController {
+  if(modelController == nil) {
+    modelController = [[PhotoModelController alloc]
+                       initWithContext:self.managedObjectContext];
+  }
+  if(modelController.managedObjectContext == nil) {
+    modelController.managedObjectContext = self.managedObjectContext;
+  }
+  return modelController;
 }
 
 - (LabeledProgressView *)progressView {
@@ -1240,7 +1220,7 @@
   }
   // albumのphotoに対する最後の保存処理実行日時を記録
   NSLog(@"downloadCompleted - set last add");
-  [modelController setLastAdd];
+  [[self photoModelController] setLastAdd];
   //
   NSLog(@"downloadCompleted - remove progress");
   [self removeProgressView];
@@ -1292,7 +1272,7 @@
                     withUserInfo:(NSDictionary *)info {
   NSLog(@"downloadDidFailWithError");
   hasErrorInDownloading = YES;
-  progressView.progress = progressView.progress + (1.0 / [modelController photoCount] );
+  progressView.progress = progressView.progress + (1.0 / [[self photoModelController] photoCount] );
 }
 
 
@@ -1302,12 +1282,12 @@
 - (void)didFinishLoading:(NSData *)data withUserInfo:(NSDictionary *)info {
   Photo *photo = (Photo *)[info objectForKey:@"photo"];
   if(photo) {
-    if( [modelController updateThumbnail:data forPhoto:photo] == nil) {
+    if( [[self photoModelController] updateThumbnail:data forPhoto:photo] == nil) {
       hasErrorInInsertingThumbnail = YES;
     }
   }
   NSNumber *f = [NSNumber numberWithFloat:progressView.progress + 
-                 (1.0f / [modelController photoCount]) ];
+                 (1.0f / [[self photoModelController] photoCount]) ];
   [self performSelectorOnMainThread:@selector(updateProgress:) 
                          withObject:f
                       waitUntilDone:NO];
@@ -1477,7 +1457,7 @@
 #pragma mark -
 
 - (NSUInteger) pageCount {
-  return [modelController photoCount];
+  return [[self photoModelController] photoCount];
   
 }
 
@@ -1485,7 +1465,7 @@
   PhotoViewController *viewController = [[PhotoViewController alloc] 
                                          initWithNibName:@"PhotoViewController" 
                                          bundle:nil];
-  viewController.fetchedPhotosController = modelController.fetchedPhotosController;
+  viewController.fetchedPhotosController = [self photoModelController].fetchedPhotosController;
   viewController.managedObjectContext = self.managedObjectContext;
   viewController.indexForPhoto = n;
   return viewController;
