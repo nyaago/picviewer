@@ -121,7 +121,6 @@ static NSLock *lockFetchedResultsController;
  }
  */
 
-
 // Implement viewDidLoad to do additional setup after loading the view, 
 // typically from a nib.
 // Viewロードの通知 - scrollViewの設定、デバイス回転管理の開始、Downloader初期化
@@ -151,10 +150,6 @@ static NSLock *lockFetchedResultsController;
   [self.view addSubview:scrollView];
   self.wantsFullScreenLayout = YES;
   self.navigationItem.rightBarButtonItem = [PhotoViewController backButton];
-  self.navigationItem.title = @"aaaa";
-  //.navigationItem.backBarButtonItem = [PhotoViewController backButton];
-
-  
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -177,22 +172,6 @@ static NSLock *lockFetchedResultsController;
   }
 }
 
-- (void)viewDidUnload {
-  NSLog(@"PhotoViewCOntroller unload");
-  [super viewDidUnload];
-}
-
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-  // Return YES for supported orientations
-  return YES;
-  // return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-*/
-
-
-
 
 - (void)didReceiveMemoryWarning {
   // Releases the view if it doesn't have a superview.
@@ -201,21 +180,8 @@ static NSLock *lockFetchedResultsController;
   // Release any cached data, images, etc that aren't in use.
 }
 
-
-
 - (void)dealloc {
   NSLog(@"PhotoViewController dealloc");
-  NSLog(@"managedObjectContext retain count = %d", 
-        [managedObjectContext retainCount]);
-  NSLog(@"prevButton retain count = %d", [prevButton retainCount]);
-  NSLog(@"nextButton retain count = %d", [nextButton retainCount]);
-  NSLog(@"scrollView retain count = %d", [scrollView retainCount]);
-  NSLog(@"imageView retain count = %d", [imageView retainCount]);
-  NSLog(@"toolbar retain count = %d", [toolbar retainCount]);
-  NSLog(@"downloader retain count = %d", [downloader retainCount]);
-  NSLog(@"fetchedPhotosController retain count = %d", 
-        [fetchedPhotosController retainCount]);
-  NSLog(@"pageController retain count = %d", [pageController retainCount]);
   
   // Download実行中の場合,停止を要求、完了するまで待つ
   if(downloader) {

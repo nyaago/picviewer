@@ -39,21 +39,29 @@
 @interface RootViewController(Private)
 
 /*!
- 追加ボタンのアクション,追加Viewを表示する
+ @method addButtonAction:
+ @discussion 追加ボタンのアクション,追加Viewを表示する
  */
 - (void)addButtonAction:(id)sender;
 
 /*!
- addボタンを返す
+ @method addButton
+ @discussion addボタンを返す
  */
 - (UIBarButtonItem *)addButton;
 
 /*!
- 新規ユーザをデータベースに保存
+ @method insertNewUser:withNickname:
+ @discussion 新規ユーザをデータベースに保存
+ @param user user ID
+ @param name ユーザーのニックネーム
  */
 - (User *)insertNewUser:(NSString *)user withNickname:(NSString *)name;
 
-
+/*!
+ @method userWithUserId:
+ @discussion 指定したユーザーIDのユーザーModelを返す
+ */
 - (User *)userWithUserId:(NSString *)uid;
 
 /*!
@@ -419,6 +427,10 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
   // Relinquish ownership of any cached data, images, etc that aren't in use.
+  [addButton release];
+  addButton = nil;
+  [toolbarButtons release];
+  toolbarButtons = nil;
 }
 
 

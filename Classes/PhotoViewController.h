@@ -89,7 +89,7 @@ PageViewDelegate> {
  @property scrollView
  @discussion 写真をScrollするためのView(ImageViewの親)
  */
-@property (nonatomic, retain) IBOutlet UIScrollView *scrollView;
+@property (nonatomic, readonly) IBOutlet UIScrollView *scrollView;
 
 /*!
  @property pageController

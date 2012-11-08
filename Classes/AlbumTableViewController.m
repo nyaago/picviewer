@@ -420,15 +420,18 @@
   // 選択行のAlbumのPhoto一覧へ
   Album *selectedObject = [modelController albumAt:indexPath];
   PhotoListViewController *photoViewController
-  = [self photoListViewControllerWithAlbum:(Album *) selectedObject];
+  = [self photoListViewControllerWithAlbum:(Album *) selectedObject] ;
 
   
     // Pass the selected object to the new view controller.
   if([self splitViewController] == nil) {
     [self.navigationController pushViewController:photoViewController animated:YES];
+    
+    NSLog(@"photoListViewController pushed. retain count = %d", [photoViewController retainCount]);
   }
 
   [pool drain];
+  NSLog(@"photoListViewController pushed. retain count = %d", [photoViewController retainCount]);
 }
 
 

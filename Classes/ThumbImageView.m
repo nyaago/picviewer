@@ -189,8 +189,6 @@ static NSMutableDictionary *thumbViewMap = nil;
 }
 
 - (void) dealloc {
-  if(delegate != nil)
-    [delegate release];
   if(index != nil)
     [index release];
   if(containerView)

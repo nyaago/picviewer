@@ -105,7 +105,7 @@
   
 }
 
-@property (nonatomic, retain) NSObject <PicasaFetchControllerDelegate> *delegate;
+@property (nonatomic, assign) NSObject <PicasaFetchControllerDelegate> *delegate;
 
 /*!
  @property userId

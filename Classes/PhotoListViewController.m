@@ -187,13 +187,12 @@
 
 
 /*!
- @method loadView
+ @method  iew
  @discussion viewをload,scrollViewの設定とthumbnailのDictionaryの初期化処理を追加している
  */
 - (void) loadView  {
   [super loadView];
 }
-
 
 /*!
  @method viewDidLoad:
@@ -262,8 +261,6 @@
   // tool bar
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbar.translucent = NO;
-  // '写真がありませんメッセージ'表示
-  [self setNoPhotoMessage:[NSNumber numberWithInteger:kNoPhotoMessage]];
 
   if(self.album == nil) {
     return;
@@ -347,6 +344,7 @@
   
   [self stopToAddThumbnails];
   isFromAlbumTableView = NO;
+  NSLog(@"photoListViewController didDisappear.retain count = %d", [self retainCount]);
 }
 
 
@@ -406,16 +404,6 @@
     picasaFetchController = nil;
   }
   
-  // ダウンロード中であれば、ダウンロード停止要求をして、停止するまで待つ
-  /*
-  if(downloader) {
-    [downloader requireStopping];
-    [downloader waitCompleted];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [downloader release];
-    downloader = nil;
-  }
-   */
   [self discardTumbnails];
   if(progressView)
     [progressView release];
@@ -900,10 +888,8 @@
     PageControlViewController *pageController =
     [[[PageControlViewController alloc] init] autorelease];
     
-    NSLog(@"init PageControllerView retain count = %d",[pageController retainCount]);
     pageController.source = self;
     pageController.curPageNumber = index;
-    NSLog(@"begore push PageControllerView retain count = %d",[pageController retainCount]);
     if([self splitViewController]) {
       UINavigationController *navController = [[[UINavigationController alloc]
                                                 initWithRootViewController:pageController]
@@ -919,10 +905,8 @@
       self.navigationItem.backBarButtonItem = [PhotoViewController backButton];
       [self.navigationController pushViewController:pageController animated:YES];
     }
-    NSLog(@"push PageControllerView retain count = %d",[pageController retainCount]);
     [pool drain];
   }
-
 
 }
 
@@ -963,7 +947,6 @@
 
 
 #pragma mark Private
-
 
 
 - (void) downloadThumbnail:(GDataEntryPhoto *)photo withPhotoModel:(Photo *)model {
@@ -1219,19 +1202,15 @@
     [alertView release];
   }
   // albumのphotoに対する最後の保存処理実行日時を記録
-  NSLog(@"downloadCompleted - set last add");
   [[self photoModelController] setLastAdd];
   //
-  NSLog(@"downloadCompleted - remove progress");
   [self removeProgressView];
 
   // toolbarのボタンを有効に
-  NSLog(@"downloadCompleted - enable tool bar");
   [self enableToolbar:YES];
   //
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
    //
-  NSLog(@"downloadCompleted - afterViewDidAppear");
   [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
                            toTarget:self
                          withObject:nil];
@@ -1291,8 +1270,6 @@
   [self performSelectorOnMainThread:@selector(updateProgress:) 
                          withObject:f
                       waitUntilDone:NO];
-//  progressView.progress = progressView.progress + 
-//  (1.0 / [self thumbnailCount] );
 }
 
 - (void) updateProgress:(NSNumber *)v {
@@ -1305,8 +1282,6 @@
  すべてダウンロード完了時の通知
  */
 - (void)didAllCompleted:(QueuedURLDownloader *)urlDownloader {
-  // 表示をリフレッシュ
-  //  [(UITableView *)self.view reloadData];
   [urlDownloader release];
   urlDownloader = nil;
   downloader = nil;

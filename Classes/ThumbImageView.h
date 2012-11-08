@@ -127,7 +127,7 @@
 
 @property (readonly, nonatomic) NSNumber *index;
 
-@property (retain, nonatomic) NSObject <ThumbImageViewDelegate> *delegate;
+@property (assign, nonatomic) NSObject <ThumbImageViewDelegate> *delegate;
 
 @property (readonly, nonatomic) UIView *containerView;
 @end

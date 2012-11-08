@@ -607,7 +607,8 @@
 
 - (void) backAction:(PageControlViewController *)sender {
   [[self navigationItem] setLeftBarButtonItem:nil];
-  [[self presentingViewController] dismissViewControllerAnimated:YES completion:^{}];
+  [[self presentingViewController] dismissViewControllerAnimated:YES completion:^{;
+  }];
 }
 
 #pragma mark -
