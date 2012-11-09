@@ -42,6 +42,8 @@
 
 @synthesize album;
 
+#pragma mark View lifecycle
+
 - (id)initWithAlbumObject:(Album *)albumObject {
 	self = [super initWithStyle:UITableViewStyleGrouped];
   if(self) {
@@ -60,7 +62,6 @@
   return self;
 }
 
-
 /*!
  @method viewDidLad
  @discussion View Load時の通知.navigationBarの設定、設定情報管理Objectの生成
@@ -76,6 +77,9 @@
   [completeButton release];
 }
   
+#pragma mark -
+
+#pragma mark Memory Management
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
@@ -84,6 +88,14 @@
 	// Release any cached data, images, etc that aren't in use.
 }
 
+- (void)dealloc {
+  if(album) {
+	  [album release];
+  }
+  [super dealloc];
+}
+
+#pragma mark -
 
 #pragma mark Table view methods
 
@@ -157,14 +169,6 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 
 - (void) completedAction:(id)sender {
   [[self parentViewController] dismissModalViewControllerAnimated:YES];
-}
-
-
-- (void)dealloc {
-  if(album) {
-	  [album release];
-  }
-  [super dealloc];
 }
 
 

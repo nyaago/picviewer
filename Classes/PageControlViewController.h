@@ -71,13 +71,6 @@
 @property (nonatomic) NSUInteger curPageNumber;
 
 /*!
- @method pageViewDidChangeCurrentPage:currentPage: 
- @discussion Page変更時の処理(現在ダミー)
- */
--(void) pageViewDidChangeCurrentPage:(PageView *)pageView 
-                               currentPage:(int)currentPage;
-
-/*!
  @method changeNavigationAndStatusBar
  @discussion NavigationBarとStatusBarの表示状態の切り替え(表示<->非表示>
  */

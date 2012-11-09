@@ -353,7 +353,6 @@
 			isa = PBXGroup;
 			children = (
 				8D1107310486CEB800E47090 /* PicasaViewer-Info.plist */,
-				721BDD831611B0D600401E21 /* libxml2.2.dylib */,
 				7234E9CA117E7C6400D7AC45 /* Library */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -400,6 +399,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				721BDD831611B0D600401E21 /* libxml2.2.dylib */,
 				72D224681640CC08004E84B2 /* QuartzCore.framework */,
 				72589F7B162BF46800BC3D9F /* Security.framework */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,

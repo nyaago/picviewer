@@ -154,6 +154,10 @@
   [settings release];
 }
 
+#pragma mark -
+
+#pragma mark Device Rotation
+
 /*!
  機器回転時に自動的にView回転を行うかの判定.
  splitView内にある場合（iPad）は自動的に回転されるように、YESを返す。
@@ -197,7 +201,7 @@
 
 #pragma mark -
 
-#pragma mark Add a new object / delete object
+#pragma mark Model Handling
 
 - (User *)insertNewUser:(NSString *)user withNickname:(NSString *)name{
   // Create a new instance of the entity managed by the fetched results controller.
@@ -261,6 +265,27 @@
   }
   [self.tableView reloadData];
   [settings release];
+}
+
+- (User *)userWithUserId:(NSString *)uid {
+  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedUsersController sections]
+                                                  objectAtIndex:0];
+  NSInteger n =  [sectionInfo numberOfObjects];
+  
+  NSUInteger indexes[2];
+  indexes[0] = 0;
+  indexes[1] = 0;
+  for(int i = 0; i < n; ++i) {
+    indexes[1] = i;
+    NSManagedObject *object =
+    [fetchedUsersController objectAtIndexPath:[NSIndexPath
+                                               indexPathWithIndexes:indexes length:2]];
+    User *user = (User *)object;
+    if([user.userId isEqual:uid] ) {
+      return user;
+    }
+  }
+  return nil;
 }
 
 #pragma mark -
@@ -399,28 +424,6 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 }
 
 
-- (User *)userWithUserId:(NSString *)uid {
-  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedUsersController sections] 
-                                                  objectAtIndex:0];
-  NSInteger n =  [sectionInfo numberOfObjects];
-
-  NSUInteger indexes[2];
-  indexes[0] = 0;
-  indexes[1] = 0;
-  for(int i = 0; i < n; ++i) {
-    indexes[1] = i;
-    NSManagedObject *object = 
-    [fetchedUsersController objectAtIndexPath:[NSIndexPath 
-                                               indexPathWithIndexes:indexes length:2]];
-    User *user = (User *)object;
-    if([user.userId isEqual:uid] ) {
-      return user;
-    }
-  }    
-  return nil;
-}
-
-
 #pragma mark -
 #pragma mark Memory management
 
@@ -499,27 +502,6 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 
 #pragma mark -
 
-#pragma mark Action
-
-- (void)addButtonAction:(id)sender {
-  self.editing = NO;
-  NSString *nibName = nil;
-  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-    nibName = @"NewUserViewController-iPad";
-  }
-  else {
-    nibName = @"NewUserViewController";
-  }
-
-  NewUserViewController *controller = [[NewUserViewController alloc]
-                                       initWithNibName:nibName
-                                       bundle:nil];
-  controller.delegate = self;
-  [controller setModalPresentationStyle:UIModalPresentationFormSheet];
-  [self presentModalViewController:controller animated:YES];
-}
-
-#pragma mark -
 
 #pragma mark NewUserViewControllerDelegate
 
@@ -635,6 +617,7 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   [pool drain];
 }
 
+#pragma mark -
 
 #pragma mark Action
 
@@ -649,6 +632,25 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   [viewController release];
   [navigationController release];
 }
+
+- (void)addButtonAction:(id)sender {
+  self.editing = NO;
+  NSString *nibName = nil;
+  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    nibName = @"NewUserViewController-iPad";
+  }
+  else {
+    nibName = @"NewUserViewController";
+  }
+  
+  NewUserViewController *controller = [[NewUserViewController alloc]
+                                       initWithNibName:nibName
+                                       bundle:nil];
+  controller.delegate = self;
+  [controller setModalPresentationStyle:UIModalPresentationFormSheet];
+  [self presentModalViewController:controller animated:YES];
+}
+
 
 #pragma mark LabeledActivityIndicatorDelegate
 

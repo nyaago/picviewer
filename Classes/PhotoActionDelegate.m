@@ -55,6 +55,8 @@
 
 @implementation PhotoActionDelegate
 
+#pragma mark Initialization
+
 - (id) initWithPhotoObject:(Photo *)photoObject 
 	withParentViewController:(UIViewController *)viewController {
   self = [super init];
@@ -68,11 +70,17 @@
   return self;
 }
 
+#pragma mark -
+
+#pragma mark Memory Management
+
 - (void)dealloc {
   [photo release];
   [parentViewController release];
   [super dealloc];
 }
+
+#pragma mark -
 
 #pragma mark Private
 

@@ -38,6 +38,7 @@
 
   UITextField *userTextField;
   UITextField *passwordTextField;
+  // 画像size 指定のControl
   UISegmentedControl *sizeControl;
 }
 

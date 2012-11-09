@@ -46,6 +46,37 @@
 // 写真なしのメッセージタイプ - Loding（写真を読み込み中です）
 #define kLodingPhotosMessage 2
 
+
+/*!
+ @method refreshAction:
+ @discussion albumのリフレッシュ、全写真データを削除してから再ロードを行う.
+ */
+- (void) refreshAction:(id)sender;
+
+/*!
+ @method infoAction:
+ @discussion Infoボタンのアクション、Album情報のViewを表示
+ */
+- (void) infoAction:(id)sender;
+
+/*!
+ @method removeProgressView
+ @discussiom Progress Bar をView階層から削除（破棄はしない）
+ */
+- (void) removeProgressView;
+
+/*!
+ @method progressView
+ @discussion Progress Bar View を返す
+ */
+- (LabeledProgressView *)progressView;
+
+/*!
+ @method enableToolbar:
+ @discussion toolbarのButtonの有効無効の切り替え
+ */
+- (void) enableToolbar:(BOOL)enable;
+
 /*!
  @method downloadThumbnail:withPhotoModel
  @discussion photoのThumbnailをダウンロードする.
@@ -83,30 +114,10 @@
 - (void)setContentSizeWithImageCount;
 
 /*!
- @method refreshAction:
- @discussion albumのリフレッシュ、全写真データを削除してから再ロードを行う.
- */
-- (void) refreshAction:(id)sender;
-
-/*!
- @method infoAction:
- @discussion Infoボタンのアクション、Album情報のViewを表示
- */
-- (void) infoAction:(id)sender;
-
-
-/*!
  @method refreshPhotos
  @discussion Photoデータを1回削除後、再ロード(Picasaへの問い合わせ+Thumbnail - download)
  */
 - (void) refreshPhotos;
-
-
-/*!
- @method enableToolbar:
- @discussion toolbarのButtonの有効無効の切り替え
- */
-- (void) enableToolbar:(BOOL)enable;
 
 /*!
  @method daysBetween:and:
@@ -138,17 +149,6 @@
  @discussion photo model 検索のcontrollerを返す
  */
 - (PhotoModelController *) photoModelController;
-/*!
- @method removeProgressView
- @discussiom Progress Bar をView階層から削除（破棄はしない）
- */
-- (void) removeProgressView;
-
-/*!
- @method progressView
- @discussion Progress Bar View を返す
- */
-- (LabeledProgressView *)progressView;
 
 /*!
  @method downloadCompleted
@@ -307,30 +307,6 @@
   layoutedOrientation = [[UIDevice currentDevice] orientation];
 }
 
-
-- (void)didReceiveMemoryWarning {
-  // Releases the view if it doesn't have a superview.
-  [super didReceiveMemoryWarning];
-  NSLog(@"didReceiveMemoryWarning");
-  
-  // Release any cached data, images, etc that aren't in use.
-  [lockSave release];
-  lockSave = nil;
-  [thumbnailLock release];
-  thumbnailLock = nil;
-  [toolbarButtons release];
-  toolbarButtons = nil;
-  [infoButton release];
-  infoButton = nil;
-  [refreshButton release];
-  refreshButton = nil;
-  [progressView  release];
-  progressView = nil;
-  [modelController release];
-  modelController = nil;
-  [self discardTumbnails];
-}
-
 - (void)viewWillDisappear:(BOOL)animated {
   //
   [super viewWillDisappear:animated];
@@ -347,6 +323,9 @@
   NSLog(@"photoListViewController didDisappear.retain count = %d", [self retainCount]);
 }
 
+#pragma mark -
+
+#pragma mark Device Rotation
 
 /*!
  機器回転時に自動的にView回転を行うかの判定.
@@ -388,15 +367,38 @@
   }
 }
 
+#pragma mark -
+
+#pragma mark Memory Management
+
+- (void)didReceiveMemoryWarning {
+  // Releases the view if it doesn't have a superview.
+  [super didReceiveMemoryWarning];
+  NSLog(@"didReceiveMemoryWarning");
+  
+  // Release any cached data, images, etc that aren't in use.
+  [lockSave release];
+  lockSave = nil;
+  [thumbnailLock release];
+  thumbnailLock = nil;
+  [toolbarButtons release];
+  toolbarButtons = nil;
+  [infoButton release];
+  infoButton = nil;
+  [refreshButton release];
+  refreshButton = nil;
+  [progressView  release];
+  progressView = nil;
+  [modelController release];
+  modelController = nil;
+  [self discardTumbnails];
+}
 
 - (void)dealloc {
   NSLog(@"PhotoListViewController dealloc");
   if(progressView) {
     NSLog(@"progressView retain count = %d", [progressView retainCount]);
   }
-  NSLog(@"backBUtton retain count = %d", [backButton retainCount]);
-  NSLog(@"album retain count = %d", [album retainCount]);
-  NSLog(@"managedObjectContext retain count = %d", [managedObjectContext retainCount]);
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
   if(picasaFetchController) {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -427,6 +429,8 @@
     [thumbnailLock release];
   [super dealloc];
 }
+
+#pragma mark -
 
 #pragma mark Method For performing on MainThread
 
@@ -478,6 +482,8 @@
 }
 
 #pragma mark -
+
+#pragma mark Thumbnails Handling
 
 - (void)loadThumbnails {
   // このMethod は Main以外のThreadで実行される.
@@ -591,6 +597,9 @@
   return imageView;
 }
 
+#pragma mark -
+
+#pragma mark UI Parts
 
 - (NSArray *) toolbarButtons {
   NSString *path;
@@ -629,7 +638,42 @@
   return toolbarButtons;
 }
 
+- (UIBarButtonItem *)backButton {
+  if(!backButton) {
+    backButton = [[UIBarButtonItem alloc]
+                  initWithTitle:NSLocalizedString(@"Albums", @"Albums")
+                  style:UIBarButtonItemStyleDone
+                  target:nil
+                  action:nil ];
+    
+  }
+  return backButton;
+}
 
+- (LabeledProgressView *)progressView {
+  if(progressView) {
+    return progressView;
+  }
+  // progressView
+  CGRect frame = CGRectMake(0.0f, self.view.frame.size.height - 200.0f ,
+                            self.view.frame.size.width, 200.0f);
+  progressView = [[LabeledProgressView alloc] initWithFrame:frame];
+  [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
+                                             @"download")];
+  
+  return progressView;
+}
+
+- (void) removeProgressView {
+  [progressView removeFromSuperview];
+  [progressView release];
+  progressView = nil;
+}
+
+- (void) enableToolbar:(BOOL)enable {
+  refreshButton.enabled = enable;
+  infoButton.enabled = enable;
+}
 
 #pragma mark -
 
@@ -966,18 +1010,6 @@
 }
 
 
-- (UIBarButtonItem *)backButton {
-  if(!backButton) {
-    backButton = [[UIBarButtonItem alloc] 
-                  initWithTitle:NSLocalizedString(@"Albums", @"Albums")
-                  style:UIBarButtonItemStyleDone 
-                  target:nil
-                  action:nil ];
-    
-  }
-  return backButton;
-}
-
 - (void) refreshPhotos {
 
   onRefresh = YES;
@@ -1007,11 +1039,6 @@
   [settings release];
   [pool drain];
   
-}
-
-- (void) enableToolbar:(BOOL)enable {
-  refreshButton.enabled = enable;
-  infoButton.enabled = enable;
 }
 
 - (NSInteger)minutesBetween:(NSDate *)d1 and:(NSDate *)d2 {
@@ -1151,26 +1178,9 @@
   return modelController;
 }
 
-- (LabeledProgressView *)progressView {
-  if(progressView) {
-    return progressView;
-  }
-  // progressView
-  CGRect frame = CGRectMake(0.0f, self.view.frame.size.height - 200.0f ,
-                            self.view.frame.size.width, 200.0f);
-  progressView = [[LabeledProgressView alloc] initWithFrame:frame];
-  [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
-                      @"download")];
+#pragma mark -
 
-  return progressView;
-}
-
-- (void) removeProgressView {
-  [progressView removeFromSuperview];
-  [progressView release];
-  progressView = nil;
-}
-
+#pragma mark UI After Download  Handling
 
 /*!
  すべてダウンロード完了時の通知
@@ -1201,8 +1211,6 @@
     [alertView show];
     [alertView release];
   }
-  // albumのphotoに対する最後の保存処理実行日時を記録
-  [[self photoModelController] setLastAdd];
   //
   [self removeProgressView];
 
@@ -1234,7 +1242,6 @@
   self.scrollView.userInteractionEnabled = YES;
 
 }
-
 
 #pragma mark - 
 
@@ -1285,6 +1292,9 @@
   [urlDownloader release];
   urlDownloader = nil;
   downloader = nil;
+  // albumのphotoに対する最後の保存処理実行日時を記録
+  [[self photoModelController] setLastAdd];
+
   //
   [self performSelectorOnMainThread:@selector(downloadCompleted)
                          withObject:nil
@@ -1307,7 +1317,7 @@
 
 }
 
-
+#pragma mark -
 
 #pragma mark Action
 
@@ -1431,6 +1441,8 @@
 
 #pragma mark -
 
+#pragma mark PageViewSource
+
 - (NSUInteger) pageCount {
   return [[self photoModelController] photoCount];
   
@@ -1446,6 +1458,7 @@
   return viewController;
 }
 
+#pragma mark -
 
 
 @end

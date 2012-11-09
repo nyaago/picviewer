@@ -55,6 +55,7 @@ static NSInteger imageSizes[3] = {640, 1280, 1600};
 
 @implementation SettingsManager
 
+#pragma mark Public
 
 - (void) setUserId:(NSString *)userId {
   [self setObject:userId forKey:@"userId"];
@@ -100,6 +101,9 @@ static NSInteger imageSizes[3] = {640, 1280, 1600};
   return [n intValue];
 }
 
+#pragma mark -
+
+#pragma mark Static
 
 + (NSInteger)imageSizeToIndex:(NSInteger)size {
   int c = sizeof(imageSizes)  / sizeof(imageSizes[0]);
@@ -121,6 +125,7 @@ static NSInteger imageSizes[3] = {640, 1280, 1600};
   return imageSizes[index];
 }
 
+#pragma mark -
 
 #pragma mark Private
 
@@ -159,5 +164,6 @@ static NSInteger imageSizes[3] = {640, 1280, 1600};
   [pool drain];
 }
 
+#pragma mark -
 
 @end

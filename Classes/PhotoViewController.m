@@ -110,6 +110,9 @@ static NSLock *lockFetchedResultsController;
 @synthesize indexForPhoto;
 @synthesize toolbar;
 @synthesize pageController;
+
+#pragma mark View lifecycle
+
 /*
  // The designated initializer.  Override if you create the controller programmatically 
  // and want to perform customization that is not appropriate for viewDidLoad.
@@ -172,6 +175,9 @@ static NSLock *lockFetchedResultsController;
   }
 }
 
+#pragma mark -
+
+#pragma mark Memory Management
 
 - (void)didReceiveMemoryWarning {
   // Releases the view if it doesn't have a superview.
@@ -354,6 +360,8 @@ static NSLock *lockFetchedResultsController;
 
 #pragma mark -
 
+#pragma mark Private
+
 
 -(CGRect) viewFrameForImage:(UIImage *)image {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -396,7 +404,7 @@ static NSLock *lockFetchedResultsController;
   for(int i = 0; i < 4; ++i) {
     NSLog(@"Class = %@,Page view,x ==> %f, y => %f, width => %f, height => %f ",
           [v class],
-          rect.origin.x , rect.origin.y, 
+          rect.origin.x , rect.origin.y,
           rect.size.width, rect.size.height
           );
     v = v.superview;
@@ -479,6 +487,10 @@ static NSLock *lockFetchedResultsController;
   [downloader finishQueuing];
   [pool drain];
 }
+
+#pragma mark -
+
+#pragma mark Action
 
 - (void) tapAction:(id)arg {
   if(lastTapCount == 1) {

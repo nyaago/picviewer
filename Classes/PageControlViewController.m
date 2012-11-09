@@ -365,6 +365,10 @@
   deviceRotation = nil;
 }
 
+#pragma mark -
+
+#pragma mark Device Rotation
+
 /*!
  機器回転時に自動的にView回転を行うかの判定.
  自動的に回転されるように、常にYESを返す。
@@ -389,6 +393,10 @@
 (UIInterfaceOrientation)interfaceOrientation {
   return YES;
 }
+
+#pragma mark -
+
+#pragma mark Memory Management
 
 
 - (void)didReceiveMemoryWarning {
@@ -431,6 +439,7 @@
   [ super dealloc ];
 }
 
+#pragma mark -
 
 #pragma mark Responding to Scrolling and Dragging
 
@@ -494,11 +503,6 @@
 }
 
 #pragma mark Public 
-
--(void) pageViewDidChangeCurrentPage:(PageView *)pageView 
-                               currentPage:(int)currentPage {
-  NSLog(@"現在表示中のページ %d\n", currentPage);
-}
 
 -(void) changeNavigationAndStatusBar {
 
@@ -573,19 +577,6 @@
   [self setNavigationTitle];
 }
 
-- (void)infoAction:(id)sender {
-  PageView *scrollView = (PageView *)self.view;
-  if([scrollView.curPage respondsToSelector:@selector(viewInfoAction:)]) {
-    [scrollView.curPage viewInfoAction:self];
-  }
-}
-
-- (void)doAction:(id)sender {
-  PageView *scrollView = (PageView *)self.view;
-  if([scrollView.curPage respondsToSelector:@selector(doAction:)]) {
-    [scrollView.curPage doAction:self];
-  }
-}
 
 - (void) setCurPageNumber:(NSUInteger)n {
   PageView *view = (PageView *)self.view;
@@ -604,6 +595,25 @@
   }
   return 0;
 }
+
+#pragma mark -
+
+#pragma mark Action
+
+- (void)infoAction:(id)sender {
+  PageView *scrollView = (PageView *)self.view;
+  if([scrollView.curPage respondsToSelector:@selector(viewInfoAction:)]) {
+    [scrollView.curPage viewInfoAction:self];
+  }
+}
+
+- (void)doAction:(id)sender {
+  PageView *scrollView = (PageView *)self.view;
+  if([scrollView.curPage respondsToSelector:@selector(doAction:)]) {
+    [scrollView.curPage doAction:self];
+  }
+}
+
 
 - (void) backAction:(PageControlViewController *)sender {
   [[self navigationItem] setLeftBarButtonItem:nil];

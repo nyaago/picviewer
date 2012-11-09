@@ -69,11 +69,23 @@
  */
 - (void) enableToolbar:(BOOL)enable;
 
-- (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)album 
+/*!
+ @method insertOrUpdateAlbumsWithUserFeed:withUser:hasError:
+ @discussion albumモデルへの挿入または更新
+ @param album Googleより取得したalbumデータ
+ @param userObject userモデル
+ @param f エラー有無
+ */
+- (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)album
                                 withUser:(User *)userObject
                                 hasError:(BOOL *)f;
 
 
+/*!
+ @method photoListViewControllerWithAlbum:
+ @return Photo一覧のview controller
+ @param album albumモデル
+ */
 - (PhotoListViewController *)photoListViewControllerWithAlbum:(Album *)album;
 
 @end
@@ -183,6 +195,7 @@
  [super viewDidDisappear:animated];
  }
 
+#pragma mark Memory Management
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
@@ -206,13 +219,37 @@
     [refreshButton release];
     refreshButton = nil;
   }
+}
 
-
+- (void)dealloc {
+  NSLog(@"AlbumTableViewController deallloc");
+  
+  // 一覧ロード中であれば、停止要求をして、停止するまで待つ
+  if(picasaFetchController) {
+    [picasaFetchController release];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    picasaFetchController = nil;
+  }
+  
+  if(modelController)
+    [modelController release];
+  if(managedObjectContext)
+    [managedObjectContext release];
+  if(user)
+    [user release];
+  if(backButton)
+    [backButton release];
+  if(refreshButton)
+    [refreshButton release];
+  if(toolbarButtons)
+    [toolbarButtons release];
+  if(onLoadLock)
+    [onLoadLock release];
+  [super dealloc];
 }
 
 
 #pragma mark -
-
 
 #pragma mark PicasaFetchControllerDelegate
 
@@ -435,6 +472,9 @@
 }
 
 
+#pragma mark -
+
+#pragma mark Device Rotation
 /*!
  機器回転時に自動的にView回転を行うかの判定.
  splitView内にある場合（iPad）は自動的に回転されるように、YESを返す。
@@ -476,38 +516,62 @@
   }
 }
 
+#pragma mark -
 
-- (void)dealloc {
-  NSLog(@"AlbumTableViewController deallloc");
 
-  // 一覧ロード中であれば、停止要求をして、停止するまで待つ
-  if(picasaFetchController) {
-    [picasaFetchController release];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    picasaFetchController = nil;
+#pragma mark UI Parts
+
+- (UIBarButtonItem *)backButton {
+  if(!backButton) {
+    backButton = [[UIBarButtonItem alloc]
+                  initWithTitle:NSLocalizedString(@"Accounts", @"Account")
+                  style:UIBarButtonItemStyleDone
+                  target:nil
+                  action:nil ];
+    
   }
-  
-  if(modelController)
-    [modelController release];
-  if(managedObjectContext)
-    [managedObjectContext release];
-  if(user)
-    [user release];
-  if(backButton)
-    [backButton release];
-  if(refreshButton)
-    [refreshButton release];
-  if(toolbarButtons) 
-    [toolbarButtons release];
-  if(onLoadLock)
-    [onLoadLock release];
-  [super dealloc];
+  return backButton;
 }
+
+- (NSArray *) toolbarButtons {
+  //NSString *path;
+  
+  if(!toolbarButtons) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
+    toolbarButtons = [[NSMutableArray alloc] init];
+    // Refresh
+    refreshButton = [[UIBarButtonItem alloc]
+                     initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                     target:self
+                     action:@selector(refreshAction:)];
+    [toolbarButtons addObject:refreshButton];
+    
+    
+    // Space
+    UIBarButtonItem *spaceRight
+    = [[UIBarButtonItem alloc]
+       initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+       target:self
+       action:nil];
+    spaceRight.width = 30.0f;
+    [toolbarButtons addObject:spaceRight];
+    [spaceRight release];
+    [pool drain];
+  }
+  return toolbarButtons;
+}
+
+- (void) enableToolbar:(BOOL)enable {
+  refreshButton.enabled = enable;
+}
+
+#pragma mark -
 
 #pragma mark Private
 
 
-- (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)feed 
+- (void)insertOrUpdateAlbumsWithUserFeed:(GDataFeedPhotoUser *)feed
                                 withUser:(User *)userObject 
                                 hasError:(BOOL *)f {
   
@@ -604,51 +668,6 @@
   
 }
 
-
-- (UIBarButtonItem *)backButton {
-  if(!backButton) {
-    backButton = [[UIBarButtonItem alloc] 
-                  initWithTitle:NSLocalizedString(@"Accounts", @"Account")
-                  style:UIBarButtonItemStyleDone 
-                  target:nil
-                  action:nil ];
-    
-  }
-  return backButton;
-}
-
-- (NSArray *) toolbarButtons {
-  //NSString *path;
-  
-  if(!toolbarButtons) {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    toolbarButtons = [[NSMutableArray alloc] init];
-    // Refresh
-    refreshButton = [[UIBarButtonItem alloc] 
-                                initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
-                                target:self
-                                action:@selector(refreshAction:)];
-    [toolbarButtons addObject:refreshButton];
-    
-    
-    // Space
-    UIBarButtonItem *spaceRight
-    = [[UIBarButtonItem alloc] 
-       initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-       target:self
-       action:nil];
-    spaceRight.width = 30.0f;
-    [toolbarButtons addObject:spaceRight];
-    [spaceRight release];
-    [pool drain];
-  }
-  return toolbarButtons;
-}
-
-- (void) enableToolbar:(BOOL)enable {
-  refreshButton.enabled = enable;
-}
 
 - (PhotoListViewController *)photoListViewControllerWithAlbum:(Album *)album {
   PhotoListViewController *photoViewController = nil;
@@ -793,6 +812,8 @@
 
 #pragma mark -
 
+#pragma mark Accessor to Property
+
 - (void)setUser:(User *)newUser {
 
   if(user != newUser) {
@@ -805,6 +826,7 @@
   
 }
 
+#pragma mark -
 
 @end
 
