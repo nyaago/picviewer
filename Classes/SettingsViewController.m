@@ -28,6 +28,28 @@
 #import "SettingsViewController.h"
 #import "NetworkReachability.h"
 
+@interface SettingsViewController(Private)
+
+/*!
+ @method sizeControl
+ @return 画像size指定のControlを返す
+ */
+- (UISegmentedControl *) sizeControl;
+
+/*!
+ @method userTextField
+ @return user id 入力テキストフィールド
+ */
+- (UITextField *) userTextField;
+
+/*!
+ @method passwordTextFiled
+ @return password 入力テキストフィールド
+ */
+- (UITextField *) passwordTextField;
+
+@end
+
 @implementation SettingsViewController
 
 #pragma mark View Lifecycle
@@ -70,26 +92,38 @@
   [super viewDidAppear:animated];
 }
 
+#pragma mark -
+
+#pragma mark Memery Manegement
 
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-	
 	// Release any cached data, images, etc that aren't in use.
-}
-
-- (void)viewDidUnload {
-	[super viewDidUnload];
   [completeButton release];
   completeButton = nil;
   [settings release];
   settings = nil;
+  [sizeControl release];
+  sizeControl = nil;
   [userTextField release];
   userTextField = nil;
   [passwordTextField release];
   passwordTextField = nil;
-  [sizeControl release];
-  sizeControl = nil;
+}
+
+- (void)dealloc {
+  if(completeButton)
+    [completeButton release];
+  if(settings)
+    [settings release];
+  if(userTextField)
+    [userTextField release];
+  if(passwordTextField)
+    [passwordTextField release];
+  if(sizeControl)
+    [sizeControl release];
+  [super dealloc];
 }
 
 
@@ -156,12 +190,8 @@ titleForHeaderInSection:(NSInteger)section {
             frame =  CGRectMake(140.0f, 10.0f,
                                 cell.frame.size.width - 140.0f ,
                                 cell.frame.size.height - 20.0f);
-            userTextField = [[UITextField alloc] initWithFrame:frame];
-            [userTextField addTarget:self 
-                         action:@selector(userDidEndEditing:) 
-               forControlEvents:UIControlEventEditingDidEndOnExit];
-            userTextField.text = settings.userId;
-            [cell addSubview:userTextField];
+            [self userTextField].frame = frame;
+            [cell addSubview:[self userTextField]];
             break;
           case (1):
             cell.textLabel.text = NSLocalizedString(@"Settings.Account.Password",
@@ -170,13 +200,9 @@ titleForHeaderInSection:(NSInteger)section {
                                 10.0f,
                                 cell.frame.size.width - 140.0f ,
                                 cell.frame.size.height - 20.0f);
-            passwordTextField = [[UITextField alloc] initWithFrame:frame];
-            [passwordTextField setSecureTextEntry:YES];
-            [passwordTextField addTarget:self 
-                         action:@selector(passwordDidEndEditing:) 
-               forControlEvents:UIControlEventEditingDidEndOnExit];
-            passwordTextField.text = settings.password;
-            [cell addSubview:passwordTextField];
+            [self passwordTextField].frame = frame;
+            [self passwordTextField].text = settings.password;
+            [cell addSubview:[self passwordTextField]];
             break;
        }
         break;
@@ -190,19 +216,9 @@ titleForHeaderInSection:(NSInteger)section {
                                 cell.frame.size.width - (120.0f + 10.0f) ,
                                 cell.frame.size.height - 20.0f);
           	
-            sizeControl = [[UISegmentedControl alloc] initWithFrame:frame];
-            [sizeControl insertSegmentWithTitle:@"640" 
-                                        atIndex:0 
-                                       animated:NO];
-            [sizeControl insertSegmentWithTitle:@"1280" 
-                                        atIndex:1
-                                       animated:NO];
-            [sizeControl insertSegmentWithTitle:@"1600" 
-                                        atIndex:2 
-                                       animated:NO];
-            sizeControl.selectedSegmentIndex = [SettingsManager 
-                                                imageSizeToIndex:settings.imageSize];
-            [cell addSubview:sizeControl];
+            [self sizeControl].frame = frame;
+            [cell addSubview:[self sizeControl]];
+            
             break;
         }
             
@@ -258,6 +274,51 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
   UITextField *textField = (UITextField *)sender;
   settings.password = textField.text;
 }
+
+#pragma mark UI Parts
+
+- (UISegmentedControl *) sizeControl {
+  if(sizeControl == nil) {
+    sizeControl = [[UISegmentedControl alloc] init];
+    [sizeControl insertSegmentWithTitle:@"640"
+                                atIndex:0
+                               animated:NO];
+    [sizeControl insertSegmentWithTitle:@"1280"
+                                atIndex:1
+                               animated:NO];
+    [sizeControl insertSegmentWithTitle:@"1600"
+                                atIndex:2
+                               animated:NO];
+    sizeControl.selectedSegmentIndex = [SettingsManager
+                                        imageSizeToIndex:settings.imageSize];
+ 
+  }
+  return sizeControl;
+}
+
+- (UITextField *) userTextField {
+  if(userTextField == nil) {
+    userTextField = [[UITextField alloc] init];
+    [userTextField addTarget:self
+                      action:@selector(userDidEndEditing:)
+            forControlEvents:UIControlEventEditingDidEndOnExit];
+    userTextField.text = settings.userId;
+  }
+  return userTextField;
+}
+
+- (UITextField *) passwordTextField {
+  if(passwordTextField == nil) {
+    passwordTextField = [[UITextField alloc] init];
+    [passwordTextField setSecureTextEntry:YES];
+    [passwordTextField addTarget:self
+                          action:@selector(passwordDidEndEditing:)
+                forControlEvents:UIControlEventEditingDidEndOnExit];
+  }
+  return passwordTextField;
+}
+
+#pragma mark -
 
 #pragma mark PicasaFetchControllerDelegate
 
@@ -327,18 +388,6 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 
 
 #pragma mark -
-
-- (void)dealloc {
-  if(completeButton)
-    [completeButton release];
-  if(settings) 
-    [settings release];
-  if(userTextField)
-    [userTextField release];
-  if(passwordTextField) 
-    [passwordTextField release];
-  [super dealloc];
-}
 
 
 @end
