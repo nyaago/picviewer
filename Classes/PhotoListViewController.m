@@ -263,6 +263,7 @@
   self.navigationController.toolbar.translucent = NO;
 
   if(self.album == nil) {
+    [self setNoPhotoMessage:[NSNumber numberWithInt:kNoPhotoMessage]];
     return;
   }
   if(isFromAlbumTableView == NO && self.splitViewController == nil) {
@@ -272,7 +273,7 @@
     frame.size.height -= self.navigationController.toolbar.frame.size.height;
     self.view.frame = frame;
   }
-
+  
   if(isFromAlbumTableView == YES) {
     [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
     // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
@@ -469,10 +470,10 @@
     if([noPhotoLabel superview] == nil) {
       [self.scrollView addSubview:noPhotoLabel];
       NSLog(@"message type  = %d", [show integerValue] );
-      noPhotoLabel.text = [show integerValue] == kLodingPhotosMessage ?
-      NSLocalizedString(@"PhotoList.Loding", @"Loging Photos") :
-      NSLocalizedString(@"PhotoList.None", @"No Photos");
     }
+    noPhotoLabel.text = [show integerValue] == kLodingPhotosMessage ?
+    NSLocalizedString(@"PhotoList.Loding", @"Loging Photos") :
+    NSLocalizedString(@"PhotoList.None", @"No Photos");
   }
   else {
     if(noPhotoLabel != nil && [noPhotoLabel superview] != nil) {
@@ -759,9 +760,6 @@
     [pool drain];
     return;
   }
-  // clean fetched controller
-  //[fetchedPhotosController release];
-  //fetchedPhotosController = nil;
   // 削除
   if(onRefresh) {
 	  [[self photoModelController] removePhotos];

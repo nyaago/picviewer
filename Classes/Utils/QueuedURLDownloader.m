@@ -254,11 +254,17 @@ didReceiveResponse:(NSURLResponse *)response {
 }
 
 - (void) requireStopping {
+  BOOL running = NO;
   [lock lock];
+  if(!completed && !started) {
+    running = YES;
+  }
   stoppingRequired = YES;
   [lock unlock];
-  if([delegate respondsToSelector:@selector(dowloadCanceled:)] ) {
-    [delegate dowloadCanceled:self];
+  if(running == YES) {
+    if([delegate respondsToSelector:@selector(dowloadCanceled:)] ) {
+      [delegate dowloadCanceled:self];
+    }
   }
 }
 

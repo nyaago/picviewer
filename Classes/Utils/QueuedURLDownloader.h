@@ -103,6 +103,7 @@
   NSLock *lock;
   // Timeout時間,単位:秒,Default 10.0秒
   NSTimeInterval timeoutInterval;
+  //
 }
 
 /*!

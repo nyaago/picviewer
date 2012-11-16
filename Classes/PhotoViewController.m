@@ -193,7 +193,6 @@ static NSLock *lockFetchedResultsController;
   if(downloader) {
     [downloader requireStopping];
     [downloader waitCompleted];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [downloader release];
   }
   
@@ -307,6 +306,7 @@ static NSLock *lockFetchedResultsController;
  */
 - (void)downloadDidFailWithError:(NSError *)error withUserInfo:(NSDictionary *)info {
   NSLog(@"downloadDidFailWithError");
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
 
@@ -354,6 +354,13 @@ static NSLock *lockFetchedResultsController;
     [self.scrollView addSubview:imageView];
   }
   //
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+}
+
+/*!
+ ダウンロードがキャンセルされたときの通知
+ */
+- (void)dowloadCanceled:(QueuedURLDownloader *)downloader {
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
