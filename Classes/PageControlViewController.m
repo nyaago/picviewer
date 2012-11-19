@@ -542,18 +542,20 @@
 
 
 - (void)toNextPage:(id)sender {
+  
   PageView *scrollView = (PageView *)self.view;
-	[scrollView toNextPage];  
-  if(scrollView.curPageNumber + 1 < [source pageCount]) {
-    UIViewController<PageViewDelegate> *controller 
-    = [source pageAt:scrollView.curPageNumber + 1];
-    [scrollView setNextPage:controller];
-    [controller pageDidAddWithPageViewController:self
-                                       withOrientation:layoutedOrientation];
-    [controller setPageController:self];
-    controller.view.hidden = YES;
-    [controller release];
+  if(scrollView.curPageNumber + 1 >= [source pageCount]) {
+    return;
   }
+	[scrollView toNextPage];
+  UIViewController<PageViewDelegate> *controller
+  = [source pageAt:scrollView.curPageNumber + 1];
+  [scrollView setNextPage:controller];
+  [controller pageDidAddWithPageViewController:self
+                                     withOrientation:layoutedOrientation];
+  [controller setPageController:self];
+  controller.view.hidden = YES;
+  [controller release];
   [scrollView layoutViews];
   [self setToolbarStatus];
   [self setNavigationTitle];
@@ -561,17 +563,18 @@
 
 - (void)toPrevPage:(id)sender {
   PageView *scrollView = (PageView *)self.view;
-	[scrollView toPrevPage];  
-  if(scrollView.curPageNumber > 0) {
-    UIViewController<PageViewDelegate> *controller 
-    = [source pageAt:scrollView.curPageNumber - 1];
-    [scrollView setPrevPage:controller];
-    [controller pageDidAddWithPageViewController:self
-                                 withOrientation:layoutedOrientation];
-    [controller setPageController:self];
-    controller.view.hidden = YES;
-    [controller release];
+  if(scrollView.curPageNumber <= 0) {
+    return;
   }
+	[scrollView toPrevPage];
+  UIViewController<PageViewDelegate> *controller
+  = [source pageAt:scrollView.curPageNumber - 1];
+  [scrollView setPrevPage:controller];
+  [controller pageDidAddWithPageViewController:self
+                               withOrientation:layoutedOrientation];
+  [controller setPageController:self];
+  controller.view.hidden = YES;
+  [controller release];
   [scrollView layoutViews];
   [self setToolbarStatus];
   [self setNavigationTitle];
