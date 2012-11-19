@@ -157,6 +157,12 @@
 - (void) setPageController:(PageControlViewController *)controller;
 
 
+/*!
+ @meothd canDiscard
+ @discussion この画面を破棄してもよいかの判定
+ @return 破棄してもOKならYESを返す
+ */
+- (BOOL) canDiscard;
 
 @optional
 

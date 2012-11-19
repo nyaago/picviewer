@@ -547,6 +547,12 @@
   if(scrollView.curPageNumber + 1 >= [source pageCount]) {
     return;
   }
+  if(scrollView.prevPage != nil && [scrollView.prevPage canDiscard] == NO ) {
+    return;
+  }
+  if(scrollView.curPage != nil && [scrollView.curPage canDiscard] == NO ) {
+    return;
+  }
 	[scrollView toNextPage];
   UIViewController<PageViewDelegate> *controller
   = [source pageAt:scrollView.curPageNumber + 1];
@@ -564,6 +570,12 @@
 - (void)toPrevPage:(id)sender {
   PageView *scrollView = (PageView *)self.view;
   if(scrollView.curPageNumber <= 0) {
+    return;
+  }
+  if(scrollView.nextPage != nil && [scrollView.nextPage canDiscard] == NO ) {
+    return;
+  }
+  if(scrollView.curPage != nil && [scrollView.curPage canDiscard] == NO ) {
     return;
   }
 	[scrollView toPrevPage];

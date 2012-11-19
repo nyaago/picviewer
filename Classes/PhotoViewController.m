@@ -661,6 +661,13 @@ static NSLock *lockFetchedResultsController;
   [sheet showInView:parentController.view];                        
 }
 
+- (BOOL) canDiscard {
+  if(downloader == nil || downloader.isCompleted) {
+    return YES;
+  }
+  return NO;
+}
+
 #pragma mark -
 
 #pragma mark UIScrollViewDelegate
