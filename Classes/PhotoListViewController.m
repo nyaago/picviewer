@@ -206,6 +206,7 @@
   [super viewDidLoad];
   //
   thumbnailLock = [[NSLock alloc] init];
+  onAddingThumbnailsLock = [[NSLock alloc] init];
 
   //
   isFromAlbumTableView = YES;
@@ -274,6 +275,14 @@
     self.view.frame = frame;
   }
   
+  [onAddingThumbnailsLock lock];
+  BOOL skip = onAddingThumbnails;
+  [onAddingThumbnailsLock unlock];
+  if(skip == YES) {
+    return;
+  }
+
+  
   if(isFromAlbumTableView == YES) {
     [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
     // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
@@ -287,10 +296,21 @@
 }
 
 - (void) afterViewDidAppear:(id)arg {
+  [onAddingThumbnailsLock lock];
+  onAddingThumbnails = YES;
+  stoppingToAddingThumbnailsRequred = NO;
+  [onAddingThumbnailsLock unlock];
+
   //
   [self discardTumbnails];
   //
   [self loadThumbnails];
+  //
+  [onAddingThumbnailsLock lock];
+  onAddingThumbnails = NO;
+  stoppingToAddingThumbnailsRequred = NO;
+  [onAddingThumbnailsLock unlock];
+
 }
 
 /*!
@@ -428,6 +448,8 @@
     [lockSave release];
   if(thumbnailLock)
     [thumbnailLock release];
+  if(onAddingThumbnailsLock)
+    [onAddingThumbnailsLock release];
   [super dealloc];
 }
 
@@ -493,10 +515,6 @@
   // thumbnailを保持するコレクションの準備
   [thumbnailLock lock];
 
-  [onAddingThumbnailsLock lock];
-  onAddingThumbnails = YES;
-  stoppingToAddingThumbnailsRequred = NO;
-  [onAddingThumbnailsLock unlock];
   
   [self.view setNeedsLayout];
   
@@ -520,12 +538,13 @@
                             waitUntilDone:NO];
       }
       // 中断が要求されているかチェック
-      [onAddingThumbnailsLock lock];
-      if(stoppingToAddingThumbnailsRequred) {
+      if([onAddingThumbnailsLock tryLock] == YES) {
+        if(stoppingToAddingThumbnailsRequred) {
+          [onAddingThumbnailsLock unlock];
+          break;
+        }
         [onAddingThumbnailsLock unlock];
-        break;
       }
-      [onAddingThumbnailsLock unlock];
       
     }
   }
@@ -533,10 +552,6 @@
   [self performSelectorOnMainThread:@selector(setContentSizeWithImageCount)
                          withObject:nil
                       waitUntilDone:YES];
-  [onAddingThumbnailsLock lock];
-  onAddingThumbnails = NO;
-  stoppingToAddingThumbnailsRequred = NO;
-  [onAddingThumbnailsLock unlock];
   [thumbnailLock unlock];
   [pool drain];
 }
@@ -546,12 +561,14 @@
   stoppingToAddingThumbnailsRequred = YES;
   [onAddingThumbnailsLock unlock];
   while (YES) {
-    [onAddingThumbnailsLock lock];
-    if(onAddingThumbnails == NO) {
+    if([onAddingThumbnailsLock tryLock] == YES) {
+      if(onAddingThumbnails == NO) {
+        [onAddingThumbnailsLock unlock];
+        break;
+      }
       [onAddingThumbnailsLock unlock];
-      break;
     }
-    [onAddingThumbnailsLock unlock];
+    [NSThread sleepForTimeInterval:0.01f];
   }
   return;
 }
@@ -923,6 +940,12 @@
 - (void)photoTouchesEnded:(ThumbImageView *)imageView
                   touches:(NSSet *)touches
                 withEvent:(UIEvent *)event {
+  [onAddingThumbnailsLock lock];
+  BOOL skip = onAddingThumbnails;
+  [onAddingThumbnailsLock unlock];
+  if(skip == YES) {
+    return;
+  }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   // 写真表示Viewへ
   NSInteger index = [imageView.index integerValue];
@@ -1131,6 +1154,11 @@
   BOOL ret = NO;
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   if([self mustLoad:curAlbum]) {
+    [onAddingThumbnailsLock lock];
+    onAddingThumbnails = YES;
+    stoppingToAddingThumbnailsRequred = NO;
+    [onAddingThumbnailsLock unlock];
+
     // クリア + 全ロードか?
     onRefresh = [self mustRefresh:curAlbum];
     
@@ -1297,6 +1325,10 @@
   [self performSelectorOnMainThread:@selector(downloadCompleted)
                          withObject:nil
                       waitUntilDone:YES];
+  [onAddingThumbnailsLock lock];
+  onAddingThumbnails = NO;
+  [onAddingThumbnailsLock unlock];
+
 
 }
 
