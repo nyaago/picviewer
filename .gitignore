@@ -1,4 +1,6 @@
-**/.DS_Store
-build
-private
-
+.DS_Store
+/xcuserdata
+UserInterfaceState.xcuserstate
+/build
+/private
+*~
