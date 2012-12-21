@@ -45,7 +45,8 @@
 #define kNoPhotoMessage 1
 // 写真なしのメッセージタイプ - Loding（写真を読み込み中です）
 #define kLodingPhotosMessage 2
-
+// Album の Reload確認を行う間隔（分）
+#define kIntervalForReload 15
 
 /*!
  @method refreshAction:
@@ -171,6 +172,12 @@
  */
 - (void)discardTumbnail:(UIView *)view;
 
+/*!
+ @method onAlbumSelected:
+ @discussion Album を反映する。
+ */
+- (void) onAlbumSelected:(Album *)album;
+
 @end
 
 
@@ -226,7 +233,7 @@
   //
   
   lockSave = [[NSLock alloc] init];
-
+  lockForShowingAlbum = [[NSLock alloc] init];
   if(self.album == nil) {
     return;
   }
@@ -289,7 +296,7 @@
     // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
     // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
     // 表示関連の操作はmain Threadでされる必要があるので)
-    [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:) 
+    [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
                              toTarget:self 
                            withObject:nil];
   }
@@ -302,15 +309,30 @@
   [onAddingThumbnailsLock unlock];
 
   //
-  [self discardTumbnails];
+  [self performSelectorOnMainThread:@selector(discardTumbnails)
+                         withObject:nil
+                      waitUntilDone:YES];
   //
-  [self loadThumbnails];
+  [self performSelectorOnMainThread:@selector(loadThumbnails)
+                         withObject:nil
+                      waitUntilDone:YES];
+
   //
   [onAddingThumbnailsLock lock];
   onAddingThumbnails = NO;
   stoppingToAddingThumbnailsRequred = NO;
   [onAddingThumbnailsLock unlock];
-
+  
+  Album *nextAlbum = nil;
+  [lockForShowingAlbum lock];
+  nextAlbum = nextShowedAlbum;
+  showingAlbum = nil;
+  [lockForShowingAlbum unlock];
+  if(nextAlbum != nil) {
+    [self performSelectorOnMainThread:@selector(onAlbumSelected:)
+                           withObject:nextAlbum
+                        waitUntilDone:YES];
+  }
 }
 
 /*!
@@ -398,10 +420,6 @@
   NSLog(@"didReceiveMemoryWarning");
   
   // Release any cached data, images, etc that aren't in use.
-  [lockSave release];
-  lockSave = nil;
-  [thumbnailLock release];
-  thumbnailLock = nil;
   [toolbarButtons release];
   toolbarButtons = nil;
   [infoButton release];
@@ -410,15 +428,12 @@
   refreshButton = nil;
   [progressView  release];
   progressView = nil;
-  [modelController release];
-  modelController = nil;
   [self discardTumbnails];
 }
 
 - (void)dealloc {
   NSLog(@"PhotoListViewController dealloc");
   if(progressView) {
-    NSLog(@"progressView retain count = %d", [progressView retainCount]);
   }
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
   if(picasaFetchController) {
@@ -446,6 +461,8 @@
     [managedObjectContext release];
   if(lockSave)
     [lockSave release];
+  if(lockForShowingAlbum)
+    [lockForShowingAlbum release];
   if(thumbnailLock)
     [thumbnailLock release];
   if(onAddingThumbnailsLock)
@@ -602,13 +619,17 @@
   indexes[1] = index;
   Photo *photoObject = [[self photoModelController] photoAt:index];
   UIImage *image = nil;
-  if(photoObject.thumbnail) {
+  if(photoObject && photoObject.thumbnail) {
+    NSLog(@"create thumbnail image");
     image  = [UIImage imageWithData:photoObject.thumbnail];
     imageView = [ThumbImageView viewWithImage:image
                                     withIndex:[NSNumber numberWithInt:index]
                                 withContainer:self.view ];
     imageView.userInteractionEnabled = YES;
     imageView.delegate = self;
+  }
+  else {
+    NSLog(@"cat't get photo model object");
   }
   
   [pool drain];
@@ -699,50 +720,7 @@
 
 - (void) albumTableViewControll:(AlbumTableViewController *)controller
                     selectAlbum:(Album *)selectedAlbum {
-  // '写真がありませんメッセージ'表示
-  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
-  
-  isFromAlbumTableView = YES;
-  [self discardTumbnails];
-  if(downloader != nil && ![downloader isCompleted] && [downloader isStarted]) {
-    [[self photoModelController] clearLastAdd];
-    [downloader requireStopping];
-  }
-
-  self.album = selectedAlbum;
-  // Title設定
-  self.navigationItem.title = self.album.title;
-  BOOL load = [self loadPhotos:self.album];
-//  [self loadThumbnails];
-  // navigationbar,  statusbar
-  self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
-  [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackOpaque;
-  // tool bar
-  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
-  self.navigationController.toolbar.translucent = NO;
-  
-  if(self.album == nil) {
-    return;
-  }
-  
-  if(isFromAlbumTableView == NO) {	// 写真画面から戻ってきた場合
-    // viewのサイズ, 前画面(写真)がtoolbar部分を含んでいたので、そのtoolbar分マイナス
-    CGRect frame = self.view.frame;
-    frame.size.height -= self.navigationController.toolbar.frame.size.height;
-    self.view.frame = frame;
-  }
-  
-  if( load == NO) {
-    // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
-    // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
-    // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
-    // 表示関連の操作はmain Threadでされる必要があるので)
-    [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
-                             toTarget:self
-                           withObject:nil];
-  }
-  self.view.userInteractionEnabled = YES;
-  
+  [self onAlbumSelected:selectedAlbum];
 }
 
 
@@ -811,7 +789,7 @@
   }	
   // Photo一覧のFetched Controllerを生成
   [NSFetchedResultsController deleteCacheWithName:@"Root"];
-  if (![[self photoModelController].fetchedPhotosController performFetch:&error]) {
+  if (![[[self photoModelController] fetchedPhotosController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     
     UIAlertView *alertView = [[UIAlertView alloc] 
@@ -1014,6 +992,74 @@
 #pragma mark Private
 
 
+- (void) onAlbumSelected:(Album *)selectedAlbum {
+  [lockForShowingAlbum lock];
+  if(showingAlbum != nil) {
+    nextShowedAlbum = selectedAlbum;
+    [lockForShowingAlbum unlock];
+    return;
+  }
+  if(selectedAlbum == nil) {
+    [lockForShowingAlbum unlock];
+    return;
+  }
+  if(nextShowedAlbum != nil && selectedAlbum.albumId == nextShowedAlbum.albumId) {
+    nextShowedAlbum = nil;
+
+  }
+  
+  showingAlbum = selectedAlbum;
+  [lockForShowingAlbum unlock];
+
+  // '写真がありませんメッセージ'表示
+  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
+  
+  isFromAlbumTableView = YES;
+  [self discardTumbnails];
+  if(downloader != nil && ![downloader isCompleted] && [downloader isStarted]) {
+    [[self photoModelController] clearLastAdd];
+    [downloader requireStopping];
+  }
+  
+  self.album = selectedAlbum;
+  // Title設定
+  self.navigationItem.title = self.album.title;
+  BOOL load = [self loadPhotos:self.album];
+  //  [self loadThumbnails];
+  // navigationbar,  statusbar
+  self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
+  [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackOpaque;
+  // tool bar
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbar.translucent = NO;
+  
+  if(self.album == nil) {
+    return;
+  }
+  
+  if(isFromAlbumTableView == NO) {	// 写真画面から戻ってきた場合
+    // viewのサイズ, 前画面(写真)がtoolbar部分を含んでいたので、そのtoolbar分マイナス
+    CGRect frame = self.view.frame;
+    frame.size.height -= self.navigationController.toolbar.frame.size.height;
+    self.view.frame = frame;
+  }
+  
+  if( load == NO) {
+    // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
+    // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
+    // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
+    // 表示関連の操作はmain Threadでされる必要があるので)
+    [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
+                             toTarget:self
+                           withObject:nil];
+
+  }
+  self.view.userInteractionEnabled = YES;
+  
+}
+
+
+
 - (void) downloadThumbnail:(GDataEntryPhoto *)photo withPhotoModel:(Photo *)model {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   if([[[photo mediaGroup] mediaThumbnails] count] > 0) {
@@ -1103,7 +1149,7 @@
   }
     
   if ( ( curAlbum.lastAddPhotoAt == nil ||
-        [self minutesBetween:curAlbum.lastAddPhotoAt and:[NSDate date] ] > 15)
+        [self minutesBetween:curAlbum.lastAddPhotoAt and:[NSDate date] ] > kIntervalForReload)
         &&
       [NetworkReachability reachableByWifi]) {
     return YES;
@@ -1131,10 +1177,11 @@
                 initWithMaxAtSameTime:kDownloadMaxAtSameTime];
   downloader.delegate = self;
   
-  [self photoModelController].album = curAlbum;
+  [[self photoModelController] setAlbum:curAlbum];
   
   NSLog(@"fetchedPhotosController");
   NSError *error = nil;
+
   if (![[[self photoModelController] fetchedPhotosController] performFetch:&error]) {
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc]
@@ -1248,6 +1295,7 @@
   [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
                            toTarget:self
                          withObject:nil];
+
   self.view.userInteractionEnabled = YES;
   self.scrollView.scrollEnabled = YES;
   self.scrollView.userInteractionEnabled = YES;
@@ -1482,7 +1530,7 @@
   PhotoViewController *viewController = [[PhotoViewController alloc] 
                                          initWithNibName:@"PhotoViewController" 
                                          bundle:nil];
-  viewController.fetchedPhotosController = [self photoModelController].fetchedPhotosController;
+  viewController.fetchedPhotosController = [[self photoModelController] fetchedPhotosController];
   viewController.managedObjectContext = self.managedObjectContext;
   viewController.indexForPhoto = n;
   return viewController;

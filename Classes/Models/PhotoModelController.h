@@ -53,11 +53,13 @@
  */
 - (id) initWithContext:(NSManagedObjectContext *)context;
 
+- (NSFetchedResultsController *)fetchedPhotosController;
+
 /*!
  @property fetchedAlbumsController
  @discussion Album一覧のFetched Controller
  */
-@property (nonatomic, retain) NSFetchedResultsController *fetchedPhotosController;
+//@property (nonatomic, retain) NSFetchedResultsController *fetchedPhotosController;
 
 /*!
  @property managedObjectContext

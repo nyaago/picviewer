@@ -33,7 +33,7 @@
 
 @synthesize album;
 @synthesize managedObjectContext;
-@synthesize fetchedPhotosController;
+//@synthesize fetchedPhotosController;
 
 
 - (id)init {
@@ -65,7 +65,7 @@
 }
 
 - (void) setAlbum:(Album *)newAlbum {
-  if(album != newAlbum) {
+//  if(album != newAlbum) {
     [album release];
     album = newAlbum;
     [album retain];
@@ -73,7 +73,7 @@
       [fetchedPhotosController release];
       fetchedPhotosController = nil;
     }
-  }
+ // }
 }
 
 - (Photo *)insertPhoto:(GDataEntryPhoto *)photo   withAlbum:(Album *)album {
@@ -233,12 +233,14 @@
                                                           sectionNameKeyPath:nil 
                                                           cacheName:@"Root"];
   aFetchedPhotosController.delegate = self;
-  self.fetchedPhotosController = aFetchedPhotosController;
+  fetchedPhotosController = aFetchedPhotosController;
+  [fetchedPhotosController retain];
   
   [aFetchedPhotosController release];
   [fetchRequest release];
   [sortDescriptor release];
   [sortDescriptors release];
+  NSLog(@"new fetchedPhotosController created.");
   return fetchedPhotosController;
 }    
 
@@ -249,7 +251,7 @@
     return nil;
   indexes[0] = 0;
   indexes[1] = index;
-  Photo *photoObject = [fetchedPhotosController 
+  Photo *photoObject = [ [self fetchedPhotosController]
                         objectAtIndexPath:[NSIndexPath 
                                            indexPathWithIndexes:indexes length:2]];
   
@@ -258,7 +260,7 @@
 }
 
 - (NSUInteger)photoCount {
-  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedPhotosController sections]
+  id <NSFetchedResultsSectionInfo> sectionInfo = [[[self fetchedPhotosController] sections]
                                                   objectAtIndex:0];
   return [sectionInfo numberOfObjects];
   
@@ -293,6 +295,7 @@
 
 
 - (void) setLastAdd {
+  NSLog(@"setLastAdd");
   self.album.lastAddPhotoAt = [NSDate date];
   //NSLog(@"setLastAdd lock");
   //NSError *error = nil;
@@ -307,10 +310,13 @@
 }
 
 - (void) clearLastAdd {
+  NSLog(@"clearLastAdd");
   self.album.lastAddPhotoAt = nil;
   NSError *error = nil;
   [lockSave lock];
+  
   if (![managedObjectContext save:&error]) {
+    
   }
   [lockSave unlock];
 }

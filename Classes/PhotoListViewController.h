@@ -46,6 +46,12 @@ ThumbImageViewDelegate> {
   @private
   // CoreData album Model
   Album *album;
+  // 次に表示することを指定されたCoreData album Model
+  Album *nextShowedAlbum;
+  // 表示しようとしているAlbum
+  Album *showingAlbum;
+  // 表示中AlbumのLock
+  NSLock *lockForShowingAlbum;
   
   NSManagedObjectContext *managedObjectContext;
   // CoreData Model のController
