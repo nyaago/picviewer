@@ -50,6 +50,7 @@
 "AlbumInfo.PhotosUsed" = "Photo Count - %d";
 
 // Photo List
+"PhotoList.Choose" = "Choose a album";
 "PhotoList.None" = "No Photos";
 "PhotoList.Loding" = "Loding..";
 

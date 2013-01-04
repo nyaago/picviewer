@@ -45,6 +45,8 @@
 #define kNoPhotoMessage 1
 // 写真なしのメッセージタイプ - Loding（写真を読み込み中です）
 #define kLodingPhotosMessage 2
+// アルバム未選択のメッセージタイプ - Choose a albumu（アルバムを選択してください）
+#define kChooseAlbumMessage 3
 // Album の Reload確認を行う間隔（分）
 #define kIntervalForReload 15
 
@@ -100,7 +102,8 @@
 /*!
  @method setNoPhotoMessage:
  @discussion No Phtos のメッセージ表示
- @param show 0/kNoPhotoMessage/kLodingPhotosMessage -> 表示/No Photos/Loging Photos
+ @param show 0/kNoPhotoMessage/kLodingPhotosMessage/kChooseAlubum 
+ -> 表示/No Photos/Loging Photos/ChooseAlbumu
  */
 - (void)setNoPhotoMessage:(NSNumber *)show;
 
@@ -271,7 +274,7 @@
   self.navigationController.toolbar.translucent = NO;
 
   if(self.album == nil) {
-    [self setNoPhotoMessage:[NSNumber numberWithInt:kNoPhotoMessage]];
+    [self setNoPhotoMessage:[NSNumber numberWithInt:kChooseAlbumMessage]];
     return;
   }
   if(isFromAlbumTableView == NO && self.splitViewController == nil) {
@@ -510,9 +513,22 @@
       [self.scrollView addSubview:noPhotoLabel];
       NSLog(@"message type  = %d", [show integerValue] );
     }
-    noPhotoLabel.text = [show integerValue] == kLodingPhotosMessage ?
-    NSLocalizedString(@"PhotoList.Loding", @"Loging Photos") :
-    NSLocalizedString(@"PhotoList.None", @"No Photos");
+  
+    NSString *message = @"";
+    switch ([show integerValue] ) {
+      case kNoPhotoMessage:
+        message = NSLocalizedString(@"PhotoList.None", @"No Photos");
+        break;
+      case kLodingPhotosMessage:
+        message = NSLocalizedString(@"PhotoList.None", @"No Photos");
+        break;
+      case kChooseAlbumMessage:
+        message = NSLocalizedString(@"PhotoList.Choose", @"Choose a album");
+        break;
+      default:
+        break;
+    }
+    noPhotoLabel.text = message;
   }
   else {
     if(noPhotoLabel != nil && [noPhotoLabel superview] != nil) {
@@ -1011,7 +1027,7 @@
   showingAlbum = selectedAlbum;
   [lockForShowingAlbum unlock];
 
-  // '写真がありませんメッセージ'表示
+  // '写真を読み込んでいます'表示
   [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
   
   isFromAlbumTableView = YES;
@@ -1266,7 +1282,7 @@
     UIAlertView *alertView = [[UIAlertView alloc]
                               initWithTitle:NSLocalizedString(@"Error", @"Error")
                               message:NSLocalizedString(@"Error.DownloadThumb",
-                                                        @"Error IN Downloading")
+                                                        @"Error In Downloading")
                               delegate:self
                               cancelButtonTitle:@"OK"
                               otherButtonTitles:nil];
@@ -1277,7 +1293,7 @@
     UIAlertView *alertView = [[UIAlertView alloc]
                               initWithTitle:NSLocalizedString(@"Error", @"Error")
                               message:NSLocalizedString(@"Error.InsertThumb",
-                                                        @"Error IN Saving")
+                                                        @"Error In Saving")
                               delegate:self
                               cancelButtonTitle:@"OK"
                               otherButtonTitles:nil];
