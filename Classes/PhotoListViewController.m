@@ -312,9 +312,11 @@
   [onAddingThumbnailsLock unlock];
 
   //
+  [onAddingThumbnailsLock lock];
   [self performSelectorOnMainThread:@selector(discardTumbnails)
                          withObject:nil
                       waitUntilDone:YES];
+  [onAddingThumbnailsLock unlock];
   //
   [self performSelectorOnMainThread:@selector(loadThumbnails)
                          withObject:nil
