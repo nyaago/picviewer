@@ -321,18 +321,20 @@
   [self performSelectorOnMainThread:@selector(loadThumbnails)
                          withObject:nil
                       waitUntilDone:YES];
-
-  //
+//  [self loadThumbnails];
   [onAddingThumbnailsLock lock];
   onAddingThumbnails = NO;
   stoppingToAddingThumbnailsRequred = NO;
   [onAddingThumbnailsLock unlock];
-  
+  //
   Album *nextAlbum = nil;
   [lockForShowingAlbum lock];
   nextAlbum = nextShowedAlbum;
   showingAlbum = nil;
+  nextShowedAlbum = nil;
   [lockForShowingAlbum unlock];
+  //
+  
   if(nextAlbum != nil) {
     [self performSelectorOnMainThread:@selector(onAlbumSelected:)
                            withObject:nextAlbum
@@ -576,6 +578,7 @@
       if([onAddingThumbnailsLock tryLock] == YES) {
         if(stoppingToAddingThumbnailsRequred) {
           [onAddingThumbnailsLock unlock];
+          [self discardTumbnails];
           break;
         }
         [onAddingThumbnailsLock unlock];
@@ -1018,6 +1021,7 @@
     return;
   }
   if(selectedAlbum == nil) {
+    showingAlbum = nil;
     [lockForShowingAlbum unlock];
     return;
   }
@@ -1052,6 +1056,7 @@
   self.navigationController.toolbar.translucent = NO;
   
   if(self.album == nil) {
+    showingAlbum = nil;
     return;
   }
   
@@ -1063,13 +1068,15 @@
   }
   
   if( load == NO) {
-    // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
-    // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
-    // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
-    // 表示関連の操作はmain Threadでされる必要があるので)
     [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
                              toTarget:self
                            withObject:nil];
+
+  }
+  else {
+    [lockForShowingAlbum lock];
+    showingAlbum = nil;
+    [lockForShowingAlbum unlock];
 
   }
   self.view.userInteractionEnabled = YES;
