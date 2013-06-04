@@ -54,7 +54,8 @@
   UIBarButtonItem *nextButton;
   // 前ページ表示ボタン
   UIBarButtonItem *prevButton;
-  
+  //
+  PageView *pageView;
 }
 
 /*!
@@ -69,6 +70,12 @@
  @discussion 現在ページ番号
  */
 @property (nonatomic) NSUInteger curPageNumber;
+
+/*!
+ @property pageView
+ @discussion paging 用 view
+ */
+@property (nonatomic, retain) PageView *pageView;
 
 /*!
  @method changeNavigationAndStatusBar
@@ -117,6 +124,8 @@
  @method backAction:
  @discussion 前頁へ戻る(iPad）
  */
+
+
 - (void) backAction:(PageControlViewController *)sender;
 
 
@@ -163,6 +172,13 @@
  @return 破棄してもOKならYESを返す
  */
 - (BOOL) canDiscard;
+
+/*!
+ @method prepareToDiscard
+ @discussion 破棄のための準備を指示
+ */
+- (void) prepareToDiscard;
+
 
 @optional
 

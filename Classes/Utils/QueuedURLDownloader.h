@@ -156,6 +156,12 @@
 - (BOOL) isCompleted;
 
 /*!
+ @method stoppingRequired
+ @discussion Download処理中止要求されているか
+ */
+- (BOOL) stoppingRequired;
+
+/*!
  @method isStarted
  @discussion Download処理が開始されているかの判定
  */

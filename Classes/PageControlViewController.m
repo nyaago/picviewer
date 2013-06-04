@@ -195,6 +195,7 @@
 @implementation PageControlViewController
 
 @synthesize source;
+@synthesize pageView;
 //@synthesize scrollView;
 
 #pragma mark View lifecycle
@@ -219,12 +220,15 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   // Page View 生成して階層に追加
   CGRect scrollViewBounds = [[UIScreen mainScreen] bounds];
-  PageView *pageView = [ [ PageView alloc ]
-                        initWithFrame:scrollViewBounds];
-  pageView.delegate = self;
-  self.view = pageView;
+  PageView *view = [[ [ PageView alloc ]
+                        initWithFrame:scrollViewBounds] autorelease];
+  view.delegate = self;
+  self.view = view;
+  self.pageView = view;
+  [pool drain];
 }
 
 
@@ -423,9 +427,12 @@
 
 
 - (void)dealloc {
-  PageView *pageView = (PageView *)self.view;
+//  PageView *pageView = (PageView *)self.view;
+//  if(pageView) {
+//    [ pageView release ];
+//  }
   if(pageView) {
-    [ pageView release ];
+    [pageView release];
   }
   if(deviceRotation) {
     [deviceRotation release];
@@ -631,6 +638,28 @@
 
 
 - (void) backAction:(PageControlViewController *)sender {
+  // 下位view の破棄
+  if(self.pageView.curPage) {
+    [self.pageView.curPage prepareToDiscard];
+  }
+  if(self.pageView.nextPage) {
+    [self.pageView.nextPage prepareToDiscard];
+  }
+  if(self.pageView.prevPage) {
+    [self.pageView.prevPage prepareToDiscard];
+  }
+
+  if(self.pageView.curPage) {
+    [self.pageView.curPage canDiscard];
+  }
+  if(self.pageView.nextPage) {
+    [self.pageView.nextPage canDiscard];
+  }
+  if(self.pageView.prevPage) {
+    [self.pageView.prevPage canDiscard];
+  }
+  // ====
+  
   [[self navigationItem] setLeftBarButtonItem:nil];
   [[self presentingViewController] dismissViewControllerAnimated:YES completion:^{;
   }];

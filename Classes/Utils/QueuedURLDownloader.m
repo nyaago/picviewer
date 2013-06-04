@@ -126,6 +126,11 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)fragment {
+  if([self.queuedDownloader stoppingRequired]) {
+    [connection cancel];
+    [self.queuedDownloader.delegate dowloadCanceled:self.queuedDownloader];
+    [self.queuedDownloader finishDownload:self];
+  }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   if(fragment) {
     //NSLog(@"data length = %d", [fragment length]);
@@ -141,6 +146,12 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+  if([self.queuedDownloader stoppingRequired]) {
+    [connection cancel];
+    [self.queuedDownloader.delegate dowloadCanceled:self.queuedDownloader];
+    [self.queuedDownloader finishDownload:self];
+    return;
+  }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSLog(@"connection:didFailWithError - %@", error);
   if (delegate != nil
@@ -150,8 +161,14 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
   [pool drain];
 }
 
-- (void)connection:(NSURLConnection *)connection 
+- (void)connection:(NSURLConnection *)connection
 didReceiveResponse:(NSURLResponse *)response {
+  if([self.queuedDownloader stoppingRequired]) {
+    [connection cancel];
+    [self.queuedDownloader.delegate dowloadCanceled:self.queuedDownloader];
+    [self.queuedDownloader finishDownload:self];
+  }
+
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 //  NSLog(@"connection:didReceiveResponse ");
   if (delegate != nil
@@ -161,6 +178,13 @@ didReceiveResponse:(NSURLResponse *)response {
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+  if([self.queuedDownloader stoppingRequired]) {
+    [connection cancel];
+    [self.queuedDownloader.delegate dowloadCanceled:self.queuedDownloader];
+    [self.queuedDownloader finishDownload:self];
+    return;
+  }
+
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 //  NSLog(@"connection:connectionDidFinishLoading ");
   if(data) {
@@ -275,9 +299,6 @@ didReceiveResponse:(NSURLResponse *)response {
       [delegate dowloadCanceled:self];
     }
   }
-  [lock lock];
-  completed = YES;
-  [lock unlock];
 }
 
 - (BOOL) isCompleted {
@@ -286,6 +307,15 @@ didReceiveResponse:(NSURLResponse *)response {
   ret = completed;
   [lock unlock];
   return ret;
+}
+
+- (BOOL) stoppingRequired {
+  BOOL ret;
+  [lock lock];
+  ret = stoppingRequired;
+  [lock unlock];
+  return ret;
+  
 }
 
 - (BOOL) isStarted {
@@ -310,6 +340,10 @@ didReceiveResponse:(NSURLResponse *)response {
 
 - (void) run {
   [lock lock];
+  if(stoppingRequired || completed) {
+    [lock unlock];
+    return;
+  }
   started = YES;
   [lock unlock];
   while (1) {
@@ -357,19 +391,20 @@ didReceiveResponse:(NSURLResponse *)response {
   if(delegate == nil){
     return;
   }
-  [lock lock];
-  completed = YES;
-  [lock unlock];
   if(delegate != nil && [delegate respondsToSelector:@selector(didAllCompleted:)] ) {
     [lock lock];
     if(stoppingRequired) {
       [lock unlock];
+      [delegate didAllCompleted:self];
     }
     else {
       [lock unlock];
       [delegate didAllCompleted:self];
     }
   }
+  [lock lock];
+  completed = YES;
+  [lock unlock];
 }
 
 - (void) finishDownload:(QueuedURLDownloaderElem *)elem {

@@ -665,7 +665,16 @@ static NSLock *lockFetchedResultsController;
   if(downloader == nil || downloader.isCompleted) {
     return YES;
   }
-  return NO;
+  [downloader requireStopping];
+  [downloader waitCompleted];
+  return YES;
+}
+
+
+- (void)prepareToDiscard {
+  if(downloader != nil || downloader.isCompleted == NO) {
+    [downloader requireStopping];
+  }
 }
 
 #pragma mark -
@@ -728,6 +737,8 @@ static NSLock *lockFetchedResultsController;
   }
   imageView.frame = frame;
 }
+
+
 
 
 #pragma mark statci Method
