@@ -92,6 +92,13 @@ didReceiveResponse:(NSURLResponse *)response;
  */
 - (void) finishDownload:(QueuedURLDownloaderElem *)elem;
 
+/*!
+ @method cleanCanceledDownload:
+ @discussion キャンセルされたダウンロード要素の
+ 後かたずけをする.
+ */
+- (void) cleanCanceledDownloadElems;
+
 
 @end
 
@@ -126,10 +133,9 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)fragment {
+  
   if([self.queuedDownloader stoppingRequired]) {
-    [connection cancel];
-    [self.queuedDownloader.delegate dowloadCanceled:self.queuedDownloader];
-    [self.queuedDownloader finishDownload:self];
+    return;
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   if(fragment) {
@@ -146,10 +152,8 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+  
   if([self.queuedDownloader stoppingRequired]) {
-    [connection cancel];
-    [self.queuedDownloader.delegate dowloadCanceled:self.queuedDownloader];
-    [self.queuedDownloader finishDownload:self];
     return;
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -163,10 +167,9 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 
 - (void)connection:(NSURLConnection *)connection
 didReceiveResponse:(NSURLResponse *)response {
+  
   if([self.queuedDownloader stoppingRequired]) {
-    [connection cancel];
-    [self.queuedDownloader.delegate dowloadCanceled:self.queuedDownloader];
-    [self.queuedDownloader finishDownload:self];
+    return;
   }
 
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -178,10 +181,8 @@ didReceiveResponse:(NSURLResponse *)response {
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+
   if([self.queuedDownloader stoppingRequired]) {
-    [connection cancel];
-    [self.queuedDownloader.delegate dowloadCanceled:self.queuedDownloader];
-    [self.queuedDownloader finishDownload:self];
     return;
   }
 
@@ -224,7 +225,6 @@ didReceiveResponse:(NSURLResponse *)response {
 }
 
 @end
-
 
 
 
@@ -295,8 +295,10 @@ didReceiveResponse:(NSURLResponse *)response {
   queuingFinished = YES;
   [lock unlock];
   if(running == YES) {
-    if([delegate respondsToSelector:@selector(dowloadCanceled:)] ) {
-      [delegate dowloadCanceled:self];
+    NSEnumerator *enumerator = [runningDict keyEnumerator];
+    QueuedURLDownloaderElem *elem;
+    while((elem = (QueuedURLDownloaderElem *)enumerator.nextObject )) {
+      [elem.con cancel];
     }
   }
 }
@@ -334,9 +336,43 @@ didReceiveResponse:(NSURLResponse *)response {
       [lock unlock];
       [NSThread sleepForTimeInterval:0.01f];
     }
+    else {
+      [NSThread sleepForTimeInterval:0.01f];
+    }
   }
 }
 
+
+- (NSInteger)waitingCount {
+  NSInteger result;
+  [lock lock];
+  result = [waitingQueue count];
+  [lock unlock];
+  return result;
+}
+
+
+- (NSInteger)runningCount {
+  NSInteger result;
+  [lock lock];
+  result = [runningDict count];
+  [lock unlock];
+  return result;
+}
+
+
+- (void) dealloc {
+  [self waitCompleted];
+  delegate = nil;
+  [waitingQueue release];
+  [runningDict release];
+  [lock release];
+  NSLog(@"QueuedURLDownloader dealloc . completed.");
+  [super dealloc];
+}
+
+
+#pragma mark Private
 
 - (void) run {
   [lock lock];
@@ -362,9 +398,9 @@ didReceiveResponse:(NSURLResponse *)response {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         QueuedURLDownloaderElem *elem = [waitingQueue objectAtIndex:0];
         [waitingQueue removeObjectAtIndex:0];
-        NSURLRequest *request = [[NSURLRequest alloc] 
-                                 initWithURL:elem.URL 
-                                 cachePolicy:NSURLRequestUseProtocolCachePolicy 
+        NSURLRequest *request = [[NSURLRequest alloc]
+                                 initWithURL:elem.URL
+                                 cachePolicy:NSURLRequestUseProtocolCachePolicy
                                  timeoutInterval:timeoutInterval];
         // DownLoadを開始
         elem.con = [[NSURLConnection alloc] initWithRequest:request delegate:elem];
@@ -387,20 +423,16 @@ didReceiveResponse:(NSURLResponse *)response {
       [NSThread sleepForTimeInterval:0.01f];
     }
   }
-  // 完了の通知
-  if(delegate == nil){
-    return;
+  // 中断された場合のクリーンとdelegate実行
+  if(self.stoppingRequired) {
+    [self cleanCanceledDownloadElems];
+    if(delegate && [delegate respondsToSelector:@selector(dowloadCanceled:)] ) {
+      [delegate dowloadCanceled:self];
+    }
   }
+  // 完了の通知
   if(delegate != nil && [delegate respondsToSelector:@selector(didAllCompleted:)] ) {
-    [lock lock];
-    if(stoppingRequired) {
-      [lock unlock];
-      [delegate didAllCompleted:self];
-    }
-    else {
-      [lock unlock];
-      [delegate didAllCompleted:self];
-    }
+    [delegate didAllCompleted:self];
   }
   [lock lock];
   completed = YES;
@@ -418,44 +450,18 @@ didReceiveResponse:(NSURLResponse *)response {
   [lock unlock];
 }
 
-- (NSInteger)waitingCount {
-  NSInteger result;
-  [lock lock];
-  result = [waitingQueue count];
-  [lock unlock];
-  return result;
-}
-
-
-- (NSInteger)runningCount {
-  NSInteger result;
-  [lock lock];
-  result = [runningDict count];
-  [lock unlock];
-  return result;
-}
-
-
-- (void) dealloc {
-  while(1) {
-    if([lock tryLock]) {
-      if([runningDict count] == 0 && (completed || !started)) {
-        [lock unlock];
-        break;
-      }
-      [lock unlock];
-      [NSThread sleepForTimeInterval:0.01f];
-    }
-    else {
-      [NSThread sleepForTimeInterval:0.01f];
-    }
+- (void) cleanCanceledDownloadElems {
+  if(self.stoppingRequired == NO) {
+    return;
   }
-  delegate = nil;
-  [waitingQueue release];
-  [runningDict release];
-  [lock release];
-  NSLog(@"QueuedURLDownloader dealloc . completed.");
-  [super dealloc];
+  [lock lock];
+  NSEnumerator *enumerator = [runningDict keyEnumerator];
+  QueuedURLDownloaderElem *elem;
+  while((elem = (QueuedURLDownloaderElem *)enumerator.nextObject )) {
+    [elem release];
+  }
+  [lock unlock];
 }
+
 
 @end
