@@ -360,6 +360,9 @@
 - (void)viewWillDisappear:(BOOL)animated {
   //
   [super viewWillDisappear:animated];
+  if(downloader) {
+    [downloader requireStopping];
+  }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -791,7 +794,8 @@
             [[photo title] contentStringValue], [photo GPhotoID], [photo feedLink]);
       //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
       BOOL f;
-      if(onRefresh || ![[self photoModelController] selectPhoto:photo hasError:&f] ) {
+      Photo *photoModel = [[self photoModelController] selectPhoto:photo hasError:&f];
+      if(onRefresh || !photoModel ) {
         if([progressView subviews] != nil) {
           // toolbarのButtonを無効に
           [self enableToolbar:NO];
@@ -805,6 +809,10 @@
         else {
           hasErrorInInserting = YES;
         }
+      }
+      else if(!photoModel.thumbnail) {
+        // Thumnail をロード
+        [self downloadThumbnail:photo withPhotoModel:photoModel];
       }
     }
   }	
@@ -1179,7 +1187,17 @@
       [NetworkReachability reachableByWifi]) {
     return YES;
   }
-  return NO;
+  BOOL ret = NO;
+  // thumbnail の未ロードのものがないかのチェック
+  for(int i = 0; i < [modelController photoCount]; ++i) {
+    Photo *photoModel = [modelController photoAt:i];
+    if(photoModel == nil || photoModel.thumbnail == nil) {
+      ret = YES;
+      break;
+    }
+  }
+  
+  return ret;
 }
 
 - (BOOL)mustRefresh:(Album *)curAlbum {
