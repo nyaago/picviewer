@@ -266,6 +266,7 @@
   self.wantsFullScreenLayout = YES;
 }
 
+
 /*!
  @method viewDidDisappear:
  @discussion viewが表示非表示になったときの通知.各ページのViewの削除
@@ -315,7 +316,6 @@
   self.navigationController.navigationBar.hidden = NO;
   self.navigationController.toolbarHidden = NO;
   // Page追加
-  PageView *pageView = (PageView *)self.view;
   if(source) {
     NSUInteger count = [source pageCount];
     [pageView setPageCount:count];
@@ -367,6 +367,34 @@
 - (void)viewWillDisappear:(BOOL)animated {
   [deviceRotation release];
   deviceRotation = nil;
+  // 下位view の破棄
+  if(self.pageView.curPage) {
+    [self.pageView.curPage requireToDiscard];
+  }
+  if(self.pageView.nextPage) {
+    [self.pageView.nextPage requireToDiscard];
+  }
+  if(self.pageView.prevPage) {
+    [self.pageView.prevPage requireToDiscard];
+  }
+  
+  if(self.pageView.curPage) {
+    if([self.pageView.curPage canDiscard] == NO) {
+      return;
+    }
+  }
+  if(self.pageView.nextPage) {
+    if([self.pageView.nextPage canDiscard] == NO) {
+      return;
+    }
+  }
+  if(self.pageView.prevPage) {
+    if([self.pageView.prevPage canDiscard] == NO) {
+      return;
+    }
+  }
+
+  
 }
 
 #pragma mark -
@@ -417,7 +445,6 @@
     [toolbarButtons release];
     nextButton = nil;
   }
-  PageView *pageView = (PageView *)self.view;
   if(pageView) {
     [ pageView release ];
     self.view = nil;
@@ -456,7 +483,6 @@
  */
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
   NSLog(@"begin dragging");
-  PageView *pageView = (PageView *)self.view;
   if(pageView.nextPage) {
     pageView.nextPage.view.hidden = NO;
   }
@@ -493,7 +519,6 @@
       }
     }
   }
-  PageView *pageView = (PageView *)self.view;
   if(pageView.nextPage) {
     pageView.nextPage.view.hidden = YES;
   }
@@ -554,11 +579,11 @@
   if(scrollView.curPageNumber + 1 >= [source pageCount]) {
     return;
   }
-  if(scrollView.prevPage != nil && [scrollView.prevPage canDiscard] == NO ) {
-    return;
+  if(scrollView.prevPage != nil) {
+    [scrollView.prevPage waitUntilCompleted];
   }
-  if(scrollView.curPage != nil && [scrollView.curPage canDiscard] == NO ) {
-    return;
+  if(scrollView.curPage != nil ) {
+    [scrollView.curPage waitUntilCompleted];
   }
 	[scrollView toNextPage];
   UIViewController<PageViewDelegate> *controller
@@ -579,11 +604,11 @@
   if(scrollView.curPageNumber <= 0) {
     return;
   }
-  if(scrollView.nextPage != nil && [scrollView.nextPage canDiscard] == NO ) {
-    return;
+  if(scrollView.nextPage != nil) {
+    [scrollView.nextPage waitUntilCompleted];
   }
-  if(scrollView.curPage != nil && [scrollView.curPage canDiscard] == NO ) {
-    return;
+  if(scrollView.curPage != nil ) {
+    [scrollView.curPage waitUntilCompleted];
   }
 	[scrollView toPrevPage];
   UIViewController<PageViewDelegate> *controller
@@ -640,23 +665,29 @@
 - (void) backAction:(PageControlViewController *)sender {
   // 下位view の破棄
   if(self.pageView.curPage) {
-    [self.pageView.curPage prepareToDiscard];
+    [self.pageView.curPage requireToDiscard];
   }
   if(self.pageView.nextPage) {
-    [self.pageView.nextPage prepareToDiscard];
+    [self.pageView.nextPage requireToDiscard];
   }
   if(self.pageView.prevPage) {
-    [self.pageView.prevPage prepareToDiscard];
+    [self.pageView.prevPage requireToDiscard];
   }
 
   if(self.pageView.curPage) {
-    [self.pageView.curPage canDiscard];
+    if([self.pageView.curPage canDiscard] == NO) {
+      return;
+    }
   }
   if(self.pageView.nextPage) {
-    [self.pageView.nextPage canDiscard];
+    if([self.pageView.nextPage canDiscard] == NO) {
+      return;
+    }
   }
   if(self.pageView.prevPage) {
-    [self.pageView.prevPage canDiscard];
+    if([self.pageView.prevPage canDiscard] == NO) {
+      return;
+    }
   }
   // ====
   

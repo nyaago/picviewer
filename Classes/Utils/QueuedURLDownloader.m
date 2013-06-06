@@ -288,17 +288,21 @@ didReceiveResponse:(NSURLResponse *)response {
 - (void) requireStopping {
   BOOL running = NO;
   [lock lock];
-  if(!completed && !started) {
+  if(!completed && started) {
     running = YES;
   }
   stoppingRequired = YES;
   queuingFinished = YES;
   [lock unlock];
   if(running == YES) {
+    NSLog(@"QueuedURLDownloader. requireStopping.");
     NSEnumerator *enumerator = [runningDict keyEnumerator];
-    QueuedURLDownloaderElem *elem;
-    while((elem = (QueuedURLDownloaderElem *)enumerator.nextObject )) {
+    NSString *URL;
+    while((URL = (NSString *)enumerator.nextObject )) {
+      QueuedURLDownloaderElem *elem = (QueuedURLDownloaderElem *)[runningDict objectForKey:URL];
+      NSLog(@"QueuedURLDownloader. cancel connection.");
       [elem.con cancel];
+      NSLog(@"QueuedURLDownloader. canceled connection.");
     }
   }
 }
@@ -377,6 +381,7 @@ didReceiveResponse:(NSURLResponse *)response {
 - (void) run {
   [lock lock];
   if(stoppingRequired || completed) {
+    completed = YES;
     [lock unlock];
     return;
   }
@@ -407,6 +412,7 @@ didReceiveResponse:(NSURLResponse *)response {
         [request release];
         [runningDict setObject:elem forKey:elem.URL];
         [elem.con start];
+        NSLog(@"start  connection.");
         downloading = YES;
         [lock unlock];
         [[NSRunLoop currentRunLoop] run];
@@ -454,6 +460,7 @@ didReceiveResponse:(NSURLResponse *)response {
   if(self.stoppingRequired == NO) {
     return;
   }
+  NSLog(@"cleanCanceledDownloadElems");
   [lock lock];
   NSEnumerator *enumerator = [runningDict keyEnumerator];
   QueuedURLDownloaderElem *elem;

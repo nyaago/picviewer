@@ -165,6 +165,18 @@
  */
 - (void) setPageController:(PageControlViewController *)controller;
 
+/*!
+ @method waitUntilCompleted
+ @discussion この画面のデーターのロードなどが完了するまで待つ.
+ */
+- (void) waitUntilCompleted;
+
+/*!
+ @method isCompleted
+ @discussion この画面のデーターのロードなどが完了しているか
+ */
+- (BOOL) isCompleted;
+
 
 /*!
  @meothd canDiscard
@@ -174,10 +186,10 @@
 - (BOOL) canDiscard;
 
 /*!
- @method prepareToDiscard
+ @method requireToDiscard
  @discussion 破棄のための準備を指示
  */
-- (void) prepareToDiscard;
+- (void) requireToDiscard;
 
 
 @optional

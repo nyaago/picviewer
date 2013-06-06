@@ -661,6 +661,20 @@ static NSLock *lockFetchedResultsController;
   [sheet showInView:parentController.view];                        
 }
 
+
+- (BOOL) isCompleted {
+  return downloader.isCompleted;
+}
+
+- (void) waitUntilCompleted {
+  if(downloader == nil || downloader.isCompleted) {
+    return;
+  }
+  [downloader waitCompleted];
+  return;
+  
+}
+
 - (BOOL) canDiscard {
   if(downloader == nil || downloader.isCompleted) {
     return YES;
@@ -671,7 +685,7 @@ static NSLock *lockFetchedResultsController;
 }
 
 
-- (void)prepareToDiscard {
+- (void) requireToDiscard {
   if(downloader != nil || downloader.isCompleted == NO) {
     [downloader requireStopping];
   }
