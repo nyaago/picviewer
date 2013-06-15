@@ -74,6 +74,12 @@ didReceiveResponse:(NSURLResponse *)response;
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)fragment;
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection;
 
+-(void)performInvocation:(NSInvocation *)anInvocation;
+/*!
+ delegate を実行するthread
+ */
+- (NSThread *) threadForDelegate;
+
 @end
 
 @interface QueuedURLDownloader(Private)
@@ -141,9 +147,30 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
   if(fragment) {
     //NSLog(@"data length = %d", [fragment length]);
   }
+  SEL selector;
   if (delegate != nil
-      && [delegate respondsToSelector:@selector(didReceiveData:withUserInfo:)])
-    [delegate didReceiveData:fragment withUserInfo:userInfo];
+      && [delegate respondsToSelector:@selector(didReceiveData:withUserInfo:)]) {
+    
+    selector = @selector(didReceiveData:withUserInfo:);
+    // シグネチャを作成
+    NSMethodSignature *signature = [[delegate class] instanceMethodSignatureForSelector:selector];
+    // invocationの作成
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+    
+    [invocation setTarget:delegate];
+    [invocation setArgument:&fragment atIndex:2];
+    [invocation setArgument:&userInfo atIndex:3];
+    [invocation setSelector:selector];
+    if([[self threadForDelegate] isEqual:[NSThread currentThread]] ) {
+      [self performSelector:@selector(performInvocation:) withObject:invocation];
+    }
+    else {
+      [self performSelector:@selector(performInvocation:)
+                   onThread:[self threadForDelegate]
+                 withObject:invocation
+              waitUntilDone:NO];
+    }
+  }
   if(!data) {
     data = [[NSMutableData alloc] init];
   }
@@ -157,10 +184,32 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
     return;
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  SEL selector;
   NSLog(@"connection:didFailWithError - %@", error);
   if (delegate != nil
-      && [delegate respondsToSelector:@selector(downloadDidFailWithError:withUserInfo:)])
-    [delegate downloadDidFailWithError:error withUserInfo:userInfo];
+      && [delegate respondsToSelector:@selector(downloadDidFailWithError:withUserInfo:)]) {
+    
+    selector = @selector(downloadDidFailWithError:withUserInfo:);
+    // シグネチャを作成
+    NSMethodSignature *signature = [[delegate class] instanceMethodSignatureForSelector:selector];
+    // invocationの作成
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+    
+    [invocation setTarget:delegate];
+    [invocation setArgument:&error atIndex:2];
+    [invocation setArgument:&userInfo atIndex:3];
+    [invocation setSelector:selector];
+  
+    if([[self threadForDelegate] isEqual:[NSThread currentThread]] ) {
+      [self performSelector:@selector(performInvocation:) withObject:invocation];
+    }
+    else {
+      [self performSelector:@selector(performInvocation:)
+                   onThread:[self threadForDelegate]
+                 withObject:invocation
+              waitUntilDone:NO];
+    }
+  }
   [self.queuedDownloader finishDownload:self];
   [pool drain];
 }
@@ -173,10 +222,32 @@ didReceiveResponse:(NSURLResponse *)response {
   }
 
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  SEL selector;
 //  NSLog(@"connection:didReceiveResponse ");
   if (delegate != nil
-      && [ delegate respondsToSelector:@selector(didReceiveResponse:withUserInfo:)])
-    [delegate didReceiveResponse:response withUserInfo:userInfo];
+      && [ delegate respondsToSelector:@selector(didReceiveResponse:withUserInfo:)]) {
+    
+    selector = @selector(didReceiveResponse:withUserInfo:);
+    // シグネチャを作成
+    NSMethodSignature *signature = [[delegate class] instanceMethodSignatureForSelector:selector];
+    // invocationの作成
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+    
+    [invocation setTarget:delegate];
+    [invocation setArgument:&response atIndex:2];
+    [invocation setArgument:&userInfo atIndex:3];
+    [invocation setSelector:selector];
+  
+    if([[self threadForDelegate] isEqual:[NSThread currentThread]] ) {
+      [self performSelector:@selector(performInvocation:) withObject:invocation];
+    }
+    else {
+      [self performSelector:@selector(performInvocation:)
+                 onThread:[self threadForDelegate]
+               withObject:invocation
+            waitUntilDone:NO];
+    }
+  }
   [pool drain];
 }
 
@@ -192,18 +263,33 @@ didReceiveResponse:(NSURLResponse *)response {
 //    NSLog(@"data length = %d", [data length]);
   }
   if(self.userInfo) {
-    /*
-     NSEnumerator *enumerator = [self.userInfo keyEnumerator];
-     id key;
-     
-     while ((key = [enumerator nextObject])) {
-     //  NSLog(@"key = %@, value = %@", key, [self.userInfo valueForKey:key]);
-     } 
-     */
   }
+  SEL selector;
   if (delegate != nil
-      && [ delegate respondsToSelector:@selector(didFinishLoading:withUserInfo:)])
-    [delegate didFinishLoading:data withUserInfo:userInfo];
+      && [ delegate respondsToSelector:@selector(didFinishLoading:withUserInfo:)]) {
+    
+    
+    selector = @selector(didFinishLoading:withUserInfo:);
+    // シグネチャを作成
+    NSMethodSignature *signature = [[delegate class] instanceMethodSignatureForSelector:selector];
+    // invocationの作成
+    NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+    
+    [invocation setTarget:delegate];
+    [invocation setArgument:&data atIndex:2];
+    [invocation setArgument:&userInfo atIndex:3];
+    [invocation setSelector:selector];
+  
+    if([[self threadForDelegate] isEqual:[NSThread currentThread]] ) {
+      [self performSelector:@selector(performInvocation:) withObject:invocation];
+    }
+    else {
+      [self performSelector:@selector(performInvocation:)
+                   onThread:[self threadForDelegate]
+                 withObject:invocation
+              waitUntilDone:NO];
+    }
+  }
   [self.queuedDownloader finishDownload:self];
   [pool drain];
 }
@@ -224,6 +310,17 @@ didReceiveResponse:(NSURLResponse *)response {
   [super dealloc];
 }
 
+-(void)performInvocation:(NSInvocation *)anInvocation{
+	[anInvocation invoke];
+}
+
+
+- (NSThread *) threadForDelegate {
+  return self.queuedDownloader.delegateOnMainThread ?
+                                [NSThread mainThread] :
+                                [NSThread currentThread];
+}
+
 @end
 
 
@@ -234,9 +331,11 @@ didReceiveResponse:(NSURLResponse *)response {
 @synthesize delegate;
 @synthesize completedCount;
 @synthesize timeoutInterval;
+@synthesize delegateOnMainThread;
 
 - (id) init {
   [self initWithMaxAtSameTime:1];
+  delegateOnMainThread = YES;
   return self;
 }
 
@@ -244,6 +343,7 @@ didReceiveResponse:(NSURLResponse *)response {
   self = [super init];
   if(self == nil)
     return self;
+  delegateOnMainThread = YES;
   maxAtSameTime = count;
   waitingQueue = [[NSMutableArray alloc] init];
   runningDict = [[NSMutableDictionary alloc] init];
@@ -338,6 +438,7 @@ didReceiveResponse:(NSURLResponse *)response {
     if([lock tryLock] == YES) {
       ret = completed || !started;
       [lock unlock];
+      
       [NSThread sleepForTimeInterval:0.01f];
     }
     else {

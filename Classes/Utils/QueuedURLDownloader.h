@@ -103,7 +103,8 @@
   NSLock *lock;
   // Timeout時間,単位:秒,Default 10.0秒
   NSTimeInterval timeoutInterval;
-  //
+  // delegateをmain thread で実行するか? デフォルト=>YES
+  BOOL delegateOnMainThread;
 }
 
 /*!
@@ -121,6 +122,11 @@
  @discussion Timeout時間,単位:秒,Default 10.0秒
  */
 @property (nonatomic) NSTimeInterval timeoutInterval;
+/*!
+ @property delegateOnMainThread
+ @discussion delegateをmain thread で実行するか? デフォルト=>YES
+ */
+@property (nonatomic) BOOL delegateOnMainThread;
 
 /*!
  @method initWithMaxAtSameTime:
