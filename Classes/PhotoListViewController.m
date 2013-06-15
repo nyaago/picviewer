@@ -51,6 +51,13 @@
 #define kIntervalForReload 15
 
 /*!
+ @method addTbumbnailForPhoto:
+ @param photo photo モデル
+ @discussion 指定した写真モデルについてサムネイルをview上に表示する。
+ */
+- (void) addTbumbnailForPhoto:(Photo *)photo;
+
+/*!
  @method refreshAction:
  @discussion albumのリフレッシュ、全写真データを削除してから再ロードを行う.
  */
@@ -135,12 +142,6 @@
  @discussion データロードを行うかどうかの判定
  */
 - (BOOL)mustLoad:(Album *)curAlbum;
-
-/*!
- @method mustRefresh
- @discussion データの全ロードを行うがどうかの判定
- */
-- (BOOL)mustRefresh:(Album *)curAlbum;
 
 /*!
  @method loadPhotos
@@ -241,7 +242,6 @@
     return;
   }
 
-  [self loadPhotos:self.album];
   // Title設定
   self.navigationItem.title = self.album.title;
 }
@@ -295,22 +295,12 @@
   
   if(isFromAlbumTableView == YES) {
     [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
-    // Thumbnailを表示するImageViewがview階層に追加されるたびにそれらが画面表示されるよう
-    // (最後に一括して表示されるのではなく)、表示処理のloopを別Threadで起動、
-    // ただし、実際のview階層への追加はこのmain Threadに戻って行われることになる(
-    // 表示関連の操作はmain Threadでされる必要があるので)
-    [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
-                             toTarget:self 
-                           withObject:nil];
+    [self loadPhotos:self.album];
+
   }
 }
 
 - (void) afterViewDidAppear:(id)arg {
-  [onAddingThumbnailsLock lock];
-  onAddingThumbnails = YES;
-  stoppingToAddingThumbnailsRequred = NO;
-  [onAddingThumbnailsLock unlock];
-
   //
   [onAddingThumbnailsLock lock];
   [self performSelectorOnMainThread:@selector(discardTumbnails)
@@ -321,25 +311,6 @@
   [self performSelectorOnMainThread:@selector(loadThumbnails)
                          withObject:nil
                       waitUntilDone:YES];
-//  [self loadThumbnails];
-  [onAddingThumbnailsLock lock];
-  onAddingThumbnails = NO;
-  stoppingToAddingThumbnailsRequred = NO;
-  [onAddingThumbnailsLock unlock];
-  //
-  Album *nextAlbum = nil;
-  [lockForShowingAlbum lock];
-  nextAlbum = nextShowedAlbum;
-  showingAlbum = nil;
-  nextShowedAlbum = nil;
-  [lockForShowingAlbum unlock];
-  //
-  
-  if(nextAlbum != nil) {
-    [self performSelectorOnMainThread:@selector(onAlbumSelected:)
-                           withObject:nextAlbum
-                        waitUntilDone:YES];
-  }
 }
 
 /*!
@@ -553,7 +524,6 @@
   // なのでUIに関する操作は、performSelectorOnMainThreadでMain Thread Queueへ移動させている。
   
   // thumbnailを保持するコレクションの準備
-  [thumbnailLock lock];
 
   
   [self.view setNeedsLayout];
@@ -577,29 +547,25 @@
                                withObject:imageView 
                             waitUntilDone:NO];
       }
-      // 中断が要求されているかチェック
-      if([onAddingThumbnailsLock tryLock] == YES) {
-        if(stoppingToAddingThumbnailsRequred) {
-          [onAddingThumbnailsLock unlock];
-          [self discardTumbnails];
-          break;
-        }
-        [onAddingThumbnailsLock unlock];
-      }
-      
     }
   }
+  [self removeProgressView];
+
   // scrollViewのcontent sizeを設定(main threadで行う必要がある)
   [self performSelectorOnMainThread:@selector(setContentSizeWithImageCount)
                          withObject:nil
                       waitUntilDone:YES];
-  [thumbnailLock unlock];
+  //
+  [onAddingThumbnailsLock lock];
+  onAddingThumbnails = NO;
+  [onAddingThumbnailsLock unlock];
+
   [pool drain];
 }
 
 - (void) stopToAddThumbnails {
   [onAddingThumbnailsLock lock];
-  stoppingToAddingThumbnailsRequred = YES;
+  stoppingToAddingThumbnailsRequired = YES;
   [onAddingThumbnailsLock unlock];
   while (YES) {
     if([onAddingThumbnailsLock tryLock] == YES) {
@@ -617,9 +583,7 @@
 
 - (void)discardTumbnails {
   
-  [thumbnailLock lock];
   [ThumbImageView cleanup];
-  [thumbnailLock unlock];
   
 }
 
@@ -757,6 +721,20 @@
 - (void)albumAndPhotosWithTicket:(GDataServiceTicket *)ticket
            finishedWithAlbumFeed:(GDataFeedPhotoAlbum *)feed
                            error:(NSError *)error {
+  
+  if(nextShowedAlbum != nil) {
+    // 問い合わせ中に次のアルバムが選択されたので
+    // 現在のアルバムの処理を中断して、次に選択されたアルバムを表示
+    [self performSelectorOnMainThread:@selector(onAlbumSelected:)
+                           withObject:nextShowedAlbum
+                        waitUntilDone:NO];
+    return;
+  }
+
+  [onAddingThumbnailsLock lock];
+  onAddingThumbnails = YES;
+  stoppingToAddingThumbnailsRequired = NO;
+  [onAddingThumbnailsLock unlock];
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   BOOL hasErrorInInserting = NO;
   if(error) {
@@ -779,10 +757,6 @@
     [pool drain];
     return;
   }
-  // 削除
-  if(onRefresh) {
-	  [[self photoModelController] removePhotos];
-  }
   
   // ローカルDBへの保存
   NSArray *entries = [feed entries];
@@ -795,7 +769,9 @@
       //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
       BOOL f;
       Photo *photoModel = [[self photoModelController] selectPhoto:photo hasError:&f];
-      if(onRefresh || !photoModel ) {
+      
+      if(!photoModel ) {
+        // Photo entry 未登録時 - 登録する
         if([progressView subviews] != nil) {
           // toolbarのButtonを無効に
           [self enableToolbar:NO];
@@ -811,9 +787,26 @@
         }
       }
       else if(!photoModel.thumbnail) {
-        // Thumnail をロード
+        // Photo thumbnail 未登録時 - 登録するThumnail をロード
         [self downloadThumbnail:photo withPhotoModel:photoModel];
       }
+      else {
+        NSLog(@"count = %d",[[self photoModelController] photoCount]);
+        // Photo thumbnail　登録済み - thumbnail 表示
+        // pregress view と 写真なしメッセージを非表示
+        [self performSelectorOnMainThread:@selector(removeProgressView)
+                               withObject:self
+                            waitUntilDone:NO ];
+        [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
+                               withObject:[NSNumber numberWithBool:NO]
+                            waitUntilDone:NO];
+        // thumbnail の追加
+        [self performSelectorOnMainThread:@selector(addTbumbnailForPhoto:)
+                               withObject:photoModel
+                            waitUntilDone:NO];
+
+      }
+
     }
   }	
   // Photo一覧のFetched Controllerを生成
@@ -858,7 +851,6 @@
   [pool drain];
   [picasaFetchController release];
   picasaFetchController = nil;
-  onRefresh = NO;
 }
 
 
@@ -1020,26 +1012,38 @@
 
 #pragma mark Private
 
+- (void) addTbumbnailForPhoto:(Photo *)photo {
+  NSInteger i = [[self photoModelController] indexForPhoto:photo];
+  if(i != NSNotFound) {
+    UIView *imageView = [self thumbnailAt:i];
+    // ImageViewのView階層への追加を行う(main threadで行う必要がある)
+    if(imageView) {
+      [self addImageView:imageView];
+    }
+    // scrollViewのcontent sizeを設定(main threadで行う必要がある)
+    [self setContentSizeWithImageCount];
+  }
+}
 
 - (void) onAlbumSelected:(Album *)selectedAlbum {
-  [lockForShowingAlbum lock];
-  if(showingAlbum != nil) {
+  if(picasaFetchController && picasaFetchController.completed == NO) {
+    // Google 問い合わせ中に次のアルバムが選択された
+    // 問い合わせが返ってくるまで待つため、次の選択アルバムを記録しておいて、一回処理キャンセルしておく
+    // 問い合わせが返ってきたときｎ、再度、これを起動する。
     nextShowedAlbum = selectedAlbum;
-    [lockForShowingAlbum unlock];
     return;
   }
-  if(selectedAlbum == nil) {
-    showingAlbum = nil;
-    [lockForShowingAlbum unlock];
-    return;
-  }
-  if(nextShowedAlbum != nil && selectedAlbum.albumId == nextShowedAlbum.albumId) {
-    nextShowedAlbum = nil;
-
-  }
+  nextShowedAlbum = nil;
   
-  showingAlbum = selectedAlbum;
-  [lockForShowingAlbum unlock];
+  
+  if(downloader) {
+    [downloader requireStopping];
+  }
+//  [self stopToAddThumbnails];
+  if(downloader) {
+    [downloader waitCompleted];
+  }
+
 
   // '写真を読み込んでいます'表示
   [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
@@ -1052,6 +1056,7 @@
   }
   
   self.album = selectedAlbum;
+  [[self photoModelController] setAlbum:[self album]];
   // Title設定
   self.navigationItem.title = self.album.title;
   BOOL load = [self loadPhotos:self.album];
@@ -1075,18 +1080,6 @@
     self.view.frame = frame;
   }
   
-  if( load == NO) {
-    [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
-                             toTarget:self
-                           withObject:nil];
-
-  }
-  else {
-    [lockForShowingAlbum lock];
-    showingAlbum = nil;
-    [lockForShowingAlbum unlock];
-
-  }
   self.view.userInteractionEnabled = YES;
   
 }
@@ -1112,14 +1105,16 @@
 
 - (void) refreshPhotos {
 
-  onRefresh = YES;
   hasErrorInDownloading = NO;
   hasErrorInInsertingThumbnail = NO;
+  [[self photoModelController] setAlbum:[self album]];
   //
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   //  NSArray *objects = [fetchedPhotosController fetchedObjects];
   // toolbarのButtonを無効に
   [self enableToolbar:NO];
+  // 削除
+  [[self photoModelController] removePhotos];
   // 再ロード
   SettingsManager *settings = [[SettingsManager alloc] init];
   picasaFetchController = [[PicasaFetchController alloc] init];
@@ -1177,7 +1172,6 @@
       [alertView release];
       return NO;
     }
-    onRefresh = YES;
 		return YES;
   }
     
@@ -1200,26 +1194,13 @@
   return ret;
 }
 
-- (BOOL)mustRefresh:(Album *)curAlbum {
-  if([[self photoModelController] album].albumId != curAlbum.albumId) {
-    return YES;
-  }
-  if([[self photoModelController] photoCount] == 0) {
-    return YES;
-  }
-  if(curAlbum != nil && [curAlbum lastAddPhotoAt] == nil) {
-    return YES;
-  }
-  return NO;
-}
-
-
+  
 - (BOOL) loadPhotos:(Album *)curAlbum {
   
   downloader = [[QueuedURLDownloader alloc]
                 initWithMaxAtSameTime:kDownloadMaxAtSameTime];
   downloader.delegate = self;
-  
+  [self discardTumbnails];
   [[self photoModelController] setAlbum:curAlbum];
   
   NSLog(@"fetchedPhotosController");
@@ -1243,15 +1224,9 @@
   // CoreDataへの登録を行う
   BOOL ret = NO;
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  if([self mustLoad:curAlbum]) {
-    [onAddingThumbnailsLock lock];
-    onAddingThumbnails = YES;
-    stoppingToAddingThumbnailsRequred = NO;
-    [onAddingThumbnailsLock unlock];
-
+  if([self mustLoad:curAlbum]) {      
+    [self discardTumbnails];
     // クリア + 全ロードか?
-    onRefresh = [self mustRefresh:curAlbum];
-    
     // toolbarのButtonを無効に
     [self enableToolbar:NO];
     self.scrollView.userInteractionEnabled = NO;
@@ -1259,11 +1234,8 @@
     progressView.progress = 0.0f;
     [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
                                                @"download")];
-    if(onRefresh) {
-      [self.view addSubview:[self progressView]];
-    }
+    [self.view addSubview:[self progressView]];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    
     //
     SettingsManager *settings = [[SettingsManager alloc] init];
     picasaFetchController = [[PicasaFetchController alloc] init];
@@ -1278,6 +1250,11 @@
                                                 [[UIScreen mainScreen] scale]]];
     [settings release];
     ret = YES;
+  }
+  else {
+    [self afterViewDidAppear:self];
+    ret = NO;
+
   }
   [pool drain];
   return ret;
@@ -1329,15 +1306,12 @@
   }
   //
   [self removeProgressView];
-
+  [self setNoPhotoMessage:NO];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
   //
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
    //
-  [NSThread detachNewThreadSelector:@selector(afterViewDidAppear:)
-                           toTarget:self
-                         withObject:nil];
 
   self.view.userInteractionEnabled = YES;
   self.scrollView.scrollEnabled = YES;
@@ -1383,16 +1357,31 @@
  ダウンロード完了時の通知
  */
 - (void)didFinishLoading:(NSData *)data withUserInfo:(NSDictionary *)info {
+  [onAddingThumbnailsLock lock];
+  if(stoppingToAddingThumbnailsRequired) {
+    [onAddingThumbnailsLock unlock];
+    onAddingThumbnails = NO;
+//    [self discardTumbnails];
+    return;
+  }
+  [onAddingThumbnailsLock unlock];
+  
   Photo *photo = (Photo *)[info objectForKey:@"photo"];
   if(photo) {
     if( [[self photoModelController] updateThumbnail:data forPhoto:photo] == nil) {
       hasErrorInInsertingThumbnail = YES;
     }
   }
-  NSNumber *f = [NSNumber numberWithFloat:progressView.progress + 
-                 (1.0f / [[self photoModelController] photoCount]) ];
-  [self performSelectorOnMainThread:@selector(updateProgress:) 
-                         withObject:f
+  // pregress view と 写真なしメッセージを非表示
+  [self performSelectorOnMainThread:@selector(removeProgressView)
+                         withObject:self
+                      waitUntilDone:NO ];
+  [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
+                         withObject:[NSNumber numberWithBool:NO]
+                      waitUntilDone:NO];
+  // thumbnail の追加
+  [self performSelectorOnMainThread:@selector(addTbumbnailForPhoto:)
+                         withObject:photo
                       waitUntilDone:NO];
 }
 
@@ -1415,7 +1404,7 @@
   //
   [self performSelectorOnMainThread:@selector(downloadCompleted)
                          withObject:nil
-                      waitUntilDone:YES];
+                      waitUntilDone:NO];
   [onAddingThumbnailsLock lock];
   onAddingThumbnails = NO;
   [onAddingThumbnailsLock unlock];
@@ -1434,7 +1423,7 @@
   //
   [self performSelectorOnMainThread:@selector(downloadCanceled)
                          withObject:nil
-                      waitUntilDone:YES];
+                      waitUntilDone:NO];
 
 }
 

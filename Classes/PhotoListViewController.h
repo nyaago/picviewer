@@ -75,7 +75,7 @@ ThumbImageViewDelegate> {
   // Thumbnail表示中フラグの同期変数
   NSLock *onAddingThumbnailsLock;
   // Thumbnail表示処理の中断が要求されている?
-  BOOL stoppingToAddingThumbnailsRequred;
+  BOOL stoppingToAddingThumbnailsRequired;
   // toolbarに表示するButtonの配列
   NSMutableArray *toolbarButtons;
   // Picasaデータ取得コントローラー
@@ -84,8 +84,6 @@ ThumbImageViewDelegate> {
   UIBarButtonItem *refreshButton;
   // view information Button
   UIBarButtonItem *infoButton;
-  // 再ロード中ならYES
-  BOOL onRefresh;
   // album一覧Viewからの遷移の場合YES
   BOOL isFromAlbumTableView;
   // サムネイル処理のLock
