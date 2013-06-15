@@ -158,6 +158,12 @@ withPhotoSize:(NSNumber *)photoSize withThumbSize:(NSNumber *)thumbSize;
  */
 - (void) waitCompleted;
 
+/*!
+ @property completed
+ @return データー取得が完了しているか
+ */
+@property (nonatomic, readonly) BOOL completed;
+
 @end
 
 

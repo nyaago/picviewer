@@ -56,6 +56,7 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
 @synthesize delegate;
 @synthesize userId;
 @synthesize password;
+@synthesize completed;
 
 - (id) init {
   self = [super init];
