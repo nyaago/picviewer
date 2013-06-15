@@ -29,6 +29,15 @@
 #import "Photo.h"
 #import "Album.h"
 
+@interface PhotoModelController(private)
+
+- (NSError *) save;
+-(void)performInvocation:(NSInvocation *)anInvocation;
+- (NSFetchedResultsController *)createFetchedPhotosController;
+
+@end
+
+
 @implementation PhotoModelController
 
 @synthesize album;
@@ -117,12 +126,12 @@
   }
   
   // Save the context.
-  NSError *error = nil;
   if ([self.album respondsToSelector:@selector(addPhotoObject:) ] ) {
     [self.album addPhotoObject:(NSManagedObject *)photoObject];
   }	
   [lockSave lock];
-  if (![managedObjectContext save:&error]) {
+  NSError *error = [self save];
+  if (error) {
     // 
     [lockSave unlock];
     NSLog(@"Unresolved error %@", error);
@@ -153,9 +162,9 @@
   if(!thumbnailData || [thumbnailData length] == 0) 
     return photo;
   photo.thumbnail = thumbnailData;
-  NSError *error = nil;
   [lockSave lock];
-  if (![managedObjectContext save:&error]) {
+  NSError *error = [self save];
+  if (error) {
     // 
     [lockSave unlock];
     NSLog(@"Unresolved error %@", error);
@@ -177,17 +186,23 @@
   = [NSPredicate predicateWithFormat:@"%K = %@", @"album.albumId", album.albumId];
   [fetchRequest setPredicate:predicate];
   
-  NSError *error;
   // データの削除、親(album)からの関連の削除 + (albumに含まれる)全Photoデータの削除
-  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+  NSError *error;
+  NSArray *items = [self executeFetchRequest:fetchRequest];
 	NSSet *set = [NSSet setWithArray:items];
   [album removePhoto:set];
   for (NSManagedObject *managedObject in items) {
-    [managedObjectContext deleteObject:managedObject];
+    [managedObjectContext performSelector:@selector(deleteObject:)
+                                 onThread:[NSThread mainThread]
+                               withObject:managedObject
+                            waitUntilDone:YES];
+    
+//    [managedObjectContext deleteObject:managedObject];
     NSLog(@" object deleted");
   }
   //
-  if (![managedObjectContext save:&error]) {
+  error = [self save];
+  if (error) {
     NSLog(@"Error deleting- error:%@",error);
   }
   [fetchRequest release];
@@ -200,47 +215,7 @@
   if (fetchedPhotosController != nil) {
     return fetchedPhotosController;
   }
-  [NSFetchedResultsController deleteCacheWithName:@"Root"];
-  /*
-   Set up the fetched results controller.
-   */
-  // Create the fetch request for the entity.
-  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-  // Edit the entity name as appropriate.
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
-                                            inManagedObjectContext:managedObjectContext];
-  [fetchRequest setEntity:entity];
-  
-  NSPredicate *predicate 
-  = [NSPredicate predicateWithFormat:@"%K = %@", @"album.albumId", album.albumId];
-  [fetchRequest setPredicate:predicate];
-  
-  // Set the batch size to a suitable number.
-  [fetchRequest setFetchBatchSize:20];
-  
-  // Edit the sort key as appropriate.
-  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp" 
-                                                                 ascending:YES];
-  NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
-  
-  [fetchRequest setSortDescriptors:sortDescriptors];
-  
-  // Edit the section name key path and cache name if appropriate.
-  // nil for section name key path means "no sections".
-  NSFetchedResultsController *aFetchedPhotosController = [[NSFetchedResultsController alloc] 
-                                                          initWithFetchRequest:fetchRequest 
-                                                          managedObjectContext:managedObjectContext 
-                                                          sectionNameKeyPath:nil 
-                                                          cacheName:@"Root"];
-  aFetchedPhotosController.delegate = self;
-  fetchedPhotosController = aFetchedPhotosController;
-  [fetchedPhotosController retain];
-  
-  [aFetchedPhotosController release];
-  [fetchRequest release];
-  [sortDescriptor release];
-  [sortDescriptors release];
-  NSLog(@"new fetchedPhotosController created.");
+  [self performSelectorOnMainThread:@selector(createFetchedPhotosController) withObject:nil waitUntilDone:YES];
   return fetchedPhotosController;
 }    
 
@@ -266,6 +241,15 @@
   
 }
 
+- (NSInteger) indexForPhoto:(Photo *)photo {
+
+  NSIndexPath *indexPath = [[self fetchedPhotosController] indexPathForObject:photo ];
+  if(indexPath && indexPath.length == 2) {
+    return [indexPath indexAtPosition:1];
+  }
+  return NSNotFound;
+}
+
 - (Photo *)selectPhoto:(GDataEntryPhoto *)photo  hasError:(BOOL *)f{
   *f = NO;
   // Create the fetch request for the entity.
@@ -278,11 +262,11 @@
   = [NSPredicate predicateWithFormat:@"%K = %@ ", 
      @"photoId", [photo GPhotoID]];
   [fetchRequest setPredicate:predicate];
-  
   NSError *error;
-  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+  NSArray *items = [self executeFetchRequest:fetchRequest ];
+  [fetchRequest release];
   if(!items) {
-    NSLog(@"Unresolved error %@", error);
+//    NSLog(@"Unresolved error %@", error);
     *f = YES;
     return nil;
   }
@@ -320,6 +304,123 @@
   }
   [lockSave unlock];
 }
+
+- (NSError *) save {
+  
+  NSError **error;
+  // セレクターの作成
+	SEL selector = @selector(save:);
+	// シグネチャを作成
+	NSMethodSignature *signature = [[managedObjectContext class] instanceMethodSignatureForSelector:selector];
+	// invocationの作成
+	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+
+  [invocation setTarget:managedObjectContext];
+  [invocation setArgument:&error atIndex:2];
+  [invocation setSelector:selector];
+  
+  if([[NSThread currentThread] isEqual:[NSThread mainThread]]) {
+    [self performSelector:@selector(performInvocation:)
+               withObject:invocation];
+  }
+  else {
+    [self performSelector:@selector(performInvocation:)
+                                 onThread:[NSThread mainThread]
+                               withObject:invocation
+                            waitUntilDone:YES];
+  }
+  BOOL retVal;
+  [ invocation getReturnValue:( void * ) &retVal ];
+  if(!retVal)
+    return *error;
+  else
+    return nil;
+}
+
+
+- ( NSArray *) executeFetchRequest:(NSFetchRequest *)fetchRequest {
+  
+  NSError **error;
+  // セレクターの作成
+	SEL selector = @selector(executeFetchRequest:error:);
+	// シグネチャを作成
+	NSMethodSignature *signature = [[managedObjectContext class] instanceMethodSignatureForSelector:selector];
+	// invocationの作成
+	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
+  
+  [invocation setTarget:managedObjectContext];
+  [invocation setArgument:&fetchRequest atIndex:2];
+  [invocation setArgument:&error atIndex:3];
+  [invocation setSelector:selector];
+  
+  if([[NSThread currentThread] isEqual:[NSThread mainThread]]) {
+    [self performSelector:@selector(performInvocation:)
+               withObject:invocation];
+  }
+  else {
+    [self performSelector:@selector(performInvocation:)
+                                 onThread:[NSThread mainThread]
+                               withObject:invocation
+                            waitUntilDone:YES];
+  }
+  NSArray *retVal;
+  [ invocation getReturnValue:( void * ) &retVal ];
+  if(retVal)
+    return retVal;
+  else
+    return nil;
+}
+
+- (NSFetchedResultsController *)createFetchedPhotosController {
+  
+  [NSFetchedResultsController deleteCacheWithName:@"Root"];
+  /*
+   Set up the fetched results controller.
+   */
+  // Create the fetch request for the entity.
+  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+  // Edit the entity name as appropriate.
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
+                                            inManagedObjectContext:managedObjectContext];
+  [fetchRequest setEntity:entity];
+  
+  NSPredicate *predicate
+  = [NSPredicate predicateWithFormat:@"%K = %@", @"album.albumId", album.albumId];
+  [fetchRequest setPredicate:predicate];
+  
+  // Set the batch size to a suitable number.
+  [fetchRequest setFetchBatchSize:20];
+  
+  // Edit the sort key as appropriate.
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp"
+                                                                 ascending:YES];
+  NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
+  
+  [fetchRequest setSortDescriptors:sortDescriptors];
+  
+  // Edit the section name key path and cache name if appropriate.
+  // nil for section name key path means "no sections".
+  NSFetchedResultsController *aFetchedPhotosController = [[NSFetchedResultsController alloc]
+                                                          initWithFetchRequest:fetchRequest
+                                                          managedObjectContext:managedObjectContext
+                                                          sectionNameKeyPath:nil
+                                                          cacheName:@"Root"];
+  aFetchedPhotosController.delegate = self;
+  fetchedPhotosController = aFetchedPhotosController;
+  [fetchedPhotosController retain];
+  
+  [aFetchedPhotosController release];
+  [fetchRequest release];
+  [sortDescriptor release];
+  [sortDescriptors release];
+  NSLog(@"new fetchedPhotosController created.");
+  return fetchedPhotosController;
+}
+
+-(void)performInvocation:(NSInvocation *)anInvocation{
+	[anInvocation invoke];
+}
+
 
 
 @end

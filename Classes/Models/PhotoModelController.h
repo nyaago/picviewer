@@ -92,6 +92,13 @@
 - (void)removePhotos;
 
 /*!
+ @method indexForPhoto:
+ @param photo photo model オブジェクト
+ @discussion 指定したphoto model オブジェクトのindex番号を得る
+ @return index番号. starts at zero.見つからない場合は  NSNotFound
+ */
+- (NSInteger) indexForPhoto:(Photo *)photo;
+/*!
  @method selectPhoto:hasError:
  @discussion 指定したPhotoのphoto model オブジェクトを得る
  */
