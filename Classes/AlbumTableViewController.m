@@ -317,6 +317,7 @@
   [downloader finishQueuing];
   // そうじ
   [picasaFetchController release];
+  picasaFetchController = nil;
   [pool drain];
 }
 
