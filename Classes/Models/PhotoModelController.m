@@ -31,8 +31,6 @@
 
 @interface PhotoModelController(private)
 
-- (NSError *) save;
--(void)performInvocation:(NSInvocation *)anInvocation;
 - (NSFetchedResultsController *)createFetchedPhotosController;
 
 @end
@@ -41,7 +39,6 @@
 @implementation PhotoModelController
 
 @synthesize album;
-@synthesize managedObjectContext;
 //@synthesize fetchedPhotosController;
 
 
@@ -54,9 +51,8 @@
 }
 
 - (id) initWithContext:(NSManagedObjectContext *)context {
-  self = [self init];
+  self = [super initWithContext:context];
   if(self) {
-    managedObjectContext = [context retain];
   }
   return self;
 }
@@ -68,8 +64,6 @@
     [album release];
   if(fetchedPhotosController)
     [fetchedPhotosController release];
-  if(managedObjectContext) 
-    [managedObjectContext release];
   [super dealloc];
 }
 
@@ -92,8 +86,7 @@
   NSString *photoId = [photo GPhotoID];
   // 新しい永続化オブジェクトを作って
   Photo *photoObject 
-  = (Photo *)[NSEntityDescription insertNewObjectForEntityForName:@"Photo"
-                                           inManagedObjectContext:managedObjectContext];
+  = (Photo *)[self insertNewObjectForEntityForName:@"Photo"];
   // 値を設定
   [photoObject setValue:photoId forKey:@"photoId"];
   [photoObject setValue:[[photo title] contentStringValue] forKey:@"title"];
@@ -180,7 +173,7 @@
   NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
   // Edit the entity name as appropriate.
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
-                                            inManagedObjectContext:managedObjectContext];
+                                            inManagedObjectContext:self.managedObjectContext];
   [fetchRequest setEntity:entity];
   NSPredicate *predicate 
   = [NSPredicate predicateWithFormat:@"%K = %@", @"album.albumId", album.albumId];
@@ -192,7 +185,7 @@
 	NSSet *set = [NSSet setWithArray:items];
   [album removePhoto:set];
   for (NSManagedObject *managedObject in items) {
-    [managedObjectContext performSelector:@selector(deleteObject:)
+    [self.managedObjectContext performSelector:@selector(deleteObject:)
                                  onThread:[NSThread mainThread]
                                withObject:managedObject
                             waitUntilDone:YES];
@@ -256,7 +249,7 @@
   NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
   // Edit the entity name as appropriate.
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
-                                            inManagedObjectContext:managedObjectContext];
+                                            inManagedObjectContext:self.managedObjectContext];
   [fetchRequest setEntity:entity];
   NSPredicate *predicate 
   = [NSPredicate predicateWithFormat:@"%K = %@ ", 
@@ -299,76 +292,8 @@
   NSError *error = nil;
   [lockSave lock];
   
-  if (![managedObjectContext save:&error]) {
-    
-  }
+  error = [self save];
   [lockSave unlock];
-}
-
-- (NSError *) save {
-  
-  NSError **error;
-  // セレクターの作成
-	SEL selector = @selector(save:);
-	// シグネチャを作成
-	NSMethodSignature *signature = [[managedObjectContext class] instanceMethodSignatureForSelector:selector];
-	// invocationの作成
-	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-
-  [invocation setTarget:managedObjectContext];
-  [invocation setArgument:&error atIndex:2];
-  [invocation setSelector:selector];
-  
-  if([[NSThread currentThread] isEqual:[NSThread mainThread]]) {
-    [self performSelector:@selector(performInvocation:)
-               withObject:invocation];
-  }
-  else {
-    [self performSelector:@selector(performInvocation:)
-                                 onThread:[NSThread mainThread]
-                               withObject:invocation
-                            waitUntilDone:YES];
-  }
-  BOOL retVal;
-  [ invocation getReturnValue:( void * ) &retVal ];
-  if(!retVal)
-    return *error;
-  else
-    return nil;
-}
-
-
-- ( NSArray *) executeFetchRequest:(NSFetchRequest *)fetchRequest {
-  
-  NSError **error;
-  // セレクターの作成
-	SEL selector = @selector(executeFetchRequest:error:);
-	// シグネチャを作成
-	NSMethodSignature *signature = [[managedObjectContext class] instanceMethodSignatureForSelector:selector];
-	// invocationの作成
-	NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:signature];
-  
-  [invocation setTarget:managedObjectContext];
-  [invocation setArgument:&fetchRequest atIndex:2];
-  [invocation setArgument:&error atIndex:3];
-  [invocation setSelector:selector];
-  
-  if([[NSThread currentThread] isEqual:[NSThread mainThread]]) {
-    [self performSelector:@selector(performInvocation:)
-               withObject:invocation];
-  }
-  else {
-    [self performSelector:@selector(performInvocation:)
-                                 onThread:[NSThread mainThread]
-                               withObject:invocation
-                            waitUntilDone:YES];
-  }
-  NSArray *retVal;
-  [ invocation getReturnValue:( void * ) &retVal ];
-  if(retVal)
-    return retVal;
-  else
-    return nil;
 }
 
 - (NSFetchedResultsController *)createFetchedPhotosController {
@@ -381,7 +306,7 @@
   NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
   // Edit the entity name as appropriate.
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
-                                            inManagedObjectContext:managedObjectContext];
+                                            inManagedObjectContext:self.managedObjectContext];
   [fetchRequest setEntity:entity];
   
   NSPredicate *predicate
@@ -402,7 +327,7 @@
   // nil for section name key path means "no sections".
   NSFetchedResultsController *aFetchedPhotosController = [[NSFetchedResultsController alloc]
                                                           initWithFetchRequest:fetchRequest
-                                                          managedObjectContext:managedObjectContext
+                                                          managedObjectContext:self.managedObjectContext
                                                           sectionNameKeyPath:nil
                                                           cacheName:@"Root"];
   aFetchedPhotosController.delegate = self;
@@ -416,11 +341,6 @@
   NSLog(@"new fetchedPhotosController created.");
   return fetchedPhotosController;
 }
-
--(void)performInvocation:(NSInvocation *)anInvocation{
-	[anInvocation invoke];
-}
-
 
 
 @end

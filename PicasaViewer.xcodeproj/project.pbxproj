@@ -28,6 +28,7 @@
 		7238233412068EF60046D754 /* PhotoModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7238233312068EF60046D754 /* PhotoModelController.m */; };
 		723823A61206A3C70046D754 /* AlbumModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 723823A51206A3C70046D754 /* AlbumModelController.m */; };
 		724BD15516E873D300F8C5CF /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 724BD15416E873D300F8C5CF /* Default-568h@2x.png */; };
+		7250914B176F07F800BEBB03 /* ModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7250914A176F07F800BEBB03 /* ModelController.m */; };
 		7251549011851B2A00B136DF /* QueuedURLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 7251548F11851B2A00B136DF /* QueuedURLDownloader.m */; };
 		72582A841189B7B200A8A6FC /* PhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72582A821189B7B200A8A6FC /* PhotoViewController.m */; };
 		72582A851189B7B200A8A6FC /* PhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72582A831189B7B200A8A6FC /* PhotoViewController.xib */; };
@@ -192,6 +193,8 @@
 		723823A41206A3C70046D754 /* AlbumModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumModelController.h; sourceTree = "<group>"; };
 		723823A51206A3C70046D754 /* AlbumModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumModelController.m; sourceTree = "<group>"; };
 		724BD15416E873D300F8C5CF /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		72509149176F07F800BEBB03 /* ModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelController.h; sourceTree = "<group>"; };
+		7250914A176F07F800BEBB03 /* ModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModelController.m; sourceTree = "<group>"; };
 		7251548E11851B2A00B136DF /* QueuedURLDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QueuedURLDownloader.h; sourceTree = "<group>"; };
 		7251548F11851B2A00B136DF /* QueuedURLDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QueuedURLDownloader.m; sourceTree = "<group>"; };
 		72582A811189B7B200A8A6FC /* PhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoViewController.h; sourceTree = "<group>"; };
@@ -458,6 +461,8 @@
 				7238233312068EF60046D754 /* PhotoModelController.m */,
 				723823A41206A3C70046D754 /* AlbumModelController.h */,
 				723823A51206A3C70046D754 /* AlbumModelController.m */,
+				72509149176F07F800BEBB03 /* ModelController.h */,
+				7250914A176F07F800BEBB03 /* ModelController.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -686,6 +691,7 @@
 				72D224741640EA1D004E84B2 /* IPadThumbImageView.m in Sources */,
 				72DA9E50164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel in Sources */,
 				72ECD811175C9FD200F71D24 /* PicasaViewer.xcdatamodeld in Sources */,
+				7250914B176F07F800BEBB03 /* ModelController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

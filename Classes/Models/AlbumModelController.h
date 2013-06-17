@@ -28,6 +28,7 @@
 #import <Foundation/Foundation.h>
 #import "PicasaFetchController.h"
 
+#import "ModelController.h"
 #import "Album.h"
 #import "User.h"
 /*!
@@ -35,11 +36,10 @@
  @discussion Album Modelとのデータ入出力を行うController
  */
 
-@interface AlbumModelController : NSObject <NSFetchedResultsControllerDelegate> {
+@interface AlbumModelController : ModelController <NSFetchedResultsControllerDelegate> {
   User *user;
   
   NSFetchedResultsController *fetchedAlbumsController;
-  NSManagedObjectContext *managedObjectContext;
 
 }
 
@@ -56,13 +56,6 @@
  @discussion Album一覧のFetched Controller
  */
 @property (nonatomic, retain) NSFetchedResultsController *fetchedAlbumsController;
-
-/*!
- @property managedObjectContext
- @discussion CoreDataのObject管理Context,永続化Storeのデータの管理
- */
-@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
-
 
 /*!
  @property user

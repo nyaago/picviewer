@@ -27,6 +27,8 @@
 
 #import <Foundation/Foundation.h>
 #import "PicasaFetchController.h"
+
+#import "ModelController.h"
 #import "Album.h"
 #import "Photo.h"
 
@@ -34,11 +36,10 @@
  @class PhotoModelController
  @discussion Photo Modelとのデータ入出力を行うController
  */
-@interface PhotoModelController : NSObject <NSFetchedResultsControllerDelegate> {
+@interface PhotoModelController : ModelController <NSFetchedResultsControllerDelegate> {
   Album *album;
 
   NSFetchedResultsController *fetchedPhotosController;
-  NSManagedObjectContext *managedObjectContext;
   
   // ローカルDB保存時の Lock Object
   NSLock  *lockSave;
@@ -60,12 +61,6 @@
  @discussion Album一覧のFetched Controller
  */
 //@property (nonatomic, retain) NSFetchedResultsController *fetchedPhotosController;
-
-/*!
- @property managedObjectContext
- @discussion CoreDataのObject管理Context,永続化Storeのデータの管理
- */
-@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
 /*!
  @property album

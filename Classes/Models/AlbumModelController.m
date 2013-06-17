@@ -42,7 +42,7 @@
                   withUser:(User *)userObject;
 
 
-
+- (NSFetchedResultsController *)createFetchedPhotosController;
 
 @end
 
@@ -50,7 +50,6 @@
 @implementation AlbumModelController
 
 @synthesize user;
-@synthesize managedObjectContext;
 @synthesize fetchedAlbumsController;
 
 - (id)init {
@@ -61,9 +60,8 @@
 }
 
 - (id) initWithContext:(NSManagedObjectContext *)context withUser:(User *)userObj {
-  self = [self init];
+  self = [super initWithContext:context];
   if(self) {
-    managedObjectContext = [context retain];
     user = [userObj retain];
   }
   return self;
@@ -74,8 +72,6 @@
     [user release];
   if(fetchedAlbumsController) 
     [fetchedAlbumsController release];
-  if(managedObjectContext)
-    [managedObjectContext release];
   [super dealloc];
 }
 
@@ -84,56 +80,17 @@
   if (fetchedAlbumsController != nil) {
     return fetchedAlbumsController;
   }
-  [NSFetchedResultsController deleteCacheWithName:@"Root"];
-
-  /*
-   Set up the fetched results controller.
-   */
-  // Create the fetch request for the entity.
-  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-  // Edit the entity name as appropriate.
-  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Album"
-                                            inManagedObjectContext:managedObjectContext];
-  [fetchRequest setEntity:entity];
-  
-  NSPredicate *predicate 
-  = [NSPredicate predicateWithFormat:@"%K = %@", @"user.userId", user.userId];
-  [fetchRequest setPredicate:predicate];
-  
-  // Set the batch size to a suitable number.
-  [fetchRequest setFetchBatchSize:20];
-  
-  // Edit the sort key as appropriate.
-  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp" 
-                                                                 ascending:NO];
-  NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
-  
-  [fetchRequest setSortDescriptors:sortDescriptors];
-  
-  // Edit the section name key path and cache name if appropriate.
-  // nil for section name key path means "no sections".
-  NSFetchedResultsController *aFetchedAlbumsController = [[NSFetchedResultsController alloc] 
-                                                          initWithFetchRequest:fetchRequest 
-                                                          managedObjectContext:managedObjectContext 
-                                                          sectionNameKeyPath:nil 
-                                                          cacheName:@"Root"];
-  aFetchedAlbumsController.delegate = self;
-  self.fetchedAlbumsController = aFetchedAlbumsController;
-  
-  [aFetchedAlbumsController release];
-  [fetchRequest release];
-  [sortDescriptor release];
-  [sortDescriptors release];
-  
+  [self performSelectorOnMainThread:@selector(createFetchedPhotosController)
+                         withObject:nil
+                      waitUntilDone:YES];
   return fetchedAlbumsController;
-}    
+}
 
 - (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject{
   
   // 新しい永続化オブジェクトを作って
   NSManagedObject *newManagedObject 
-  = [NSEntityDescription insertNewObjectForEntityForName:@"Album"
-                                  inManagedObjectContext:managedObjectContext];
+  = [self insertNewObjectForEntityForName:@"Album"];
   
   // 値を設定
   [newManagedObject setValue:[album GPhotoID] forKey:@"albumId"];
@@ -143,14 +100,17 @@
   
   
   // Save the context.
-  NSError *error = nil;
   if ([self.user respondsToSelector:@selector(addAlbumObject:) ] ) {
     [self.user addAlbumObject:newManagedObject];
-  }	
-  if (![managedObjectContext save:&error]) {
-    // 
-    return nil;	
   }
+  
+  NSError *error = [self save];
+  if (error) {
+    //
+    NSLog(@"Unresolved error %@", error);
+    return nil;
+  }
+
   return (Album *)newManagedObject;
 }
 
@@ -163,10 +123,11 @@
                withUser:userObject];
   
   // Save the context.
-  NSError *error = nil;
-  if (![managedObjectContext save:&error]) {
-    // 
-    return nil;	
+  NSError *error = [self save];
+  if (error) {
+    //
+    NSLog(@"Unresolved error %@", error);
+    return nil;
   }
   return albumObject;
 }
@@ -208,13 +169,16 @@
   // 参照元User削除
   [userObject removeAlbum:set];
   // Album削除
-  [managedObjectContext deleteObject:(NSManagedObject *)albumObject];
+  [self.managedObjectContext performSelector:@selector(deleteObject:)
+                                    onThread:[NSThread mainThread]
+                                  withObject:albumObject
+                               waitUntilDone:YES];
+
   // Save the context.
-  NSError *error = nil;
-  if (![managedObjectContext save:&error]) {
-    NSLog(@"error Occured in remveing Album - %@", error);
-    [pool drain];
-    return;
+  NSError *error = [self save];
+  if (error) {
+    //
+    NSLog(@"Unresolved error %@", error);
   }
   [pool drain];
   return;
@@ -228,7 +192,7 @@
   NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
   // Edit the entity name as appropriate.
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"Album"
-                                            inManagedObjectContext:managedObjectContext];
+                                            inManagedObjectContext:self.managedObjectContext];
   [fetchRequest setEntity:entity];
   NSPredicate *predicate 
   = [NSPredicate predicateWithFormat:@"%K = %@ ", 
@@ -237,7 +201,7 @@
   
   
   NSError *error;
-  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+  NSArray *items = [self executeFetchRequest:fetchRequest];
   if(!items) {
     NSLog(@"Unresolved error %@", error);
     *f = YES;
@@ -268,7 +232,7 @@
   NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
   // Edit the entity name as appropriate.
   NSEntityDescription *entity = [NSEntityDescription entityForName:@"Album"
-                                            inManagedObjectContext:managedObjectContext];
+                                            inManagedObjectContext:self.managedObjectContext];
   [fetchRequest setEntity:entity];
   NSPredicate *predicate 
   = [NSPredicate predicateWithFormat:@"%K = %@ AND %K = %@", 
@@ -277,7 +241,7 @@
   [fetchRequest setPredicate:predicate];
   
   NSError *error;
-  NSArray *items = [managedObjectContext executeFetchRequest:fetchRequest error:&error];
+  NSArray *items = [self executeFetchRequest:fetchRequest ];
   if(!items) {
     NSLog(@"Unresolved error %@", error);
     *f = YES;
@@ -295,7 +259,7 @@
     return nil;
   album.thumbnail = thumbnailData;
   NSError *error = nil;
-  if (![managedObjectContext save:&error]) {
+  if ([self save]) {
     // 
     NSLog(@"Unresolved error %@", error);
     return nil;	
@@ -316,6 +280,52 @@
 
 -(Album *) albumAt:(NSIndexPath *)indexPath {
   return (Album *)[fetchedAlbumsController objectAtIndexPath:indexPath];
+}
+
+- (NSFetchedResultsController *)createFetchedPhotosController {
+  
+  [NSFetchedResultsController deleteCacheWithName:@"Root"];
+  
+  /*
+   Set up the fetched results controller.
+   */
+  // Create the fetch request for the entity.
+  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+  // Edit the entity name as appropriate.
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Album"
+                                            inManagedObjectContext:self.managedObjectContext];
+  [fetchRequest setEntity:entity];
+  
+  NSPredicate *predicate
+  = [NSPredicate predicateWithFormat:@"%K = %@", @"user.userId", user.userId];
+  [fetchRequest setPredicate:predicate];
+  
+  // Set the batch size to a suitable number.
+  [fetchRequest setFetchBatchSize:20];
+  
+  // Edit the sort key as appropriate.
+  NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp"
+                                                                 ascending:NO];
+  NSArray *sortDescriptors = [[NSArray alloc] initWithObjects:sortDescriptor, nil];
+  
+  [fetchRequest setSortDescriptors:sortDescriptors];
+  
+  // Edit the section name key path and cache name if appropriate.
+  // nil for section name key path means "no sections".
+  NSFetchedResultsController *aFetchedAlbumsController = [[NSFetchedResultsController alloc]
+                                                          initWithFetchRequest:fetchRequest
+                                                          managedObjectContext:self.managedObjectContext
+                                                          sectionNameKeyPath:nil
+                                                          cacheName:@"Root"];
+  aFetchedAlbumsController.delegate = self;
+  self.fetchedAlbumsController = aFetchedAlbumsController;
+  
+  [aFetchedAlbumsController release];
+  [fetchRequest release];
+  [sortDescriptor release];
+  [sortDescriptors release];
+  
+  return fetchedAlbumsController;
 }
 
 
