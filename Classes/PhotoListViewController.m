@@ -341,8 +341,8 @@
   if(picasaFetchController) {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   }
-  
-  [self stopToAddThumbnails];
+  [picasaFetchController requireStopping];
+// [self stopToAddThumbnails];
   isFromAlbumTableView = NO;
   NSLog(@"photoListViewController didDisappear.retain count = %d", [self retainCount]);
 }
@@ -721,7 +721,12 @@
 - (void)albumAndPhotosWithTicket:(GDataServiceTicket *)ticket
            finishedWithAlbumFeed:(GDataFeedPhotoAlbum *)feed
                            error:(NSError *)error {
+  // view が非表示になった場合
+  if([self.view isHidden]) {
+    return;
+  }
   
+  //
   if(nextShowedAlbum != nil) {
     // 問い合わせ中に次のアルバムが選択されたので
     // 現在のアルバムの処理を中断して、次に選択されたアルバムを表示

@@ -160,11 +160,6 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
 - (void)userAndAlbumsWithTicket:(GDataServiceTicket *)ticket
            finishedWithUserFeed:(GDataFeedPhotoUser *)feed
                           error:(NSError *)error {
-  if (error != nil) {  
-    NSLog(@"fetch error: %@", error);
-    [self handleError:error];
-    return;
-  }
   
   NSLog(@"ticket = %@", ticket);
   // 停止要求されていれば、処理中断
@@ -175,7 +170,14 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
     return;
   }
   [lock unlock];
-  if(delegate && 
+  
+  if (error != nil) {
+    NSLog(@"fetch error: %@", error);
+    [self handleError:error];
+    return;
+  }
+
+  if(delegate &&
      [delegate 
       respondsToSelector:@selector(userAndAlbumsWithTicket:finishedWithUserFeed:error:)] ) {
        [delegate userAndAlbumsWithTicket:ticket 
@@ -192,11 +194,6 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
 - (void)albumAndPhotosWithTicket:(GDataServiceTicket *)ticket
            finishedWithAlbumFeed:(GDataFeedPhotoAlbum *)feed
                            error:(NSError *)error {
-  if (error != nil) {  
-    NSLog(@"fetch error: %@", error);
-    [self handleError:error];
-    return;
-  }
   // 停止要求されていれば、処理中断
   [lock lock];
   if(stoppingRequired) {
@@ -205,6 +202,13 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
     return;
   }
   [lock unlock];
+  
+  if (error != nil) {
+    NSLog(@"fetch error: %@", error);
+    [self handleError:error];
+    return;
+  }
+
   if(delegate &&
      [delegate
       respondsToSelector:@selector(albumAndPhotosWithTicket:finishedWithAlbumFeed:error:)] ) {
@@ -220,11 +224,6 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
 - (void)photoWithTicket:(GDataServiceTicket *)ticket
   finishedWithPhotoFeed:(GDataFeedPhoto *)feed
                   error:(NSError *)error {
-  if (error != nil) {  
-    NSLog(@"fetch error: %@", error);
-    [self handleError:error];
-    return;
-  }
   // 停止要求されていれば、処理中断
   [lock lock];
   if(stoppingRequired) {
@@ -233,6 +232,13 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
     return;
   }
   [lock unlock];
+
+  if (error != nil) {
+    NSLog(@"fetch error: %@", error);
+    [self handleError:error];
+    return;
+  }
+
   if(delegate &&
      [delegate respondsToSelector:@selector(photoWithTicket:finishedWithPhotoFeed:error:)]) {
     [delegate photoWithTicket:ticket 
@@ -301,6 +307,5 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
   }
   
 }
-
 
 @end
