@@ -35,6 +35,7 @@
 #import "Album.h"
 #import "SettingsManager.h"
 #import "NetworkReachability.h"
+#import "UserModelController.h"
 
 @interface RootViewController(Private)
 
@@ -238,13 +239,10 @@
 
 - (void)deleteUser:(User *)user {
 
-  [managedObjectContext deleteObject:user];
-  SettingsManager *settings = [[SettingsManager alloc] init];
-  NSString *userId = [settings currentUser];
-  // Save the context.
-  NSString *savedUserId = user.userId;
-  NSError *error = nil;
-  if (![managedObjectContext save:&error]) {
+  self.tableView.userInteractionEnabled = NO;
+  UserModelController *modelController = [[UserModelController alloc] initWithContext:self.managedObjectContext];
+  [modelController deleteUser:user];
+/*
     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error","Error")
@@ -255,16 +253,9 @@
                               otherButtonTitles:@"OK", nil];
     [alertView show];
     [alertView release];
-  }
-  if(savedUserId == userId) {
-    PicasaViewerAppDelegate *appDelegate
-    = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
-    if(appDelegate.photoListViewController != nil) {
-      [appDelegate.photoListViewController discardTumbnails];
-    }
-  }
-  [self.tableView reloadData];
-  [settings release];
+ */
+//  [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
+//  [self.tableView reloadData];
 }
 
 - (User *)userWithUserId:(NSString *)uid {
@@ -350,10 +341,24 @@ commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
 forRowAtIndexPath:(NSIndexPath *)indexPath {
   
   if (editingStyle == UITableViewCellEditingStyleDelete) {
+    User *user = [fetchedUsersController objectAtIndexPath:indexPath];
+
+    SettingsManager *settings = [[SettingsManager alloc] init];
+    NSString *userId = [settings currentUser];
+    
+    if(user.userId == userId) {
+      PicasaViewerAppDelegate *appDelegate
+      = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
+      if(appDelegate.photoListViewController != nil) {
+        [appDelegate.photoListViewController discardTumbnails];
+      }
+      [settings setCurrentUser:nil];
+    }
+    [settings release];
+    
     // indicator View を表示して、Background threadで削除処理の起動、
   	[self.view addSubview:indicatorView];
-    User *user = [fetchedUsersController objectAtIndexPath:indexPath];
-    [indicatorView startWithTarget:self 
+    [indicatorView startWithTarget:self
                       withSelector:@selector(deleteUser:) 
                         withObject:user];
     
@@ -656,6 +661,7 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 
 - (void)indicatorStoped:(LabeledActivityIndicator *)view {
   [view removeFromSuperview];
+  self.tableView.userInteractionEnabled = YES;
 }
 
 #pragma mark -

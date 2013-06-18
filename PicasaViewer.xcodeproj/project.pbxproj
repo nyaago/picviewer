@@ -14,6 +14,7 @@
 		28860BE50F44EE6400985440 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 28860BE40F44EE6400985440 /* CoreData.framework */; };
 		2892E4100DC94CBA00A64D0F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2892E40F0DC94CBA00A64D0F /* CoreGraphics.framework */; };
 		28C286E10D94DF7D0034E888 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28C286E00D94DF7D0034E888 /* RootViewController.m */; };
+		720F8D691770125B0033856D /* UserModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 720F8D681770125B0033856D /* UserModelController.m */; };
 		721BDD841611B0D600401E21 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 721BDD831611B0D600401E21 /* libxml2.2.dylib */; };
 		721C217611A2C85700D05256 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 721C217411A2C85700D05256 /* SettingsViewController.m */; };
 		721C217711A2C85700D05256 /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 721C217511A2C85700D05256 /* SettingsViewController.xib */; };
@@ -172,6 +173,8 @@
 		28C286DF0D94DF7D0034E888 /* RootViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		28C286E00D94DF7D0034E888 /* RootViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		720F8D671770125B0033856D /* UserModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserModelController.h; sourceTree = "<group>"; };
+		720F8D681770125B0033856D /* UserModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserModelController.m; sourceTree = "<group>"; };
 		721BDD831611B0D600401E21 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = usr/lib/libxml2.2.dylib; sourceTree = SDKROOT; };
 		721C217311A2C85700D05256 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		721C217411A2C85700D05256 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
@@ -463,6 +466,8 @@
 				723823A51206A3C70046D754 /* AlbumModelController.m */,
 				72509149176F07F800BEBB03 /* ModelController.h */,
 				7250914A176F07F800BEBB03 /* ModelController.m */,
+				720F8D671770125B0033856D /* UserModelController.h */,
+				720F8D681770125B0033856D /* UserModelController.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -692,6 +697,7 @@
 				72DA9E50164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel in Sources */,
 				72ECD811175C9FD200F71D24 /* PicasaViewer.xcdatamodeld in Sources */,
 				7250914B176F07F800BEBB03 /* ModelController.m in Sources */,
+				720F8D691770125B0033856D /* UserModelController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
