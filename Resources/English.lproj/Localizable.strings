@@ -25,9 +25,9 @@
 
 
 // User追加View
-"NewUser.Account" = "ACCOUNT";
-"NewUser.Explanation" = "Please input account that you want browse.";
-"NewUser.Title" = "New User";
+"NewUser.Account" = "username or email address";
+"NewUser.Explanation" = "Enter username or mail address.";
+"NewUser.Title" = "Add User";
 
 
 // Acounts

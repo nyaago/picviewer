@@ -187,6 +187,7 @@ titleForHeaderInSection:(NSInteger)section {
           case (0):
             cell.textLabel.text = NSLocalizedString(@"Settings.Account.User"
                                                     ,@"User");
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
             frame =  CGRectMake(140.0f, 10.0f,
                                 cell.frame.size.width - 140.0f ,
                                 cell.frame.size.height - 20.0f);
@@ -196,6 +197,7 @@ titleForHeaderInSection:(NSInteger)section {
           case (1):
             cell.textLabel.text = NSLocalizedString(@"Settings.Account.Password",
                                                     @"Password");
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
             frame =  CGRectMake(140.0f,
                                 10.0f,
                                 cell.frame.size.width - 140.0f ,
@@ -211,6 +213,7 @@ titleForHeaderInSection:(NSInteger)section {
           case (0):
             cell.textLabel.text = NSLocalizedString(@"Settings.Image.Size"
                                                     ,@"Size");
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
             frame =  CGRectMake(120.0f,
                                 10.0f,
                                 cell.frame.size.width - (120.0f + 10.0f) ,
@@ -303,6 +306,8 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
                       action:@selector(userDidEndEditing:)
             forControlEvents:UIControlEventEditingDidEndOnExit];
     userTextField.text = settings.userId;
+    userTextField.placeholder = @"username or email address";
+    userTextField.keyboardType = UIKeyboardTypeEmailAddress;
   }
   return userTextField;
 }

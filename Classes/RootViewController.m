@@ -515,7 +515,8 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   if(![NetworkReachability reachable]) {
     return NO;
   }
-  
+  [self dismissModalViewControllerAnimated:YES];
+
   PicasaFetchController *controller = [[PicasaFetchController alloc] init];
   controller.delegate = self;
   [controller queryUserAndAlbums:user];
@@ -567,7 +568,6 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     [alertView release];
   }
   [(UITableView *)self.view reloadData];
-  [self dismissModalViewControllerAnimated:YES];
 }
 
 // Googleへの問い合わせの結果、認証エラーとなった場合の通知
