@@ -159,6 +159,7 @@
       [alertView release];
       return;
     }
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     // toolbarのボタンをdisable
     [self enableToolbar:NO];
     // reload
@@ -644,6 +645,7 @@
     [alertView release];
     return;
   }
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   // toolbarのボタンをdisable
   [self enableToolbar:NO];
   // Album一覧のロード処理を起動
@@ -802,7 +804,6 @@
     }
   }
   
-  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 	[self performSelectorOnMainThread:@selector(refreshAlbums) 
                          withObject:nil 
                       waitUntilDone:NO];
