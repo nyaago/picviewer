@@ -44,7 +44,7 @@
 // 写真なしのメッセージタイプ - No Photos（写真がありません）
 #define kNoPhotoMessage 1
 // 写真なしのメッセージタイプ - Loding（写真を読み込み中です）
-#define kLodingPhotosMessage 2
+#define kLoadingPhotosMessage 2
 // アルバム未選択のメッセージタイプ - Choose a albumu（アルバムを選択してください）
 #define kChooseAlbumMessage 3
 // Album の Reload確認を行う間隔（分）
@@ -115,7 +115,7 @@
 /*!
  @method setNoPhotoMessage:
  @discussion No Phtos のメッセージ表示
- @param show 0/kNoPhotoMessage/kLodingPhotosMessage/kChooseAlubum 
+ @param show 0/kNoPhotoMessage/kLoadingPhotosMessage/kChooseAlubum 
  -> 表示/No Photos/Loging Photos/ChooseAlbumu
  */
 - (void)setNoPhotoMessage:(NSNumber *)show;
@@ -302,7 +302,7 @@
 
   
   if(isFromAlbumTableView == YES) {
-    [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
+    [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
     [self loadPhotos:self.album];
 
   }
@@ -510,8 +510,8 @@
       case kNoPhotoMessage:
         message = NSLocalizedString(@"PhotoList.None", @"No Photos");
         break;
-      case kLodingPhotosMessage:
-        message = NSLocalizedString(@"PhotoList.None", @"No Photos");
+      case kLoadingPhotosMessage:
+        message = NSLocalizedString(@"PhotoList.Loading", @"No Photos");
         break;
       case kChooseAlbumMessage:
         message = NSLocalizedString(@"PhotoList.Choose", @"Choose a album");
@@ -1103,7 +1103,7 @@
 
 
   // '写真を読み込んでいます'表示
-  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
+  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
   
   isFromAlbumTableView = YES;
   [self discardTumbnails];
@@ -1513,8 +1513,7 @@
              nil];
   }
   
-  [sheet showInView:self.view];
-
+  [sheet showFromToolbar:self.navigationController.toolbar];
 }
 
 - (void) refreshAction:(id)sender {
@@ -1549,7 +1548,7 @@
     return;
   }
   progressView.progress = 0.0f;
-  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLodingPhotosMessage]];
+  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
                                              @"download")];
   [self discardTumbnails];
@@ -1660,7 +1659,6 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
       }
       break;
     default:
-      NSLog(@"canceled .");
       return;
   }
   UIPopoverController *popover;

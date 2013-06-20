@@ -54,7 +54,7 @@
 // Photo List
 "PhotoList.Choose" = "Choose a album";
 "PhotoList.None" = "No Photos";
-"PhotoList.Loding" = "Loding..";
+"PhotoList.Loading" = "Loding..";
 
 // 写真View
 "Photo.Action" = "Select The Action";
