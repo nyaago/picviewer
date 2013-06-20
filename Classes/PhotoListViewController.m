@@ -64,6 +64,12 @@
 - (void) refreshAction:(id)sender;
 
 /*!
+ @method photoAction:
+ @discussion photo撮影/選択
+ */
+- (void) photoAction:(id)sender;
+
+/*!
  @method infoAction:
  @discussion Infoボタンのアクション、Album情報のViewを表示
  */
@@ -126,9 +132,10 @@
 
 /*!
  @method refreshPhotos
+ @param refreshAll １回全クリアするか？
  @discussion Photoデータを1回削除後、再ロード(Picasaへの問い合わせ+Thumbnail - download)
  */
-- (void) refreshPhotos;
+- (void) refreshPhotos:(BOOL)refreshAll;
 
 /*!
  @method daysBetween:and:
@@ -277,13 +284,14 @@
     [self setNoPhotoMessage:[NSNumber numberWithInt:kChooseAlbumMessage]];
     return;
   }
-  if(isFromAlbumTableView == NO && self.splitViewController == nil) {
-    // 写真画面からPopされたとき.
-    // viewのサイズ, 前画面(写真)がtoolbar部分を含んでいたので、そのtoolbar分マイナス
-    CGRect frame = self.view.frame;
-    frame.size.height -= self.navigationController.toolbar.frame.size.height;
-    self.view.frame = frame;
-  }
+  // コンテンツ view の高さ
+  CGRect frame = self.navigationController.view.frame;
+  CGRect statusBarFrame = [[UIApplication sharedApplication] statusBarFrame];
+  frame.size.height -= (self.navigationController.toolbar.frame.size.height +
+                        self.navigationController.navigationBar.frame.size.height +
+                        statusBarFrame.size.height);
+  
+  self.view.frame = frame;
   
   [onAddingThumbnailsLock lock];
   BOOL skip = onAddingThumbnails;
@@ -338,10 +346,10 @@
 
 - (void)viewDidDisappear:(BOOL)animated {
   // Google問い合わせ中の場合,停止を要求、完了するまで待つ
-  if(picasaFetchController) {
+  if(self.picasaFetchController) {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   }
-  [picasaFetchController requireStopping];
+  [self.picasaFetchController requireStopping];
 // [self stopToAddThumbnails];
   isFromAlbumTableView = NO;
   NSLog(@"photoListViewController didDisappear.retain count = %d", [self retainCount]);
@@ -407,6 +415,8 @@
   infoButton = nil;
   [refreshButton release];
   refreshButton = nil;
+  [photoButton release];
+  photoButton = nil;
   [progressView  release];
   progressView = nil;
   [self discardTumbnails];
@@ -417,7 +427,7 @@
   if(progressView) {
   }
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
-  if(picasaFetchController) {
+  if(self.picasaFetchController) {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [picasaFetchController release];
     picasaFetchController = nil;
@@ -432,6 +442,9 @@
     [infoButton release];
   if(refreshButton)
     [refreshButton release];
+  if(photoButton) {
+    [photoButton release];
+  }
   if(toolbarButtons)
     [toolbarButtons release];
   if(album)
@@ -647,10 +660,30 @@
                                    initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                                    target:self
                                    action:nil];
-    spaceRight.width = 30.0f;
+//    spaceRight.width = 30.0f;
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
     
+    SettingsManager *settings = [[SettingsManager alloc] init];
+    User *user = (User *)self.album.user;
+    if(user) {
+      if([settings isEqualUserId:user.userId]) {
+        photoButton = [[UIBarButtonItem alloc]
+                        initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
+                       target:self
+                       action:@selector(photoAction:)];
+        [toolbarButtons addObject:photoButton];
+        spaceRight = [[UIBarButtonItem alloc]
+                      initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                      target:self
+                      action:nil];
+//        spaceRight.width = 30.0f;
+        [toolbarButtons addObject:spaceRight];
+        [spaceRight release];
+      }
+    }
+    [settings release];
+      
     // Info
     infoButton = [[UIBarButtonItem alloc] initWithTitle:@"" 
                                                   style:UIBarButtonItemStyleBordered 
@@ -715,6 +748,25 @@
 #pragma mark -
 
 #pragma mark PicasaFetchControllerDelegate
+
+-(void) insertedPhotoWithTicket:(GDataServiceTicket *)ticket
+          finishedWithPhotoFeed:(GDataFeedPhoto *)feed
+                          error:(NSError *)error {
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+
+  if(error) {
+    
+  }
+  else {
+    NSLog(@"upload");
+    [self performSelector:@selector(refreshPhotos:)
+               withObject:NO
+               afterDelay:0.0f];
+//    [self refreshAction:self];
+  }
+  
+}
+
 
 // Googleへの問い合わせの応答の通知
 // ローカルDBへの登録を行う.
@@ -783,7 +835,7 @@
 					// progress 状態表示
           [self.view addSubview:progressView];
         }
-        Photo *photoModel =  [[self photoModelController] insertPhoto:photo withAlbum:album];
+        Photo *photoModel =  [[self photoModelController] insertPhoto:photo withAlbum:album.albumId];
         if(photoModel) {
           [self downloadThumbnail:photo withPhotoModel:photoModel];
         }
@@ -854,8 +906,8 @@
   [downloader start];
   [downloader finishQueuing];
   [pool drain];
-  [picasaFetchController release];
-  picasaFetchController = nil;
+//  [picasaFetchController release];
+//  picasaFetchController = nil;
 }
 
 
@@ -876,8 +928,8 @@
   [pool drain];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   // Google接続コントローラーをclean
-  [picasaFetchController release];
-  picasaFetchController = nil;
+//  [picasaFetchController release];
+//  picasaFetchController = nil;
   //
   [self removeProgressView];
   // toolbarのボタンを有効に
@@ -901,8 +953,8 @@
   [pool drain];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   // Google接続コントローラーをclean
-  [picasaFetchController release];
-  picasaFetchController = nil;
+//  [picasaFetchController release];
+//  picasaFetchController = nil;
   //
   [self removeProgressView];
   // toolbarのボタンを有効に
@@ -927,8 +979,8 @@
   [pool drain];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   // Google接続コントローラーをclean
-  [picasaFetchController release];
-  picasaFetchController = nil;
+//  [picasaFetchController release];
+//  picasaFetchController = nil;
   //
   [self removeProgressView];
   // toolbarのボタンを有効に
@@ -1031,7 +1083,7 @@
 }
 
 - (void) onAlbumSelected:(Album *)selectedAlbum {
-  if(picasaFetchController && picasaFetchController.completed == NO) {
+  if(self.picasaFetchController && self.picasaFetchController.completed == NO) {
     // Google 問い合わせ中に次のアルバムが選択された
     // 問い合わせが返ってくるまで待つため、次の選択アルバムを記録しておいて、一回処理キャンセルしておく
     // 問い合わせが返ってきたときｎ、再度、これを起動する。
@@ -1108,7 +1160,7 @@
 }
 
 
-- (void) refreshPhotos {
+- (void) refreshPhotos:(BOOL)refreshAll {
 
   hasErrorInDownloading = NO;
   hasErrorInInsertingThumbnail = NO;
@@ -1119,15 +1171,17 @@
   // toolbarのButtonを無効に
   [self enableToolbar:NO];
   // 削除
-  [[self photoModelController] removePhotos];
+  if(refreshAll) {
+    [[self photoModelController] removePhotos];
+  }
   // 再ロード
   SettingsManager *settings = [[SettingsManager alloc] init];
-  picasaFetchController = [[PicasaFetchController alloc] init];
-  picasaFetchController.delegate = self;
-  picasaFetchController.userId = settings.userId;
-  picasaFetchController.password = settings.password;
+  self.picasaFetchController = [[PicasaFetchController alloc] init];
+  self.picasaFetchController.delegate = self;
+  self.picasaFetchController.userId = settings.userId;
+  self.picasaFetchController.password = settings.password;
   [self.view addSubview:[self progressView]];
-  [picasaFetchController queryAlbumAndPhotos:self.album.albumId 
+  [self.picasaFetchController queryAlbumAndPhotos:self.album.albumId
                                         user:[self.album.user valueForKey:@"userId"]
                                withPhotoSize:[NSNumber numberWithInt:settings.imageSize]
                                withThumbSize:[NSNumber numberWithInteger:
@@ -1243,11 +1297,11 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     //
     SettingsManager *settings = [[SettingsManager alloc] init];
-    picasaFetchController = [[PicasaFetchController alloc] init];
-    picasaFetchController.delegate = self;
-    picasaFetchController.userId = settings.userId;
-    picasaFetchController.password = settings.password;
-    [picasaFetchController queryAlbumAndPhotos:curAlbum.albumId
+    self.picasaFetchController = [[PicasaFetchController alloc] init];
+    self.picasaFetchController.delegate = self;
+    self.picasaFetchController.userId = settings.userId;
+    self.picasaFetchController.password = settings.password;
+    [self.picasaFetchController queryAlbumAndPhotos:curAlbum.albumId
                                           user:[curAlbum.user valueForKey:@"userId"]
                                  withPhotoSize:[NSNumber numberWithInt:settings.imageSize]
                                  withThumbSize:[NSNumber numberWithInteger:
@@ -1436,6 +1490,33 @@
 
 #pragma mark Action
 
+- (void) photoAction:(id)sender {
+  UIActionSheet *sheet;
+  if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+    sheet = [[UIActionSheet alloc]
+            initWithTitle:@""
+            delegate:self
+            cancelButtonTitle:NSLocalizedString(@"Cancel",@"Cancel")
+            destructiveButtonTitle:nil
+            otherButtonTitles:NSLocalizedString(@"Camera",@"by email"),
+            NSLocalizedString(@"PhotoLibrary",@"photo library"),
+            nil];
+  }
+  else {
+    sheet = [[UIActionSheet alloc]
+             initWithTitle:@""
+             delegate:self
+             cancelButtonTitle:NSLocalizedString(@"Cancel",@"Cancel")
+             destructiveButtonTitle:nil
+             otherButtonTitles:
+             NSLocalizedString(@"PhotoLibrary",@"photo library"),
+             nil];
+  }
+  
+  [sheet showInView:self.view];
+
+}
+
 - (void) refreshAction:(id)sender {
   if(![NetworkReachability reachable]) {
     NSString *title = NSLocalizedString(@"Notice","Notice");
@@ -1474,8 +1555,8 @@
   [self discardTumbnails];
   [self.view addSubview:progressView];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-	[self performSelectorOnMainThread:@selector(refreshPhotos) 
-                         withObject:nil 
+	[self performSelectorOnMainThread:@selector(refreshPhotos:)
+                         withObject:YES
                       waitUntilDone:NO];
   
   
@@ -1511,8 +1592,8 @@
     [self discardTumbnails];
     [self.view addSubview:progressView];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [self performSelectorOnMainThread:@selector(refreshPhotos) 
-                           withObject:nil 
+    [self performSelectorOnMainThread:@selector(refreshPhotos:)
+                           withObject:YES
                         waitUntilDone:NO];
     
   }
@@ -1555,6 +1636,87 @@
 
 
 #pragma mark -
+
+#pragma mark UIActionSheetDelegate
+
+/*!
+ 
+ */
+- (void)actionSheet:(UIActionSheet *)actionSheet
+clickedButtonAtIndex:(NSInteger)buttonIndex {
+  
+  NSInteger sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+  NSLog(@"action sheet - selected index = %d", buttonIndex);
+  //  UIViewController *contoller ;
+  switch (buttonIndex) {
+    case 0:	  // カメラ
+      if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        sourceType = UIImagePickerControllerSourceTypeCamera;
+      }
+      break;
+    case 1:	  // ライブラリ
+      if(![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        return;
+      }
+      break;
+    default:
+      NSLog(@"canceled .");
+      return;
+  }
+  UIPopoverController *popover;
+  UIImagePickerController *imagePickerController = [[UIImagePickerController alloc]init];
+  [imagePickerController setSourceType:sourceType];
+  [imagePickerController setDelegate:self];
+  
+  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad &&
+      sourceType == UIImagePickerControllerSourceTypePhotoLibrary) {
+    
+    popover = [[UIPopoverController alloc]initWithContentViewController:imagePickerController];
+		[popover presentPopoverFromBarButtonItem:photoButton
+                    permittedArrowDirections:UIPopoverArrowDirectionAny
+                                    animated:YES];
+
+  }
+  else {
+    [self presentViewController:imagePickerController animated:YES completion:nil];
+  }
+  
+
+}
+
+#pragma mark UIImagePickerControllerDelegate
+
+-(void)imagePickerController:(UIImagePickerController *)picker
+didFinishPickingMediaWithInfo:(NSDictionary *)info {
+
+  UIImage *image = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
+  NSData *imageData = UIImageJPEGRepresentation(image, 1.0f);
+  SettingsManager *settings = [[SettingsManager alloc] init];
+//  picasaFetchController = [[PicasaFetchController alloc] init];
+//  picasaFetchController.userId = settings.userId;
+//  picasaFetchController.password = settings.password;
+
+  if(!self.picasaFetchController) {
+    self.picasaFetchController = [[PicasaFetchController alloc] init];
+    self.picasaFetchController.delegate = self;
+    self.picasaFetchController.userId = settings.userId;
+    self.picasaFetchController.password = settings.password;
+
+  }
+  [settings release];
+  User *user = (User *)self.album.user;
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+
+  [self.picasaFetchController insertPhoto:imageData
+                                 withAlbum:self.album.albumId
+                                  withUser:user.userId];
+  [self dismissViewControllerAnimated:YES
+                           completion:^{
+                           }];
+//  [NSData alloc] ini
+  
+}
+
 
 #pragma mark PageViewSource
 

@@ -292,7 +292,8 @@
  */
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation{
   
-  return [self.viewControllers.lastObject preferredInterfaceOrientationForPresentation];
+  UIInterfaceOrientation orientation =  [self.viewControllers.lastObject preferredInterfaceOrientationForPresentation];
+  return orientation == 0 ? UIDeviceOrientationPortrait : orientation;
   
 }
 

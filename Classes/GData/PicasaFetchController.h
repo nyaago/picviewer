@@ -61,6 +61,16 @@
                   error:(NSError *)error;
 
 /*!
+ @method insertedPhotoWithTicket:finishedWithPhotoFeed:error:
+ @discussion PicasaFetchControllerのinsertPhoto:photoData withAlbum: （photoアップロード）
+ でのリクエストに対する通知メソッド
+ */
+- (void)insertedPhotoWithTicket:(GDataServiceTicket *)ticket
+  finishedWithPhotoFeed:(GDataFeedPhoto *)feed
+                  error:(NSError *)error;
+
+
+/*!
  @method PicasaFetchWasError:
  @discussion 認証エラーの場合の通知メソッド
  */
@@ -102,8 +112,16 @@
   NSString *userId;
   // Google Password
   NSString *password;
+  // upload するphoto データー
+  NSData *imageData;
   
 }
+
+/*!
+ @property uploadURL
+ @discussuion photo upload の URL
+ */
+@property (nonatomic, retain) NSURL *uploadURL;
 
 @property (nonatomic, assign) NSObject <PicasaFetchControllerDelegate> *delegate;
 
@@ -118,6 +136,15 @@
  */
 @property (nonatomic, retain) NSString *password;
 
+
+/*!
+ @method insertPhoto:photoData withAlbum:
+ @discussion Photoのアップロード
+ delegateのinsertedPhotoWithTicket:finishedWithPhotoFeed:error:で通知を受ける
+ @param photoData pngデーター
+ @param album album id
+ */
+- (void) insertPhoto:(NSData *)photoData withAlbum:(NSString *)album withUser:(NSString *)user;
 /*!
  @method queryUserAndAlbums
  @discussion 指定したユーザのユーザ情報とそのユーザのアルバムの一覧取得のリクエスト

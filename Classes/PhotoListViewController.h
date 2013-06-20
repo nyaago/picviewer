@@ -41,7 +41,8 @@
 <PicasaFetchControllerDelegate, 
 QueuedURLDownloaderDelegate, PageControlViewControllerDataSource,
 UIAlertViewDelegate,UISplitViewControllerDelegate,AlbumTableViewControllerDelegate,
-ThumbImageViewDelegate> {
+ThumbImageViewDelegate, UIActionSheetDelegate,
+UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
   
   @private
   // CoreData album Model
@@ -84,6 +85,8 @@ ThumbImageViewDelegate> {
   UIBarButtonItem *refreshButton;
   // view information Button
   UIBarButtonItem *infoButton;
+  // view photo Button
+  UIBarButtonItem *photoButton;
   // album一覧Viewからの遷移の場合YES
   BOOL isFromAlbumTableView;
   // サムネイル処理のLock
@@ -118,6 +121,14 @@ ThumbImageViewDelegate> {
  @discussion ダウンロード処理中に表示するProgressBar のView
  */
 @property (nonatomic, retain) IBOutlet LabeledProgressView *progressView;
+
+
+/*!
+ @property picasaFetchController
+ @discussion
+ */
+@property (nonatomic, retain) PicasaFetchController *picasaFetchController;
+
 
 /*!
  @method loadThumbnails
@@ -166,6 +177,8 @@ ThumbImageViewDelegate> {
 - (void) stopToAddThumbnails;
 
 
-
+/*!
+ */
+- (PicasaFetchController *) picasaFetchController;
 
 @end

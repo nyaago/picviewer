@@ -132,6 +132,13 @@
   NSString *userId = [settings currentUser];
   // 最初の表示、user選択済みの場合はAlbum一覧へ
   if(firstAppearance) {
+    if(settings.userId != nil && settings.username == nil) {
+      // user id が設定されているけど,usernameが設定されていない(username が
+      // 追加されて後の最初の起動) => 強制的に設定へ
+      [settings release];
+      [self settingsAction:self];
+      return;
+    }
     if(userId) {
       //	  User *user = [self selectUser:userId];
       User *user = [self userWithUserId:userId];

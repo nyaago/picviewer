@@ -29,6 +29,8 @@
 
 static NSInteger imageSizes[3] = {640, 1280, 1600};
 
+#define kRegexEmail @"^[0-9a-zA-Z][0-9a-zA-Z_+-.]+@[0-9a-zA-Z][0-9a-zA-Z_.-]+.[a-zA-Z]+$"
+
 @interface SettingsManager (Private) 
 
 /*!
@@ -63,6 +65,13 @@ static NSInteger imageSizes[3] = {640, 1280, 1600};
 
 - (NSString *) userId {
   return [self stringForKey:@"userId" withDefault:@""];
+}
+- (void) setUsername:(NSString *)username {
+  [self setObject:username forKey:@"username"];
+}
+
+- (NSString *) username {
+  return [self stringForKey:@"username" withDefault:@""];
 }
 
 - (void) setPassword:(NSString *)password {
@@ -100,6 +109,15 @@ static NSInteger imageSizes[3] = {640, 1280, 1600};
                        withDefault:[NSNumber numberWithInt:1280]];
   return [n intValue];
 }
+
+- (BOOL) isEqualUserId:(NSString *)userId {
+  NSString *myUserId = [self username];
+  if(myUserId) {
+    return [myUserId isEqualToString:userId];
+  }
+  return NO;
+}
+
 
 #pragma mark -
 
@@ -163,6 +181,20 @@ static NSInteger imageSizes[3] = {640, 1280, 1600};
   
   [pool drain];
 }
+
+- (BOOL) validEmail:(NSString *)email {
+  NSError* error = nil;
+  NSRegularExpression *regex =
+  [NSRegularExpression regularExpressionWithPattern:kRegexEmail
+                                            options:NSRegularExpressionCaseInsensitive
+                                              error:&error];
+  NSTextCheckingResult *match = [regex firstMatchInString:email
+                                                  options:0
+                                                    range:NSMakeRange(0, email.length)];
+  return !(match == nil);
+  
+}
+
 
 #pragma mark -
 

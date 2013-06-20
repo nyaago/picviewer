@@ -38,6 +38,11 @@
 /*!
  @property userId
  */
+@property (nonatomic, retain) NSString *username;
+
+/*!
+ @property userId
+ */
 @property (nonatomic, retain) NSString *userId;
 
 /*!
@@ -62,6 +67,18 @@
  @discussion
  */
 - (NSString *) userId;
+
+/*!
+ @method setUsername:
+ @discussion
+ */
+- (void) setUsername:(NSString *)username;
+
+/*!
+ @method username
+ @discussion
+ */
+- (NSString *) username;
 
 /*!
  @method setPassword
@@ -112,6 +129,13 @@
  @discussion 現在表示対象になっているアルバムを返す
  */
 - (NSString *)currentAlbum;
+
+/*!
+ @method isEqualUserId:
+ @param userId 判定するユーザーID
+ @return 指定したユーザーIDが設定されているユーザーIDと等しければYES
+ */
+- (BOOL) isEqualUserId:(NSString *)userId;
 
 /*!
  @method imageSizeToIndex

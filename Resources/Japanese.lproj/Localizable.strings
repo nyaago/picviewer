@@ -45,6 +45,9 @@
 "SaveToLibrary" = "Photoライブラリへ保存";
 "OK" = "OK";
 "Continue" = "続行";
+"PhotoLibrary" = "ライブラリーから選択";
+"Camera" = "写真を撮る";
+
 
 // Album詳細
 "AlbumInfo.PhotosUsed" = "写真 %d 枚";
@@ -56,7 +59,10 @@
 "PhotoList.Loding" = "写真を読み込んでいます";
 
 
+
+
 // 写真View
+"Photo.Action" = "操作を選択してくだいさい";
 "Photo.Action" = "操作を選択してくだいさい";
 
 //

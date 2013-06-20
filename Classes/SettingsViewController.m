@@ -387,6 +387,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
                           error:(NSError *)error {
   NSLog(@"user and album");
   [self.parentViewController dismissModalViewControllerAnimated:YES];
+  settings.username = feed.username;
 
 }
 
