@@ -1290,30 +1290,7 @@
   BOOL ret = NO;
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   if([self mustLoad:curAlbum]) {
-    [self discardTumbnails];
-    // クリア + 全ロードか?
-    // toolbarのButtonを無効に
-    [self enableToolbar:NO];
-    self.scrollView.userInteractionEnabled = NO;
-    // progress View
-    progressView.progress = 0.0f;
-    [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
-                                               @"download")];
-    [self.view addSubview:[self progressView]];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    //
-    SettingsManager *settings = [[SettingsManager alloc] init];
-    self.picasaFetchController = [[PicasaFetchController alloc] init];
-    self.picasaFetchController.delegate = self;
-    self.picasaFetchController.userId = settings.userId;
-    self.picasaFetchController.password = settings.password;
-    [self.picasaFetchController queryAlbumAndPhotos:curAlbum.albumId
-                                          user:[curAlbum.user valueForKey:@"userId"]
-                                 withPhotoSize:[NSNumber numberWithInt:settings.imageSize]
-                                 withThumbSize:[NSNumber numberWithInteger:
-                                               [ThumbImageView thumbWidthForContainer:self.view] *
-                                                [[UIScreen mainScreen] scale]]];
-    [settings release];
+    [self refreshPhotos:YES];
     ret = YES;
   }
   else {
