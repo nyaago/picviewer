@@ -69,6 +69,15 @@
   finishedWithPhotoFeed:(GDataFeedPhoto *)feed
                   error:(NSError *)error;
 
+/*!
+ @method deleted:error:
+ @discussion PicasaFetchControllerのdeletePhoto:album: （photo削除）
+ でのリクエストに対する通知メソッド
+ */
+- (void)deletedPhoto:(GDataEntryPhoto *)entry
+                          error:(NSError *)error;
+
+
 
 /*!
  @method PicasaFetchWasError:
@@ -145,6 +154,16 @@
  @param album album id
  */
 - (void) insertPhoto:(NSData *)photoData withAlbum:(NSString *)album withUser:(NSString *)user;
+
+/*!
+ @method deletePhoto:album:
+ @discussion photoの削除
+ @param photoId
+ @param albumId
+ @param user  - user id
+ */
+- (void) deletePhoto:(NSString *)photoId album:(NSString *)albumId user:(NSString *)user;
+
 /*!
  @method queryUserAndAlbums
  @discussion 指定したユーザのユーザ情報とそのユーザのアルバムの一覧取得のリクエスト

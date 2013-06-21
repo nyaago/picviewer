@@ -74,7 +74,7 @@
 /*!
  @property photoListViewContriller
  */
-@property (nonatomic,retain, readonly) PhotoListViewController *photoListViewController;
+@property (nonatomic,retain) PhotoListViewController *photoListViewController;
 
 
 @end

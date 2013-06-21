@@ -33,6 +33,7 @@
 @dynamic albumId, photoId, height, timeStamp, title, descript, width;
 @dynamic thumbnail, urlForContent, urlForThumbnail, location;
 @dynamic photoImage;
+@dynamic album;
 
 @end
 

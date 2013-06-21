@@ -79,6 +79,7 @@
 "Warn.NetworkNotReachable" = "can't connect to network.";
 
 "Notice.WifiNotReachable" = "only 3G(can't use Wi-fi).continue?";
+"Notice.DeletePhoto" = "Can I delete it?";
 
 // General
 "Width" = "Width";

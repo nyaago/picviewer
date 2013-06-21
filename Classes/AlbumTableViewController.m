@@ -675,6 +675,8 @@
 - (PhotoListViewController *)photoListViewControllerWithAlbum:(Album *)album {
   PhotoListViewController *photoViewController = nil;
   
+  PicasaViewerAppDelegate *delegate
+  = (PicasaViewerAppDelegate *) [[UIApplication sharedApplication] delegate];
   
   if([self splitViewController] == nil) {
     // iPhone
@@ -684,12 +686,11 @@
     photoViewController.album = album;
     photoViewController.managedObjectContext = self.managedObjectContext;
     self.navigationItem.backBarButtonItem =  [photoViewController backButton];
+    delegate.photoListViewController = photoViewController;
     // Pass the selected object to the new view controller.
   }
   else {
     // iPad
-    PicasaViewerAppDelegate *delegate
-    = (PicasaViewerAppDelegate *) [[UIApplication sharedApplication] delegate];
     photoViewController = delegate.photoListViewController;
     photoViewController.managedObjectContext = self.managedObjectContext;
     [photoViewController albumTableViewControll:self selectAlbum:album];

@@ -30,9 +30,16 @@
 #import "PhotoImage.h"
 #import "PhotoInfoViewController.h"
 #import "PhotoActionDelegate.h"
+#import "SettingsManager.h"
 #import "NetworkReachability.h"
 
 @interface PhotoViewController(Private)
+
+/*!
+ @method canUpdatePhoto
+ @return 写真情報の更新が可能か?
+ */
+- (BOOL) canUpdatePhoto:(NSInteger)index;
 
 /*!
  @method frameForPhoro:
@@ -369,6 +376,20 @@ static NSLock *lockFetchedResultsController;
 
 #pragma mark Private
 
+- (BOOL) canUpdatePhoto:(NSInteger ) index {
+  
+  Photo *photo = [self photoAt:index];
+  Album *album = (Album *)photo.album;
+  User *user = (User *)album.user;
+  if(user) {
+    SettingsManager *settings = [[SettingsManager alloc] init];
+    BOOL ret = [settings isEqualUserId:user.userId] ? YES : NO;
+    [settings release];
+    return ret;
+  }
+  return NO;
+}
+
 
 -(CGRect) viewFrameForImage:(UIImage *)image {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -626,6 +647,7 @@ static NSLock *lockFetchedResultsController;
   PhotoInfoViewController *viewController = [[PhotoInfoViewController alloc]
                                              initWithNibName:@"PhotoInfoViewController" 
                                              bundle:nil];
+  viewController.canUpdate = [self canUpdatePhoto:[self indexForPhoto]];
   Photo *photo = [self photoAt:indexForPhoto];
   UINavigationController *navigationController  = 
   [[UINavigationController alloc] initWithRootViewController:viewController];

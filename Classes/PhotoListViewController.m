@@ -51,6 +51,11 @@
 #define kIntervalForReload 15
 
 /*!
+ @method canUpdatePhotos
+ @return photo に対する更新操作が可能か？
+ */
+- (BOOL) canUpdatePhotos;
+/*!
  @method addTbumbnailForPhoto:
  @param photo photo モデル
  @discussion 指定した写真モデルについてサムネイルをview上に表示する。
@@ -130,12 +135,6 @@
  */
 - (void)setContentSizeWithImageCount;
 
-/*!
- @method refreshPhotos
- @param refreshAll １回全クリアするか？
- @discussion Photoデータを1回削除後、再ロード(Picasaへの問い合わせ+Thumbnail - download)
- */
-- (void) refreshPhotos:(BOOL)refreshAll;
 
 /*!
  @method daysBetween:and:
@@ -227,7 +226,7 @@
   onAddingThumbnailsLock = [[NSLock alloc] init];
 
   //
-  isFromAlbumTableView = YES;
+  needToLoadIfWifi = YES;
   // scrollView の設定
   self.scrollView.scrollEnabled = YES;
   self.scrollView.userInteractionEnabled = YES;
@@ -301,11 +300,8 @@
   }
 
   
-  if(isFromAlbumTableView == YES) {
-    [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
-    [self loadPhotos:self.album];
-
-  }
+  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
+  [self loadPhotos:self.album];
 }
 
 - (void) afterViewDidAppear:(id)arg {
@@ -351,7 +347,8 @@
   }
   [self.picasaFetchController requireStopping];
 // [self stopToAddThumbnails];
-  isFromAlbumTableView = NO;
+  needToLoadIfWifi = NO;
+  needToLoad = NO;
   NSLog(@"photoListViewController didDisappear.retain count = %d", [self retainCount]);
 }
 
@@ -664,26 +661,21 @@
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
     
-    SettingsManager *settings = [[SettingsManager alloc] init];
-    User *user = (User *)self.album.user;
-    if(user) {
-      if([settings isEqualUserId:user.userId]) {
-        photoButton = [[UIBarButtonItem alloc]
-                        initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
-                       target:self
-                       action:@selector(photoAction:)];
-        [toolbarButtons addObject:photoButton];
-        spaceRight = [[UIBarButtonItem alloc]
-                      initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                      target:self
-                      action:nil];
+    if([self canUpdatePhotos]) {
+      photoButton = [[UIBarButtonItem alloc]
+                      initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
+                     target:self
+                     action:@selector(photoAction:)];
+      [toolbarButtons addObject:photoButton];
+      spaceRight = [[UIBarButtonItem alloc]
+                    initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                    target:self
+                    action:nil];
 //        spaceRight.width = 30.0f;
-        [toolbarButtons addObject:spaceRight];
-        [spaceRight release];
-      }
+      [toolbarButtons addObject:spaceRight];
+      [spaceRight release];
     }
-    [settings release];
-      
+    
     // Info
     infoButton = [[UIBarButtonItem alloc] initWithTitle:@"" 
                                                   style:UIBarButtonItemStyleBordered 
@@ -1069,6 +1061,17 @@
 
 #pragma mark Private
 
+- (BOOL) canUpdatePhotos {
+  User *user = (User *)self.album.user;
+  if(user) {
+    SettingsManager *settings = [[SettingsManager alloc] init];
+    BOOL ret = [settings isEqualUserId:user.userId] ? YES : NO;
+    [settings release];
+    return ret;
+  }
+  return NO;
+}
+
 - (void) addTbumbnailForPhoto:(Photo *)photo {
   NSInteger i = [[self photoModelController] indexForPhoto:photo];
   if(i != NSNotFound) {
@@ -1105,7 +1108,7 @@
   // '写真を読み込んでいます'表示
   [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
   
-  isFromAlbumTableView = YES;
+  needToLoadIfWifi = YES;
   [self discardTumbnails];
   if(downloader != nil && ![downloader isCompleted] && [downloader isStarted]) {
     [[self photoModelController] clearLastAdd];
@@ -1130,7 +1133,7 @@
     return;
   }
   
-  if(isFromAlbumTableView == NO) {	// 写真画面から戻ってきた場合
+  if(needToLoadIfWifi == NO) {	// 写真画面から戻ってきた場合
     // viewのサイズ, 前画面(写真)がtoolbar部分を含んでいたので、そのtoolbar分マイナス
     CGRect frame = self.view.frame;
     frame.size.height -= self.navigationController.toolbar.frame.size.height;
@@ -1175,6 +1178,7 @@
     [[self photoModelController] removePhotos];
   }
   // 再ロード
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   SettingsManager *settings = [[SettingsManager alloc] init];
   self.picasaFetchController = [[PicasaFetchController alloc] init];
   self.picasaFetchController.delegate = self;
@@ -1210,7 +1214,9 @@
 }
 
 - (BOOL) mustLoad:(Album *)curAlbum {
-  if(isFromAlbumTableView == NO)
+  if(needToLoad == YES)
+    return YES;
+  if(needToLoadIfWifi == NO)
     return NO;
   if([[self photoModelController] album].albumId != curAlbum.albumId) {
     return YES;
@@ -1283,7 +1289,7 @@
   // CoreDataへの登録を行う
   BOOL ret = NO;
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  if([self mustLoad:curAlbum]) {      
+  if([self mustLoad:curAlbum]) {
     [self discardTumbnails];
     // クリア + 全ロードか?
     // toolbarのButtonを無効に
@@ -1554,10 +1560,7 @@
   [self discardTumbnails];
   [self.view addSubview:progressView];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-	[self performSelectorOnMainThread:@selector(refreshPhotos:)
-                         withObject:YES
-                      waitUntilDone:NO];
-  
+  [self refreshPhotos:YES];
   
 } 
 

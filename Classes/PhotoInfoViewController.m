@@ -26,7 +26,9 @@
 //++
 
 #import "PhotoInfoViewController.h"
+#import "SettingsManager.h"
 
+#define kTagAlertDelete 1
 
 @interface PhotoInfoViewController(Private)
 
@@ -36,21 +38,31 @@
  */
 - (void) completedAction:(id)sender;
 
+
+- (void) confirmDelete;
+
+- (void) doDelete;
+
+
+
 @end
 
 
 @implementation PhotoInfoViewController
 
 @synthesize photo;
+@synthesize picasaController;
+@synthesize canUpdate;
 
 #pragma mark -
 #pragma mark View lifecycle
 
-- (id)initWithPhotoObject:(Photo *)photoObject {
+- (id)initWithPhotoObject:(Photo *)photoObject canUpdate:(BOOL)fCanUpdate {
 	self = [super initWithStyle:UITableViewStyleGrouped];
   if(self) {
     //
     self.photo = photoObject;
+    self.canUpdate = fCanUpdate;
     //
     UIBarButtonItem *completeButton = [[UIBarButtonItem alloc] 
                                        initWithTitle:
@@ -86,7 +98,12 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     // Return the number of sections.
+  if(self.canUpdate) {
+    return 2;
+  }
+  else {
     return 1;
+  }
 }
 
 
@@ -96,6 +113,10 @@
   switch (section) {
     case 0:
       n = 2;
+      break;
+    case 1:
+      n = 1;
+      break;
     default:
       break;
   }
@@ -143,6 +164,18 @@
           default:
             break;
         }
+        break;
+      case (1) :
+        switch ([indexPath indexAtPosition:1]) {
+          case(0) :
+            cell.textLabel.text = @"Delete Photo";
+            cell.textLabel.textColor = [UIColor redColor];
+            cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+            break;
+          default:
+            break;
+        }
+        break;
     }
   }
   
@@ -156,6 +189,21 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     // Navigation logic may go here. Create and push another view controller.
+  switch ([indexPath indexAtPosition:0]) {
+    case(0) : //
+      break;
+    case (1) :
+      switch ([indexPath indexAtPosition:1]) {
+        case (0):
+          // 削除
+          [self confirmDelete];
+          break;
+          
+        default:
+          break;
+      }
+  }
+
 }
 
 
@@ -172,17 +220,85 @@
 
 - (void)dealloc {
   if(photo) {
-		[photo release];	
+		[photo release];
+  }
+  if(picasaController) {
+    [picasaController release];
   }
   [super dealloc];
 }
 
 #pragma mark -
 
+#pragma mark action when cell selected
+
+- (void) confirmDelete {
+  
+  UIAlertView *av = [[UIAlertView alloc]
+                     initWithTitle:NSLocalizedString(@"Notice", @"Notice")
+                     message:NSLocalizedString(@"Notice.DeletePhoto", @"confirm deleting.")
+                     delegate:self
+                     cancelButtonTitle:NSLocalizedString(@"Cancel", @"Cancel")
+                     otherButtonTitles:NSLocalizedString(@"OK", @"OK"), nil];
+  av.tag = kTagAlertDelete;
+  
+  [av show];
+}
+
 
 #pragma mark Action
 - (void) completedAction:(id)sender {
   [[self parentViewController] dismissModalViewControllerAnimated:YES];
+}
+
+#pragma mark UIAlertViewDelegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+  
+  NSLog(@"alert view - selected index = %d", buttonIndex);
+  if(alertView.tag == kTagAlertDelete) {
+    // 削除確認
+    if(buttonIndex) {
+      Album *album = (Album *)photo.album;
+      User *user = (User *)album.user;
+      [self.picasaController deletePhoto:photo.photoId album:album.albumId user:user.userId];
+    }
+  }
+}
+
+
+#pragma mark PicasaFetchControllerDelegate
+
+
+- (void)deletedPhoto:(GDataEntryPhoto *)entry
+                         error:(NSError *)error {
+  if(error) {
+    NSLog(@"%@", error.description);
+  }
+  else {
+    [self dismissViewControllerAnimated:YES completion:^{
+      PicasaViewerAppDelegate *appDelegate = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
+//      appDelegate.photoListViewController.isF
+      appDelegate.photoListViewController.needToLoad = YES;
+      [appDelegate.navigationController popToViewController:appDelegate.photoListViewController animated:YES];
+      [appDelegate.photoListViewController refreshPhotos:YES];
+    }];
+//    [appDelegate.photoListViewController
+  }
+}
+
+#pragma mark property
+
+- (PicasaFetchController *) picasaController {
+  if(picasaController == nil) {
+    picasaController = [[PicasaFetchController alloc] init];
+    SettingsManager *settings = [[SettingsManager alloc] init];
+    picasaController.userId = settings.userId;
+    picasaController.password = settings.password;
+    picasaController.delegate = self;
+    [settings release];
+  }
+  return picasaController;
 }
 
 @end

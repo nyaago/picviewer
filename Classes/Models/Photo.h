@@ -47,6 +47,8 @@
 @property (nonatomic, retain) NSString * descript;
 @property (nonatomic, retain) NSString * location;
 
+@property (nonatomic, retain) NSManagedObject * album;
+
 
 @end
 

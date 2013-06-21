@@ -87,8 +87,10 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
   UIBarButtonItem *infoButton;
   // view photo Button
   UIBarButtonItem *photoButton;
-  // album一覧Viewからの遷移の場合YES
-  BOOL isFromAlbumTableView;
+  // サムネイルloadが必要か
+  BOOL needToLoad;
+  // サムネイルloadが必要か
+  BOOL needToLoadIfWifi;
   // サムネイル処理のLock
   NSLock *thumbnailLock;
   // 現在layoutされている向き
@@ -129,6 +131,17 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
  */
 @property (nonatomic, retain) PicasaFetchController *picasaFetchController;
 
+/*!
+ @proprtyu needToLoad
+ @discussion サムネイルloadが必要か
+ */
+@property (nonatomic) BOOL needToLoad;
+
+/*!
+ @proprtyu needToLoadIfWifi
+ @discussion サムネイルloadが必要か
+ */
+@property (nonatomic) BOOL needToLoadIfWifi;
 
 /*!
  @method loadThumbnails
@@ -175,6 +188,13 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
  @discussion thumbnail処理を中断させる,中断されるまでLockされる
  */
 - (void) stopToAddThumbnails;
+
+/*!
+ @method refreshPhotos
+ @param refreshAll １回全クリアするか？
+ @discussion Photoデータを1回削除後、再ロード(Picasaへの問い合わせ+Thumbnail - download)
+ */
+- (void) refreshPhotos:(BOOL)refreshAll;
 
 
 /*!

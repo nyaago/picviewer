@@ -27,14 +27,18 @@
 
 #import <UIKit/UIKit.h>
 #import "Photo.h"
+#import "PicasaViewerAppDelegate.h"
 
 /*!
  @class PhotoInfoViewController
  @discussion 写真の情報を表示するViewのController
  */
 
-@interface PhotoInfoViewController : UITableViewController {
+@interface PhotoInfoViewController : UITableViewController <PicasaFetchControllerDelegate,
+UIAlertViewDelegate> {
 	Photo *photo;
+  BOOL canUpdate;
+  PicasaFetchController *picasaController;
 }
 
 /*!
@@ -44,9 +48,26 @@
 @property (nonatomic, retain) Photo *photo;
 
 /*!
+ @property canUpdate
+ @discussion 写真情報の更新可能か
+ */
+@property (nonatomic) BOOL canUpdate;
+
+/*!
+ @property picasaController
+ @discussion picasa アクセス controller
+ */
+@property (nonatomic, retain) PicasaFetchController *picasaController;
+
+
+/*!
  @method initWithPhotoObject:
+ @param photoObject photo model object
+ @oaram fCanUpdate 更新可能か
  @discussion 表示対象のPhotoObjectを指定しての初期化
  */
-- (id) initWithPhotoObject:(Photo *)photoObject;
+- (id) initWithPhotoObject:(Photo *)photoObject canUpdate:(BOOL)fCanUpdate;
+
+- (PicasaFetchController *) picasaController;
 
 @end

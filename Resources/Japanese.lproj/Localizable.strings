@@ -86,6 +86,7 @@
 "Warn.NetworkNotReachable" = "ネットワークに接続できません.";
 
 "Notice.WifiNotReachable" = "3G回線へ接続中ですが(Wi-fi接続できません)続行しますか";
+"Notice.DeletePhoto" = "写真を削除します。続行しますか？";
 
 
 // General
