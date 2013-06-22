@@ -28,32 +28,37 @@
 #import "PicasaFetchController.h"
 
 @interface PicasaFetchController (Private)
+
+/*!
+ アルバム一覧取得時のdelegate
+ */
 - (void)userAndAlbumsWithTicket:(GDataServiceTicket *)ticket
            finishedWithUserFeed:(GDataFeedPhotoUser *)feed
                           error:(NSError *)error ;
 
+/*!
+ 写真一覧取得時のdelegate
+ */
 - (void)albumAndPhotosWithTicket:(GDataServiceTicket *)ticket
            finishedWithAlbumFeed:(GDataFeedPhotoAlbum *)feed
                            error:(NSError *)error ;
 
 
+/*!
+ 写真取得時のdelegate
+ */
 - (void)photoWithTicket:(GDataServiceTicket *)ticket
   finishedWithPhotoFeed:(GDataFeedPhoto *)feed
                   error:(NSError *)error;
 
 
-
+/*!
+ 写真upload完了時のdelegate
+ */
 - (void) insertedPhotoWithTicket:(GDataServiceTicket *)ticket
            finishedWithPhotoFeed:(GDataFeedPhoto *)feed
                           error:(NSError *)error ;
 
-
-//
-- (void) queryAlbumForUpload:(NSString *)albumId withUser:(NSString *)user;
-- (void) albumWithTicketForUpload:(GDataServiceTicket *)ticket
-  finishedWithAlbumFeed:(GDataFeedPhotoAlbum *)feed
-                  error:(NSError *)error ;
-//
 
 
 - (void) handleError:(NSError *)error;
@@ -114,44 +119,58 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
 	  [service setUserCredentialsWithUsername:userId password:password];
   }
 
+  void (^insertBlock) () = ^() {
+    GDataEntryPhoto *entry = [GDataEntryPhoto photoEntry];
+    NSLog(@"photo data length = %d",[photoData length]);
+    NSLog(@"feed url = %@",self.uploadURL);
+    [entry setPhotoData:photoData];
+    [entry setPhotoMIMEType:@"image/jpeg"];
+    [entry setAlbumID:album];
+    [entry setTitle:[GDataTextConstruct textConstructWithString:@"title"]];
+    [entry setPhotoDescription:[GDataTextConstruct textConstructWithString:@"desc"]];
+    [entry setUploadSlug:@"from iphone"];
+    
+    [service fetchEntryByInsertingEntry:entry
+                             forFeedURL:self.uploadURL
+                               delegate:self
+                      didFinishSelector:@selector(insertedPhotoWithTicket:
+                                                  finishedWithPhotoFeed:error:)];
+    
+  };
   
-  //User *user = (User *)album.user;
-  /*
-  NSURL *feedURL = [GDataServiceGooglePhotos photoFeedURLForUserID:user.userId
-                                                           albumID:album.albumId
-                                                         albumName:nil
-                                                           photoID:nil
-                                                              kind:nil
-                                                            access:nil];
-*/
-  // upload 用 URL が未取得の場合、album 情報 問い合わせ
-  if(!uploadURL) {
+  if(!self.uploadURL) {
+    // upload 用 URL が未取得の場合、album 情報 問い合わせ
     if(imageData) {
       [imageData release];
     }
     imageData = photoData;
     [imageData retain];
-    [self queryAlbumForUpload:album withUser:user];
+    [self queryAlbum:album withUser:user
+            completionHandler:^(GDataServiceTicket *ticket, GDataFeedPhotoAlbum *feed, NSError *error) {
+
+              NSLog(@"ticket = %@", ticket);
+              // 停止要求されていれば、処理中断
+              [lock lock];
+              if(stoppingRequired) {
+                completed = YES;
+                [lock unlock];
+                return;
+              }
+              [lock unlock];
+              
+              if (error != nil) {
+                NSLog(@"fetch error: %@", error);
+                [self handleError:error];
+                return;
+              }
+              self.uploadURL = [[feed uploadLink] URL];
+              insertBlock();
+      }];
     return;
   }
-  
-  GDataEntryPhoto *entry = [GDataEntryPhoto photoEntry];
-  NSLog(@"photo data length = %d",[photoData length]);
-  NSLog(@"feed url = %@",uploadURL);
-  [entry setPhotoData:photoData];
-  [entry setPhotoMIMEType:@"image/jpeg"];
-  [entry setAlbumID:album];
-  [entry setTitle:[GDataTextConstruct textConstructWithString:@"title"]];
-  [entry setPhotoDescription:[GDataTextConstruct textConstructWithString:@"desc"]];
-  [entry setUploadSlug:@"from iphone"];
-  
-  [service fetchEntryByInsertingEntry:entry
-                          forFeedURL:uploadURL
-                            delegate:self
-                   didFinishSelector:@selector(insertedPhotoWithTicket:
-                                               finishedWithPhotoFeed:error:)];
-  
-  
+  else {
+    insertBlock();
+  }
 }
 
 - (void) deletePhoto:(NSString *)photoId album:(NSString *)albumId user:(NSString *) user {
@@ -159,23 +178,12 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
   stoppingRequired = NO;
   [lock unlock];
   
-  
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
   // アカウント設定
   if(userId && password) {
-    NSLog(@"user = %@, password = %@", userId, password);
+//    NSLog(@"user = %@, password = %@", userId, password);
 	  [service setUserCredentialsWithUsername:userId password:password];
   }
-  /*
-  NSURL *feedURL = [GDataServiceGooglePhotos photoFeedURLForUserID:targetUserId
-                                                           albumID:albumId
-                                                         albumName:nil
-                                                           photoID:photoId
-                                                              kind:nil
-                                                            access:nil];
-   */
-  
-  
   
   [self queryPhoto:photoId
              album:albumId
@@ -189,7 +197,7 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
    if(entry == nil) {
      return;
    }
-   NSLog(@"link - %@/ %@" , [entry editLink], [entry feedLink]);
+//   NSLog(@"link - %@/ %@" , [entry editLink], [entry feedLink]);
    [service deleteEntry:entry completionHandler:
     ^(GDataServiceTicket *ticket, id nilObject, NSError *error) {
       [lock lock];
@@ -213,9 +221,9 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
       }
     } ];
  }];
-  
-  
+
 }
+
 
 - (void) queryUserAndAlbums:(NSString *)user {
   [lock lock];
@@ -247,7 +255,9 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
   [service release];
 }
 
-- (void) queryAlbumForUpload:(NSString *)albumId withUser:(NSString *)user {
+- (void) queryAlbum:(NSString *)albumId withUser:(NSString *)user
+           completionHandler:(void (^)(GDataServiceTicket *ticket,GDataFeedPhotoAlbum *feed, NSError *error))handler
+{
   
   completed = NO;
   GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
@@ -263,12 +273,14 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
                                                               kind:nil
                                                             access:nil];
   GDataQueryGooglePhotos *query = [GDataQueryGooglePhotos queryWithFeedURL:feedURL];
-  //  [query setMaxResults:25];
   
   NSLog(@"queryAlbum URL = %@", [query URL]);
-  [service 	fetchFeedWithURL:[query URL]
-                    delegate:self
-           didFinishSelector:@selector(albumWithTicketForUpload:finishedWithUserFeed:error:)];
+  [service fetchFeedWithURL:[query URL] completionHandler:
+    ^(GDataServiceTicket *ticket, GDataFeedBase *feed, NSError *error) {
+      handler(ticket, (GDataFeedPhotoAlbum *)feed, error);
+   } ];
+  
+  
   [service release];
 }
 
@@ -363,12 +375,6 @@ completionHandler:(void (^)(GDataEntryPhoto *entry, NSError *error))handler
                                                               kind:@"photo"
                                                             access:nil];
   GDataQueryGooglePhotos *query = [GDataQueryGooglePhotos queryWithFeedURL:feedURL];
-  //  [query setKind:@"photo"];
-  /*
-  [query setMaxResults:25];
-  [query setThumbsize:64];
-  [query setImageSize:64];
-   */
   NSLog(@"queryPhoto = %@", [query URL]);
   
   [service fetchFeedWithURL:feedURL completionHandler:
@@ -390,35 +396,6 @@ completionHandler:(void (^)(GDataEntryPhoto *entry, NSError *error))handler
   
   [service release];
   
-}
-
-
-
-
-
-- (void)albumWithTicketForUpload:(GDataServiceTicket *)ticket
-           finishedWithUserFeed:(GDataFeedPhotoAlbum *)feed
-                          error:(NSError *)error {
-  
-  NSLog(@"ticket = %@", ticket);
-  // 停止要求されていれば、処理中断
-  [lock lock];
-  if(stoppingRequired) {
-    completed = YES;
-    [lock unlock];
-    return;
-  }
-  [lock unlock];
-  
-  if (error != nil) {
-    NSLog(@"fetch error: %@", error);
-    [self handleError:error];
-    return;
-  }
-  uploadURL = [[feed uploadLink] URL];
-  [uploadURL retain];
-  [self insertPhoto:imageData withAlbum: [feed identifier] withUser:[feed username]];
-
 }
 
 
@@ -468,8 +445,7 @@ completionHandler:(void (^)(GDataEntryPhoto *entry, NSError *error))handler
     [self handleError:error];
     return;
   }
-  uploadURL = [[feed uploadLink] URL];
-  [uploadURL retain];
+  self.uploadURL = [[feed uploadLink] URL];
   if(delegate &&
      [delegate
       respondsToSelector:@selector(albumAndPhotosWithTicket:finishedWithAlbumFeed:error:)] ) {
@@ -530,7 +506,6 @@ finishedWithPhotoFeed:(GDataFeedPhoto *)feed
 
 
 
-
 - (NSNumber *) revicedThumbSize:(NSNumber *)size {
   NSUInteger result  = thumbSizes[sizeof(thumbSizes) / sizeof(NSUInteger) - 1];
   for(NSUInteger  i = 0; i < sizeof(thumbSizes) / sizeof(NSUInteger); ++i) {
@@ -548,6 +523,7 @@ finishedWithPhotoFeed:(GDataFeedPhoto *)feed
   [lock unlock];
 }
 
+/*
 - (void) waitCompleted {
   BOOL ret = NO;
   while (YES) {
@@ -560,6 +536,7 @@ finishedWithPhotoFeed:(GDataFeedPhoto *)feed
     [NSThread sleepForTimeInterval:0.01f];
   }
 }
+ */
 
 
 - (void) handleError:(NSError *)error {

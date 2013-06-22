@@ -171,6 +171,16 @@
  @param user user id
  */
 - (void) queryUserAndAlbums:(NSString *)user;
+
+/*!
+ @method queryAlbum:withUser:completionHandler:
+ @discussion 指定したユーザのユーザ情報とそのユーザのアルバムの一覧取得のリクエスト
+ @param user user id
+ @param handler
+ */
+- (void) queryAlbum:(NSString *)albumId withUser:(NSString *)user
+  completionHandler:(void (^)(GDataServiceTicket *ticket, GDataFeedPhotoAlbum *feed, NSError *error))handler;
+
 /*!
  @method queryAlbumAndPhotos:user
  @discussion 指定したユーザ/アルバムのアルバム情報とそのアルバムの写真一覧取得のリクエスト
@@ -202,7 +212,7 @@ withPhotoSize:(NSNumber *)photoSize withThumbSize:(NSNumber *)thumbSize;
  @method waitCompleted
  @discussion 処理が完了するまで待つ,まだ開始されていない場合は、すぐに返る。
  */
-- (void) waitCompleted;
+//- (void) waitCompleted;
 
 /*!
  @property completed
