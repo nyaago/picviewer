@@ -167,6 +167,44 @@
   return photo;
 }
 
+- (void)removePhoto:(Photo *)photo {
+  [NSFetchedResultsController deleteCacheWithName:@"Photo"];
+  // Create the fetch request for the entity.
+  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+  // Edit the entity name as appropriate.
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"Photo"
+                                            inManagedObjectContext:self.managedObjectContext];
+  [fetchRequest setEntity:entity];
+  NSPredicate *predicate
+  = [NSPredicate predicateWithFormat:@"%K = %@", @"photoId", photo.photoId];
+  [fetchRequest setPredicate:predicate];
+  
+  // データの削除、
+  NSError *error;
+  NSArray *items = [self executeFetchRequest:fetchRequest];
+	NSSet *set = [NSSet setWithArray:items];
+  [album removePhoto:set];
+  for (NSManagedObject *managedObject in items) {
+    [self.managedObjectContext performSelector:@selector(deleteObject:)
+                                      onThread:[NSThread mainThread]
+                                    withObject:managedObject
+                                 waitUntilDone:YES];
+    
+    //    [managedObjectContext deleteObject:managedObject];
+    NSLog(@" object deleted");
+  }
+  //
+  /*
+  error = [self save];
+  if (error) {
+    NSLog(@"Error deleting- error:%@",error);
+  }
+   */
+  [fetchRequest release];
+  return;
+
+}
+
 - (void)removePhotos {
   [NSFetchedResultsController deleteCacheWithName:@"Photo"];
   // Create the fetch request for the entity.

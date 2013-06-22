@@ -53,6 +53,7 @@
 @synthesize photo;
 @synthesize picasaController;
 @synthesize canUpdate;
+@synthesize managedObjectContext;
 
 #pragma mark -
 #pragma mark View lifecycle
@@ -210,6 +211,12 @@
   if(picasaController) {
     [picasaController release];
   }
+  if(modelController) {
+    [modelController release];
+  }
+  if(managedObjectContext) {
+    [managedObjectContext release];
+  }
   [super dealloc];
 }
 
@@ -261,6 +268,7 @@
     NSLog(@"%@", error.description);
   }
   else {
+    [[self photoModelController] removePhoto:photo];
     PicasaViewerAppDelegate *appDelegate
     = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
     UIViewController *preseingViewController = [self presentingViewController];
@@ -300,6 +308,18 @@
     [settings release];
   }
   return picasaController;
+}
+
+
+- (PhotoModelController *) photoModelController {
+  if(modelController == nil) {
+    modelController = [[PhotoModelController alloc]
+                       initWithContext:self.managedObjectContext];
+  }
+  if(modelController.managedObjectContext == nil) {
+    modelController.managedObjectContext = self.managedObjectContext;
+  }
+  return modelController;
 }
 
 @end

@@ -648,6 +648,7 @@ static NSLock *lockFetchedResultsController;
                                              initWithNibName:@"PhotoInfoViewController" 
                                              bundle:nil];
   viewController.canUpdate = [self canUpdatePhoto:[self indexForPhoto]];
+  viewController.managedObjectContext = self.managedObjectContext;
   Photo *photo = [self photoAt:indexForPhoto];
   UINavigationController *navigationController  = 
   [[UINavigationController alloc] initWithRootViewController:viewController];

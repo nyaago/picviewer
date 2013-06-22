@@ -384,7 +384,9 @@ didReceiveResponse:(NSURLResponse *)response {
 
 - (void) requireStopping {
   BOOL running = NO;
-  [lock lock];
+  while([lock tryLock] == NO) {
+    [NSThread sleepForTimeInterval:0.1f];
+  }
   if(!completed && started) {
     running = YES;
   }
@@ -508,6 +510,10 @@ didReceiveResponse:(NSURLResponse *)response {
         // DownLoadを開始
         elem.con = [[NSURLConnection alloc] initWithRequest:request delegate:elem];
         [request release];
+        if(!elem.URL) {
+          [lock unlock];
+          continue;
+        }
         [runningDict setObject:elem forKey:elem.URL];
         [elem.con start];
         NSLog(@"start  connection.");

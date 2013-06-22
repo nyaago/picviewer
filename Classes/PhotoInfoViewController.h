@@ -39,6 +39,9 @@ UIAlertViewDelegate> {
 	Photo *photo;
   BOOL canUpdate;
   PicasaFetchController *picasaController;
+  NSManagedObjectContext *managedObjectContext;
+  PhotoModelController *modelController;
+
 }
 
 /*!
@@ -58,6 +61,11 @@ UIAlertViewDelegate> {
  @discussion picasa アクセス controller
  */
 @property (nonatomic, retain) PicasaFetchController *picasaController;
+/*!
+ @property managedObjectContext
+ @discussion CoreDataのObject管理Context,永続化Storeのデータの管理
+ */
+@property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
 
 /*!

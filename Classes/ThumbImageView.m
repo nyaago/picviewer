@@ -91,7 +91,6 @@ static NSMutableDictionary *thumbViewMap = nil;
  @discussion すべてのサムネイルの削除
  */
 + (void) cleanup {
-  /*
   NSArray *views = [thumbViewMap allValues];
   for(int i = 0; i < [views count]; ++i) {
     ThumbImageView *view = (ThumbImageView *)[views objectAtIndex:i];
@@ -101,7 +100,6 @@ static NSMutableDictionary *thumbViewMap = nil;
                           waitUntilDone:NO];
     }
   }
-   */
   [thumbViewMap removeAllObjects];
 }
 

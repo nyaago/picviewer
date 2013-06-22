@@ -636,6 +636,7 @@
 
 
 - (void)discardTumbnails {
+  /*
   for(UIView *v in self.scrollView.subviews) {
     if([v isKindOfClass:[UIImageView class]]) {
       [v performSelectorOnMainThread:@selector(removeFromSuperview)
@@ -644,6 +645,7 @@
 //      [v release];
     }
   }
+   */
   [ThumbImageView cleanup];
   
 }
@@ -882,7 +884,7 @@
 					// progress 状態表示
           [self.view addSubview:progressView];
         }
-        Photo *photoModel =  [[self photoModelController] insertPhoto:photo withAlbum:album.albumId];
+        Photo *photoModel =  [[self photoModelController] insertPhoto:photo withAlbum:album];
         if(photoModel) {
           [self downloadThumbnail:photo withPhotoModel:photoModel];
         }

@@ -87,6 +87,11 @@
 - (void)removePhotos;
 
 /*!
+ @method removePhoto:
+ @discussion photoの削除
+ */
+- (void)removePhoto:(Photo *)photo;
+/*!
  @method indexForPhoto:
  @param photo photo model オブジェクト
  @discussion 指定したphoto model オブジェクトのindex番号を得る
