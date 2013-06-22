@@ -132,7 +132,6 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
   userInfo = info;
   [userInfo retain];
   queuedDownloader = downloader;
-  [queuedDownloader retain];
   
   return self;
 }
@@ -303,8 +302,6 @@ didReceiveResponse:(NSURLResponse *)response {
     [con release];
   if(URL)
     [URL release];
-  if(queuedDownloader)
-    [queuedDownloader release];
   if(data)
     [data release];
   [super dealloc];
