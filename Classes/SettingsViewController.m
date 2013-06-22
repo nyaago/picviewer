@@ -252,7 +252,8 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 - (void) completeAction:(id)sender {
   settings.userId = userTextField.text;
   settings.password = passwordTextField.text;
-  settings.imageSize = [SettingsManager 
+  settings.username = nil; // 1たんクリア、認証OKなら
+  settings.imageSize = [SettingsManager
                         indexToImageSize:sizeControl.selectedSegmentIndex];
   
   if([NetworkReachability reachable] && [settings.userId length] > 0) {

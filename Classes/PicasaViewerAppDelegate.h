@@ -77,6 +77,8 @@
 @property (nonatomic,retain) PhotoListViewController *photoListViewController;
 
 
+- (void) onSelectUser:(User *)user;
+
 @end
 
 

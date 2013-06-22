@@ -47,6 +47,8 @@
 #define kLoadingPhotosMessage 2
 // アルバム未選択のメッセージタイプ - Choose a albumu（アルバムを選択してください）
 #define kChooseAlbumMessage 3
+// 写真なしのメッセージタイプ - Choose an user（ユーザを選択してください）
+#define kChooseUserMessage 4
 // Album の Reload確認を行う間隔（分）
 #define kIntervalForReload 15
 
@@ -197,6 +199,7 @@
 
 @synthesize managedObjectContext;
 @synthesize album;
+@synthesize user;
 @synthesize scrollView;
 @synthesize progressView;
 @synthesize needToLoad;
@@ -238,7 +241,6 @@
   self.scrollView.backgroundColor = [UIColor blackColor];
   self.scrollView.contentSize = CGSizeMake(720.0f, 100.0f);
   // toolbar
-  self.toolbarItems = [self toolbarButtons];
   self.navigationController.toolbar.translucent = NO;
   self.navigationController.toolbar.barStyle = UIBarStyleBlack;
   self.navigationController.toolbarHidden = NO;
@@ -357,6 +359,40 @@
 }
 
 #pragma mark -
+
+#pragma mark property
+
+- (void) setAlbum:(Album *)newAlbum {
+  if(album && (newAlbum == nil ||  [album.albumId isEqualToString:newAlbum.albumId])) {
+    [album release];
+    album = nil;
+  }
+  album = newAlbum;
+  if(album) {
+    [album retain];
+    [self setUser:(User *)album.user];
+  }
+  else {
+    [self setUser:nil];
+  }
+  if(album == nil) {
+    [self discardTumbnails];
+    [self setNoPhotoMessage:[NSNumber numberWithInt:kChooseAlbumMessage]];
+  }
+}
+
+- (void) setUser:(User *)newUser {
+
+  if(user && (newUser == nil || [user.userId isEqualToString:newUser.userId]) ) {
+    [user release];
+    user = nil;
+  }
+  user = newUser;
+  if(user) {
+    [user retain];
+  }
+  self.toolbarItems = [self toolbarButtons];
+}
 
 #pragma mark Device Rotation
 
@@ -517,6 +553,9 @@
       case kChooseAlbumMessage:
         message = NSLocalizedString(@"PhotoList.Choose", @"Choose a album");
         break;
+      case kChooseUserMessage:
+        message = NSLocalizedString(@"PhotoList.ChooseUser", @"Choose an user");
+        break;
       default:
         break;
     }
@@ -644,53 +683,57 @@
 
 - (NSArray *) toolbarButtons {
   NSString *path;
-  if(!toolbarButtons) {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    toolbarButtons = [[NSMutableArray alloc] init];
-    
-    // Refresh
-    refreshButton = [[UIBarButtonItem alloc] 
-                     initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
-                     target:self
-                     action:@selector(refreshAction:)];
-    [toolbarButtons addObject:refreshButton];
-    
-    // Space
-    UIBarButtonItem *spaceRight = [[UIBarButtonItem alloc] 
-                                   initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                                   target:self
-                                   action:nil];
+  if(toolbarButtons) {
+    [toolbarButtons release];
+  }
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  
+  toolbarButtons = [[NSMutableArray alloc] init];
+  if(self.album == nil) {
+    return toolbarButtons;
+  }
+  
+  // Refresh
+  refreshButton = [[UIBarButtonItem alloc] 
+                   initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh 
+                   target:self
+                   action:@selector(refreshAction:)];
+  [toolbarButtons addObject:refreshButton];
+  
+  // Space
+  UIBarButtonItem *spaceRight = [[UIBarButtonItem alloc] 
+                                 initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                                 target:self
+                                 action:nil];
 //    spaceRight.width = 30.0f;
+  [toolbarButtons addObject:spaceRight];
+  [spaceRight release];
+  
+  if([self canUpdatePhotos]) {
+    photoButton = [[UIBarButtonItem alloc]
+                    initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
+                   target:self
+                   action:@selector(photoAction:)];
+    [toolbarButtons addObject:photoButton];
+    spaceRight = [[UIBarButtonItem alloc]
+                  initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+                  target:self
+                  action:nil];
+//        spaceRight.width = 30.0f;
     [toolbarButtons addObject:spaceRight];
     [spaceRight release];
-    
-    if([self canUpdatePhotos]) {
-      photoButton = [[UIBarButtonItem alloc]
-                      initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
-                     target:self
-                     action:@selector(photoAction:)];
-      [toolbarButtons addObject:photoButton];
-      spaceRight = [[UIBarButtonItem alloc]
-                    initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
-                    target:self
-                    action:nil];
-//        spaceRight.width = 30.0f;
-      [toolbarButtons addObject:spaceRight];
-      [spaceRight release];
-    }
-    
-    // Info
-    infoButton = [[UIBarButtonItem alloc] initWithTitle:@"" 
-                                                  style:UIBarButtonItemStyleBordered 
-                                                 target:self
-                                                 action:@selector(infoAction:)];
-    path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
-    infoButton.image = [[UIImage alloc] initWithContentsOfFile:path];
-    [toolbarButtons addObject:infoButton];
-    
-    [pool drain];
   }
+  
+  // Info
+  infoButton = [[UIBarButtonItem alloc] initWithTitle:@"" 
+                                                style:UIBarButtonItemStyleBordered 
+                                               target:self
+                                               action:@selector(infoAction:)];
+  path = [[NSBundle mainBundle] pathForResource:@"newspaper" ofType:@"png"];
+  infoButton.image = [[UIImage alloc] initWithContentsOfFile:path];
+  [toolbarButtons addObject:infoButton];
+  
+  [pool drain];
   return toolbarButtons;
 }
 
@@ -1066,7 +1109,6 @@
 #pragma mark Private
 
 - (BOOL) canUpdatePhotos {
-  User *user = (User *)self.album.user;
   if(user) {
     SettingsManager *settings = [[SettingsManager alloc] init];
     BOOL ret = [settings isEqualUserId:user.userId] ? YES : NO;

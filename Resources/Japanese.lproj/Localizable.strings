@@ -57,6 +57,7 @@
 "PhotoList.Choose" = "アルバムを選択してください";
 "PhotoList.None" = "写真がありません";
 "PhotoList.Loading" = "写真を読み込んでいます";
+"PhotoList.ChooseUser" = "ユーザーを選択してください";
 
 
 

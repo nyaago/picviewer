@@ -257,6 +257,12 @@
 }
 
 
+- (void) onSelectUser:(User *)user {
+  if(self.photoListViewController) {
+    self.photoListViewController.user = user;
+  }
+}
+
 @end
 
 /*!

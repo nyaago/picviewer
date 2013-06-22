@@ -45,6 +45,8 @@ ThumbImageViewDelegate, UIActionSheetDelegate,
 UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
   
   @private
+  // CoreData user model
+  User *user;
   // CoreData album Model
   Album *album;
   // 次に表示することを指定されたCoreData album Model
@@ -107,8 +109,14 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
 /*!
+ @property user
+ @discussion 現在選択されているuser
+ */
+@property (nonatomic, retain) User *user;
+
+/*!
  @property album
- @discussion 現在選択されているUser
+ @discussion 現在選択されているalbum
  */
 @property (nonatomic, retain) Album *album;
 
@@ -142,6 +150,18 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
  @discussion サムネイルloadが必要か
  */
 @property (nonatomic) BOOL needToLoadIfWifi;
+
+/*!
+ @method setAlbum:
+ @param album
+ */
+- (void) setAlbum:(Album *)album;
+
+/*!
+ @method setUser:
+ @param user 
+ */
+- (void) setUser:(User *)user;
 
 /*!
  @method loadThumbnails

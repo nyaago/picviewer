@@ -193,7 +193,13 @@
 }
 
  - (void)viewDidDisappear:(BOOL)animated {
- [super viewDidDisappear:animated];
+  [super viewDidDisappear:animated];
+  if([self splitViewController] == nil) {
+    PicasaViewerAppDelegate *delegate
+    = (PicasaViewerAppDelegate *) [[UIApplication sharedApplication] delegate];
+    if(delegate.photoListViewController) {
+    }
+  }
  }
 
 #pragma mark Memory Management
