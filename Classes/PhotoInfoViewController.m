@@ -141,26 +141,11 @@
           case(0) :
             cell.textLabel.text = self.photo.title;
             break;
-//          case(1) :
-//            cell.textLabel.text = self.photo.descript;
-//            break;
           case(1) :
             cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@",
                                    NSLocalizedString(@"Location", @"Location"),
                                    self.photo.location];
             break;
-          /*  
-          case(2) :
-            {
-            NSString *w = NSLocalizedString(@"Width", @"Width");
-            NSString *h = NSLocalizedString(@"Height", @"Height");
-            cell.textLabel.text = [NSString stringWithFormat:@"%@:%@ = %d:%d", 
-                                   w, h,
-                                   [self.photo.width intValue], 
-                                   [self.photo.height intValue] ];
-            }
-            break;
-           */
           default:
             break;
         }
@@ -277,13 +262,12 @@
   }
   else {
     [self dismissViewControllerAnimated:YES completion:^{
-      PicasaViewerAppDelegate *appDelegate = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
-//      appDelegate.photoListViewController.isF
+      PicasaViewerAppDelegate *appDelegate
+        = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
       appDelegate.photoListViewController.needToLoad = YES;
       [appDelegate.navigationController popToViewController:appDelegate.photoListViewController animated:YES];
       [appDelegate.photoListViewController refreshPhotos:YES];
     }];
-//    [appDelegate.photoListViewController
   }
 }
 
