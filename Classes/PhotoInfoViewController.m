@@ -261,14 +261,31 @@
     NSLog(@"%@", error.description);
   }
   else {
-    [self dismissViewControllerAnimated:YES completion:^{
-      PicasaViewerAppDelegate *appDelegate
-        = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
+    PicasaViewerAppDelegate *appDelegate
+    = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
+    UIViewController *preseingViewController = [self presentingViewController];
+    [[self presentingViewController] dismissViewControllerAnimated:NO completion:^{
       appDelegate.photoListViewController.needToLoad = YES;
-      [appDelegate.navigationController popToViewController:appDelegate.photoListViewController animated:YES];
-      [appDelegate.photoListViewController refreshPhotos:YES];
+      if(appDelegate.navigationController.splitViewController) {
+        // ipad
+        [[preseingViewController presentingViewController] dismissViewControllerAnimated:YES
+                                                                              completion:^{}];
+        [appDelegate.photoListViewController refreshPhotos:NO];
+      }
+      else {
+        // iphone
+        [appDelegate.navigationController popToViewController:appDelegate.photoListViewController
+                                                     animated:NO];
+      }
     }];
   }
+}
+
+- (void) popToRoot {
+  PicasaViewerAppDelegate *appDelegate
+  = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
+
+  [appDelegate.detailNavigationController popToRootViewControllerAnimated:YES];
 }
 
 #pragma mark property

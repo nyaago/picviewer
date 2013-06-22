@@ -42,7 +42,7 @@
 QueuedURLDownloaderDelegate, PageControlViewControllerDataSource,
 UIAlertViewDelegate,UISplitViewControllerDelegate,AlbumTableViewControllerDelegate,
 ThumbImageViewDelegate, UIActionSheetDelegate,
-UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
+UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverControllerDelegate> {
   
   @private
   // CoreData user model
@@ -100,6 +100,8 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate> {
   //
   UILabel *noPhotoLabel;
 
+  UIPopoverController *pickerPopoverController;
+  
 }
 
 /*!

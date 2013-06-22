@@ -45,6 +45,7 @@
 @synthesize window;
 @synthesize navigationController;
 @synthesize photoListViewController;
+@synthesize detailNavigationController;
 
 #pragma mark -
 #pragma mark Application lifecycle
@@ -69,11 +70,11 @@
                                initWithNibName:@"PhotoListViewController-iPad"
                                         bundle:nil];
 
-    UINavigationController *detailNav = [[[UINavigationController alloc]
+    detailNavigationController = [[[UINavigationController alloc]
                                          initWithRootViewController:photoListViewController]
                                          autorelease];
     NSArray *controllers = [NSArray arrayWithObjects:[self createNavigationController],
-                            detailNav,
+                            detailNavigationController,
                             nil];
     UISplitViewController *splitController = [[[UISplitViewController alloc] init] autorelease];
     [splitController setDelegate:photoListViewController];
@@ -251,6 +252,7 @@
   [persistentStoreCoordinator release];
   
   [navigationController release];
+  [detailNavigationController release];
   [photoListViewController release];
   [window release];
   [super dealloc];

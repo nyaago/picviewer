@@ -34,6 +34,7 @@
 #import "AlbumInfoViewController.h"
 #import "SettingsManager.h"
 #import "NetworkReachability.h"
+#import "PicasaViewerAppDelegate.h"
 
 #define kDownloadMaxAtSameTime 5
 
@@ -635,7 +636,14 @@
 
 
 - (void)discardTumbnails {
-  
+  for(UIView *v in self.scrollView.subviews) {
+    if([v isKindOfClass:[UIImageView class]]) {
+      [v performSelectorOnMainThread:@selector(removeFromSuperview)
+                             withObject:nil
+                          waitUntilDone:YES];
+//      [v release];
+    }
+  }
   [ThumbImageView cleanup];
   
 }
@@ -1223,6 +1231,7 @@
   if(refreshAll) {
     [[self photoModelController] removePhotos];
   }
+  [self discardTumbnails];
   // 再ロード
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   SettingsManager *settings = [[SettingsManager alloc] init];
@@ -1336,7 +1345,7 @@
   BOOL ret = NO;
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   if([self mustLoad:curAlbum]) {
-    [self refreshPhotos:YES];
+    [self refreshPhotos:NO];
     ret = YES;
   }
   else {
@@ -1687,7 +1696,6 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
     default:
       return;
   }
-  UIPopoverController *popover;
   UIImagePickerController *imagePickerController = [[UIImagePickerController alloc]init];
   [imagePickerController setSourceType:sourceType];
   [imagePickerController setDelegate:self];
@@ -1695,8 +1703,9 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad &&
       sourceType == UIImagePickerControllerSourceTypePhotoLibrary) {
     
-    popover = [[UIPopoverController alloc]initWithContentViewController:imagePickerController];
-		[popover presentPopoverFromBarButtonItem:photoButton
+    pickerPopoverController = [[UIPopoverController alloc]initWithContentViewController:imagePickerController];
+    pickerPopoverController.delegate = self;
+		[pickerPopoverController presentPopoverFromBarButtonItem:photoButton
                     permittedArrowDirections:UIPopoverArrowDirectionAny
                                     animated:YES];
 
@@ -1730,17 +1739,34 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   [settings release];
   User *user = (User *)self.album.user;
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-
+  
   [self.picasaFetchController insertPhoto:imageData
                                  withAlbum:self.album.albumId
                                   withUser:user.userId];
-  [self dismissViewControllerAnimated:YES
-                           completion:^{
-                           }];
+  if(pickerPopoverController) {
+    [pickerPopoverController dismissPopoverAnimated:YES];
+    [pickerPopoverController release];
+    pickerPopoverController = nil;
+  }
+  else {
+    [self dismissViewControllerAnimated:YES completion:^{}];
+  }
+  
 //  [NSData alloc] ini
   
 }
 
+#pragma mark UIPopoverControllerDelegate Method
+
+// ポップオーバー コントロールがコントロール領域外をタップするなどして非表示とされた際の処理
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController
+{
+  // the user dismissed the popover, so release it here
+  if(popoverController) {
+    [popoverController release];
+    pickerPopoverController = nil;
+  }
+}
 
 #pragma mark PageViewSource
 

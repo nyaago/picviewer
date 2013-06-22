@@ -38,6 +38,7 @@
   
   UIWindow *window;
   UINavigationController *navigationController;
+  UINavigationController *detailNavigationController;
   PhotoListViewController *photoListViewController;
   
 }
@@ -68,6 +69,10 @@
  @property navigationController
  */
 @property (nonatomic, retain, readonly) IBOutlet UINavigationController *navigationController;
+/*!
+ @property detailNavigationController
+ */
+@property (nonatomic, retain, readonly) IBOutlet UINavigationController *detailNavigationController;
 
 - (NSString *)applicationDocumentsDirectory;
 
