@@ -166,12 +166,6 @@
 - (void) setPageController:(PageControlViewController *)controller;
 
 /*!
- @method waitUntilCompleted
- @discussion この画面のデーターのロードなどが完了するまで待つ.
- */
-- (void) waitUntilCompleted;
-
-/*!
  @method isCompleted
  @discussion この画面のデーターのロードなどが完了しているか
  */

@@ -496,7 +496,7 @@ static NSLock *lockFetchedResultsController;
                               initWithTitle:title
                               message:message
                               delegate:nil
-                              cancelButtonTitle:@"OK" 
+                              cancelButtonTitle:@"OK"
                               otherButtonTitles:nil];
     [alertView show];
     [alertView release];
@@ -689,15 +689,6 @@ static NSLock *lockFetchedResultsController;
   return downloader.isCompleted;
 }
 
-- (void) waitUntilCompleted {
-  if(downloader == nil || downloader.isCompleted) {
-    return;
-  }
-  [downloader waitCompleted];
-  return;
-  
-}
-
 - (BOOL) canDiscard {
   if(downloader == nil || downloader.isCompleted) {
     return YES;
@@ -709,7 +700,7 @@ static NSLock *lockFetchedResultsController;
 
 
 - (void) requireToDiscard {
-  if(downloader != nil || downloader.isCompleted == NO) {
+  if(downloader != nil ) {
     [downloader requireStopping];
   }
 }

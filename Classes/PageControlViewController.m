@@ -579,11 +579,9 @@
   if(scrollView.curPageNumber + 1 >= [source pageCount]) {
     return;
   }
-  if(scrollView.prevPage != nil) {
-    [scrollView.prevPage waitUntilCompleted];
-  }
-  if(scrollView.curPage != nil ) {
-    [scrollView.curPage waitUntilCompleted];
+  if(scrollView.prevPage) {
+    [scrollView.prevPage requireToDiscard];
+    [scrollView.prevPage canDiscard];
   }
 	[scrollView toNextPage];
   UIViewController<PageViewDelegate> *controller
@@ -600,16 +598,16 @@
 }
 
 - (void)toPrevPage:(id)sender {
+  
   PageView *scrollView = (PageView *)self.view;
   if(scrollView.curPageNumber <= 0) {
     return;
   }
-  if(scrollView.nextPage != nil) {
-    [scrollView.nextPage waitUntilCompleted];
+  if(scrollView.nextPage) {
+    [scrollView.nextPage requireToDiscard];
+    [scrollView.nextPage canDiscard];
   }
-  if(scrollView.curPage != nil ) {
-    [scrollView.curPage waitUntilCompleted];
-  }
+
 	[scrollView toPrevPage];
   UIViewController<PageViewDelegate> *controller
   = [source pageAt:scrollView.curPageNumber - 1];

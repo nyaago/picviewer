@@ -139,7 +139,7 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)fragment {
   
-  if([self.queuedDownloader stoppingRequired]) {
+  if([self.queuedDownloader stoppingRequired] || [self.queuedDownloader isCompleted]) {
     return;
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -179,7 +179,7 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
   
-  if([self.queuedDownloader stoppingRequired]) {
+  if([self.queuedDownloader stoppingRequired] || [self.queuedDownloader isCompleted]) {
     return;
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -216,7 +216,7 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 - (void)connection:(NSURLConnection *)connection
 didReceiveResponse:(NSURLResponse *)response {
   
-  if([self.queuedDownloader stoppingRequired]) {
+  if([self.queuedDownloader stoppingRequired] || [self.queuedDownloader isCompleted]) {
     return;
   }
 
@@ -252,7 +252,7 @@ didReceiveResponse:(NSURLResponse *)response {
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 
-  if([self.queuedDownloader stoppingRequired]) {
+  if([self.queuedDownloader stoppingRequired] || [self.queuedDownloader isCompleted]) {
     return;
   }
 
