@@ -32,5 +32,6 @@
 
 @dynamic album;
 @dynamic userId,timeStamp, thumbnail, nickname;
+@dynamic lastModAlbumAt;
 
 @end

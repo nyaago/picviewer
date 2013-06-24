@@ -75,7 +75,7 @@
  @param index 
  @param Album オブジェクト
  */
--(Album *) albumAt:(NSIndexPath *)index;
+-(Album *) albumAt:(NSInteger)index;
 
 /*!
  @method insertAlbum:withUser;
@@ -124,5 +124,9 @@
  */
 - (Album *)updateThumbnail:(NSData *)thumbnailData forAlbum:(Album *)album;
 
+/*!
+ 
+ */
+- (void) setLastMod;
 
 @end

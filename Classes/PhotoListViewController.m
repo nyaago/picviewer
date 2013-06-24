@@ -51,7 +51,7 @@
 // 写真なしのメッセージタイプ - Choose an user（ユーザを選択してください）
 #define kChooseUserMessage 4
 // Album の Reload確認を行う間隔（分）
-#define kIntervalForReload 15
+#define kIntervalForReloadWifi 15
 
 /*!
  @method canUpdatePhotos
@@ -782,6 +782,7 @@
 - (void) enableToolbar:(BOOL)enable {
   refreshButton.enabled = enable;
   infoButton.enabled = enable;
+  photoButton.enabled = enable;
 }
 
 #pragma mark -
@@ -1298,7 +1299,7 @@
   }
     
   if ( ( curAlbum.lastAddPhotoAt == nil ||
-        [self minutesBetween:curAlbum.lastAddPhotoAt and:[NSDate date] ] > kIntervalForReload)
+        [self minutesBetween:curAlbum.lastAddPhotoAt and:[NSDate date] ] > kIntervalForReloadWifi)
         &&
       [NetworkReachability reachableByWifi]) {
     return YES;

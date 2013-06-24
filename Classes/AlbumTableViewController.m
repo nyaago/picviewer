@@ -34,6 +34,8 @@
 
 @interface AlbumTableViewController(Private)
 
+// Album の Reload確認を行う間隔（分）
+#define kIntervalForReloadWifi 15
 
 
 /*!
@@ -87,6 +89,18 @@
  @param album albumモデル
  */
 - (PhotoListViewController *)photoListViewControllerWithAlbum:(Album *)album;
+
+/*!
+ @method mustLoad
+ @discussion 
+ */
+- (BOOL) mustLoad:(User *)curUser;
+
+/*!
+ @method daysBetween:and:
+ @discussion 日付オブジェクトの時間差を返す.
+ */
+- (NSInteger)minutesBetween:(NSDate *)d1 and:(NSDate *)d2;
 
 @end
 
@@ -143,7 +157,7 @@
   // Albumが0件であれば、Googleへの問い合わせを起動.
   // 問い合わせ結果は、userAndAlbumsWithTicket:finishedWithUserFeed:errorで受け
   // CoreDataへの登録を行う
-  if([modelController albumCount] == 0) {
+  if([self mustLoad:self.user]) {
     // Network接続の確認
     if(![NetworkReachability reachable]) {
       NSString *title = NSLocalizedString(@"Notice","Notice");
@@ -160,20 +174,7 @@
       return;
     }
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    // toolbarのボタンをdisable
-    [self enableToolbar:NO];
-    // reload
-    SettingsManager *settings = [[SettingsManager alloc] init];
-    picasaFetchController = [[PicasaFetchController alloc] init];
-    picasaFetchController.delegate = self;
-    picasaFetchController.userId = settings.userId;
-    picasaFetchController.password = settings.password;
-    [picasaFetchController queryUserAndAlbums:self.user.userId];
-    [settings release];
-    
-    downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:3];
-    downloader.delegate = self;
-
+    [self refreshAlbums];
   }
 }
 
@@ -283,6 +284,7 @@
                                     withUser:user 
                                     hasError:&hasErrorInInserting];
     }
+    [modelController setLastMod];
     // Album一覧のFetched Controllerを生成
     if(hasErrorInInserting || hasErrorDeleting) {
       NSString *message = nil;
@@ -315,6 +317,17 @@
     [pool drain];
     return;
   }
+  // thumbnailをクリアしておく
+  NSUInteger indexes[] = {0, 0};
+  for(int i = 0; i < [self.tableView numberOfRowsInSection:0 ]  ; ++i) {
+    indexes[1] = i;
+    UITableViewCell *cell =  [self.tableView
+                              cellForRowAtIndexPath:[NSIndexPath                                                                  indexPathWithIndexes:indexes length:2]];
+    if(cell.imageView.image) {
+      [cell.imageView setImage:nil];
+    }
+  }
+
   // Load中フラグをOffに
   [onLoadLock lock];
   onLoad = NO;
@@ -434,11 +447,11 @@
     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault 
                                    reuseIdentifier:CellIdentifier] autorelease];
   }
-  Album *managedObject = [modelController albumAt:indexPath];
+  Album *managedObject = [modelController albumAt:[indexPath indexAtPosition:1]];
   cell.textLabel.text = [[managedObject valueForKey:@"title"] description];
   if(!cell.imageView.image) {
     // Configure the cell.
-    Album *managedObject = (Album *)[modelController albumAt:indexPath];
+    Album *managedObject = (Album *)[modelController albumAt:[indexPath indexAtPosition:1]];
     if(managedObject.thumbnail) {
       UIImage *image = [[UIImage alloc] initWithData:managedObject.thumbnail];
       cell.imageView.image = image;
@@ -463,7 +476,7 @@
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
   // 選択行のAlbumのPhoto一覧へ
-  Album *selectedObject = [modelController albumAt:indexPath];
+  Album *selectedObject = [modelController albumAt:[indexPath indexAtPosition:1]];
   PhotoListViewController *photoViewController
   = [self photoListViewControllerWithAlbum:(Album *) selectedObject] ;
 
@@ -705,6 +718,55 @@
   return photoViewController;
 }
 
+- (BOOL) mustLoad:(User *)curUser {
+  if([modelController albumCount] == 0) {
+    return YES;
+  }
+
+  
+  if ( curUser.lastModAlbumAt == nil) {
+    return YES;
+  }
+  if([self minutesBetween:curUser.lastModAlbumAt and:[NSDate date] ] > kIntervalForReloadWifi
+      &&
+      [NetworkReachability reachableByWifi]) {
+    return YES;
+  }
+
+  SettingsManager *settings = [[SettingsManager alloc] init];
+  NSDate *userLastModifiedAt = settings.userLastModifiedAt;
+  [settings release];
+  if(userLastModifiedAt != nil &&
+     [self minutesBetween:curUser.lastModAlbumAt and:userLastModifiedAt ] > 0) {
+    return YES;
+  }
+  BOOL ret = NO;
+  // thumbnail の未ロードのものがないかのチェック
+  for(int i = 0; i < [modelController albumCount]; ++i) {
+    Album *albumModel = [modelController albumAt:i];
+    if(albumModel == nil || albumModel.thumbnail == nil) {
+      ret = YES;
+      break;
+    }
+  }
+  
+  return ret;
+
+}
+
+- (NSInteger)minutesBetween:(NSDate *)d1 and:(NSDate *)d2 {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  if(!d1) {
+    d1 = [NSDate date];
+  }
+  if(!d2) {
+    d2 = [NSDate date];
+  }
+  NSTimeInterval t  = [d2 timeIntervalSinceDate:d1];
+  NSInteger n = (NSInteger)(t  / 60);
+  [pool drain];
+  return n;
+}
 
 #pragma mark -
 
@@ -800,16 +862,6 @@
   onLoad = YES;
   [onLoadLock unlock];
   
-  // thumbnailをクリアしておく
-  NSUInteger indexes[] = {0, 0};
-  for(int i = 0; i < [self.tableView numberOfRowsInSection:0 ]  ; ++i) {
-    indexes[1] = i;
-    UITableViewCell *cell =  [self.tableView 
-                              cellForRowAtIndexPath:[NSIndexPath                                                                  indexPathWithIndexes:indexes length:2]];
-    if(cell.imageView.image) {
-      [cell.imageView setImage:nil];
-    }
-  }
   
 	[self performSelectorOnMainThread:@selector(refreshAlbums) 
                          withObject:nil 

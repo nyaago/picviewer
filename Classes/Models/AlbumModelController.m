@@ -273,13 +273,20 @@
   if(!fetchedAlbumsController) {
     return 0;
   }
-  id <NSFetchedResultsSectionInfo> sectionInfo = [[fetchedAlbumsController sections]
+  id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedAlbumsController sections]
                                                   objectAtIndex:0];
   return [sectionInfo numberOfObjects];
 }
 
--(Album *) albumAt:(NSIndexPath *)indexPath {
-  return (Album *)[fetchedAlbumsController objectAtIndexPath:indexPath];
+-(Album *) albumAt:(NSInteger)index {
+  NSUInteger indexes[2];
+  if(index >= [self albumCount])
+    return nil;
+  indexes[0] = 0;
+  indexes[1] = index;
+
+  return (Album *)[self.fetchedAlbumsController objectAtIndexPath:[NSIndexPath
+                                                                   indexPathWithIndexes:indexes length:2]];
 }
 
 - (NSFetchedResultsController *)createFetchedPhotosController {
@@ -327,6 +334,16 @@
   
   return fetchedAlbumsController;
 }
+
+/*!
+ @metohd setLastMod
+ @discussion 最後にアルバムの追加/削除/更新が行われた日時を記録
+ */
+- (void) setLastMod {
+  NSLog(@"setLastAdd");
+  self.user.lastModAlbumAt = [NSDate date];
+}
+
 
 
 @end

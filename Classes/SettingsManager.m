@@ -74,6 +74,15 @@ static NSInteger imageSizes[3] = {640, 1280, 1600};
   return [self stringForKey:@"username" withDefault:@""];
 }
 
+- (void) setUserLastModifiedAt:(NSDate *)userLastModifiedAt {
+  [self setObject:userLastModifiedAt forKey:@"userLastModifiedAt"];
+}
+
+- (NSDate *)userLastModifiedAt {
+  return (NSDate *)[self objectForKey:@"userLastModifiedAt" withDefault:nil];
+}
+
+
 - (void) setPassword:(NSString *)password {
   [self setObject:password forKey:@"password"];
 }

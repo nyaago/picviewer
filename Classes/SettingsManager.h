@@ -51,6 +51,12 @@
 @property (nonatomic, retain) NSString *password;
 
 /*!
+ @property userLastModifiedAt
+ */
+@property (nonatomic, retain) NSDate *userLastModifiedAt;
+
+
+/*!
  @property imageSize;
  */
 @property (nonatomic) NSInteger imageSize;
@@ -79,6 +85,16 @@
  @discussion
  */
 - (NSString *) username;
+
+/*!
+ @method setUserLastModifiedAt:
+ */
+- (void) setUserLastModifiedAt:(NSDate *)userLastModifiedAt;
+
+/*!
+ @method userLastModifiedAt
+ */
+- (NSDate *)userLastModifiedAt;
 
 /*!
  @method setPassword
