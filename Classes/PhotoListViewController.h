@@ -65,6 +65,7 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
   UIBarButtonItem *backButton;
   UIScrollView *scrollView;
   LabeledProgressView *progressView;
+  UIActivityIndicatorView *activityIndicatorView;
   // ローカルDB保存時の Lock Object
   NSLock  *lockSave;
   // Download中にエラーが発生したか?
@@ -134,6 +135,11 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
  */
 @property (nonatomic, retain) IBOutlet LabeledProgressView *progressView;
 
+/*!
+ @property activityIndicatorView
+ @discussion 
+ */
+@property (nonatomic, readonly) UIActivityIndicatorView *activityIndicatorView;
 
 /*!
  @property picasaFetchController

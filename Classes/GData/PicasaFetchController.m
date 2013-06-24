@@ -161,6 +161,12 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
               if (error != nil) {
                 NSLog(@"fetch error: %@", error);
                 [self handleError:error];
+                if(delegate &&
+                   [delegate respondsToSelector:@selector(insertedPhotoWithTicket:finishedWithPhotoFeed:error:)]) {
+                  [delegate insertedPhotoWithTicket:ticket
+                              finishedWithPhotoFeed:nil
+                                              error:error];
+                }
                 return;
               }
               self.uploadURL = [[feed uploadLink] URL];
@@ -192,6 +198,12 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
    if(error) {
      NSLog(@"fetch error: %@", error);
      [self handleError:error];
+     if(delegate &&
+        [delegate respondsToSelector:@selector(deletedPhoto:error:)]) {
+       
+       [delegate deletedPhoto:entry
+                        error:error];
+     }
      return;
    }
    if(entry == nil) {
@@ -380,8 +392,10 @@ completionHandler:(void (^)(GDataEntryPhoto *entry, NSError *error))handler
   [service fetchFeedWithURL:feedURL completionHandler:
    ^(GDataServiceTicket *ticket, GDataFeedBase *feed, NSError *error) {
      GDataFeedPhoto *photoFeed = (GDataFeedPhoto *)feed;
-     if(error) {
-       handler(nil, error);
+     if (error != nil) {
+       NSLog(@"fetch error: %@", error);
+       [self handleError:error];
+       return;
      }
      else {
        for(GDataEntryPhoto *entry in [photoFeed entries]) {
@@ -416,7 +430,6 @@ completionHandler:(void (^)(GDataEntryPhoto *entry, NSError *error))handler
   if (error != nil) {
     NSLog(@"fetch error: %@", error);
     [self handleError:error];
-    return;
   }
 
   if(delegate &&
@@ -443,9 +456,10 @@ completionHandler:(void (^)(GDataEntryPhoto *entry, NSError *error))handler
   if (error != nil) {
     NSLog(@"fetch error: %@", error);
     [self handleError:error];
-    return;
   }
-  self.uploadURL = [[feed uploadLink] URL];
+  else {
+    self.uploadURL = [[feed uploadLink] URL];
+  }
   if(delegate &&
      [delegate
       respondsToSelector:@selector(albumAndPhotosWithTicket:finishedWithAlbumFeed:error:)] ) {
@@ -473,7 +487,6 @@ completionHandler:(void (^)(GDataEntryPhoto *entry, NSError *error))handler
   if (error != nil) {
     NSLog(@"fetch error: %@", error);
     [self handleError:error];
-    return;
   }
   if(delegate &&
      [delegate respondsToSelector:@selector(photoWithTicket:finishedWithPhotoFeed:error:)]) {
@@ -489,7 +502,6 @@ finishedWithPhotoFeed:(GDataFeedPhoto *)feed
   if (error != nil) {
     NSLog(@"fetch error: %@", error);
     [self handleError:error];
-    return;
   }
   if(delegate &&
      [delegate respondsToSelector:@selector(insertedPhotoWithTicket:finishedWithPhotoFeed:error:)]) {

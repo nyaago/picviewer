@@ -85,9 +85,15 @@
 
 /*!
  @method removeProgressView
- @discussiom Progress Bar をView階層から削除（破棄はしない）
+ @discussiom Progress Bar をView階層から削除
  */
 - (void) removeProgressView;
+
+/*!
+ @method removeActiveIndicatorView
+ @discussion active indecator view を view階層から削除
+ */
+- (void) removeActiveIndicatorView;
 
 /*!
  @method progressView
@@ -203,6 +209,7 @@
 @synthesize user;
 @synthesize scrollView;
 @synthesize progressView;
+@synthesize activityIndicatorView;
 @synthesize needToLoad;
 @synthesize needToLoadIfWifi;
 @synthesize picasaFetchController;
@@ -457,6 +464,8 @@
   photoButton = nil;
   [progressView  release];
   progressView = nil;
+  [activityIndicatorView release];
+  activityIndicatorView = nil;
   [self discardTumbnails];
 }
 
@@ -474,6 +483,8 @@
   [self discardTumbnails];
   if(progressView)
     [progressView release];
+  if(activityIndicatorView)
+    [activityIndicatorView release];
   if(backButton)
     [backButton release];
   if(infoButton)
@@ -773,10 +784,38 @@
   return progressView;
 }
 
+- (UIActivityIndicatorView *)activityIndicatorView {
+  if(activityIndicatorView) {
+    return activityIndicatorView;
+  }
+  CGRect frame = CGRectMake(self.view.frame.size.width / 2 - 100.0f ,
+                            self.view.frame.size.height - 200.0f ,
+                            200.0f,
+                            200.0f);
+  activityIndicatorView = [[UIActivityIndicatorView alloc] initWithFrame:frame];
+  activityIndicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+  return activityIndicatorView;
+}
+
 - (void) removeProgressView {
+  if(!self.progressView) {
+    return;
+  }
   [progressView removeFromSuperview];
   [progressView release];
   progressView = nil;
+}
+
+- (void) removeActiveIndicatorView {
+  if(!self.activityIndicatorView) {
+    return;
+  }
+  if([self.activityIndicatorView isAnimating]) {
+    [self.activityIndicatorView stopAnimating];
+  }
+  [self.activityIndicatorView removeFromSuperview];
+  [activityIndicatorView release];
+  activityIndicatorView = nil;
 }
 
 - (void) enableToolbar:(BOOL)enable {
@@ -803,9 +842,12 @@
           finishedWithPhotoFeed:(GDataFeedPhoto *)feed
                           error:(NSError *)error {
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+  [self.activityIndicatorView stopAnimating];
+  [self removeActiveIndicatorView];
 
   if(error) {
-    
+    NSLog(@"insert errror");
+    return;
   }
   else {
     NSLog(@"upload");
@@ -846,22 +888,6 @@
   BOOL hasErrorInInserting = NO;
   if(error) {
     // Error
-    NSString *title = NSLocalizedString(@"Error","Error");
-    NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Error");
-    if ([error code] == 404) {   // ユーザがいない
-      title = NSLocalizedString(@"Result",@"Result");
-      message = NSLocalizedString(@"Warn.NoAlbum", @"No album");
-    }
-    //	NSLog(@" error %@, %@", error, [error userInfo]);
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:title
-                              message:message
-                              delegate:nil
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
-    [pool drain];
     return;
   }
   
@@ -981,6 +1007,7 @@
 //  [picasaFetchController release];
 //  picasaFetchController = nil;
   //
+  [self removeActiveIndicatorView];
   [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
@@ -1006,6 +1033,7 @@
 //  [picasaFetchController release];
 //  picasaFetchController = nil;
   //
+  [self removeActiveIndicatorView];
   [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
@@ -1032,6 +1060,7 @@
 //  [picasaFetchController release];
 //  picasaFetchController = nil;
   //
+  [self removeActiveIndicatorView];
   [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
@@ -1742,7 +1771,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   [settings release];
   User *user = (User *)self.album.user;
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-  
+  [self.view addSubview:self.activityIndicatorView];
+  [self.activityIndicatorView startAnimating];
   [self.picasaFetchController insertPhoto:imageData
                                  withAlbum:self.album.albumId
                                   withUser:user.userId];
