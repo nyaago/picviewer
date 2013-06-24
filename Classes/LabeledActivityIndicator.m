@@ -25,6 +25,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //++
 
+#import <QuartzCore/QuartzCore.h>
 #import "LabeledActivityIndicator.h"
 
 @interface LabeledActivityIndicator(Private)
@@ -43,24 +44,32 @@
 
 @synthesize indicatorView;
 
+
 - (id)initWithFrame:(CGRect)frame {
   if ((self = [super initWithFrame:frame])) {
     // Initialization code
     CGRect rect = CGRectMake((frame.size.width - 50.0f) / 2,  
-                             50.0f,
+                             (frame.size.height - 65.0f),
                              50.0f, 
                              50.0f);
 		indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:rect];
+    indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
     [self addSubview:indicatorView];
     rect = CGRectMake(25.0f,  
                       20.0f,
                       frame.size.width - 50.0f, 
                       30.0f);
     messageLabel = [[UILabel alloc] initWithFrame:rect];
+    messageLabel.textColor = [UIColor whiteColor];
+    messageLabel.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.0f];
     [self addSubview:messageLabel];
     self.backgroundColor = [UIColor grayColor];
-    messageLabel.backgroundColor = [UIColor grayColor];
     
+    self.layer.cornerRadius = 10;
+    self.clipsToBounds = YES;
+    CGColorRef borderColor = [[UIColor colorWithRed:1.0f green:1.0f blue:1.0f alpha:1.0f] CGColor];
+    self.layer.borderColor = borderColor;
+    self.layer.borderWidth = 2.0f;
   }
   return self;
 }

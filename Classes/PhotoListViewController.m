@@ -89,11 +89,14 @@
  */
 - (void) removeProgressView;
 
+
+
+
 /*!
- @method removeActiveIndicatorView
- @discussion active indecator view を view階層から削除
+ @method removeActivityIndicatorView
+ @discussion activity indecator view を view階層から削除
  */
-- (void) removeActiveIndicatorView;
+- (void) removeActivityIndicatorView;
 
 /*!
  @method progressView
@@ -784,16 +787,17 @@
   return progressView;
 }
 
-- (UIActivityIndicatorView *)activityIndicatorView {
+- (LabeledActivityIndicator *)activityIndicatorView {
   if(activityIndicatorView) {
     return activityIndicatorView;
   }
-  CGRect frame = CGRectMake(self.view.frame.size.width / 2 - 100.0f ,
-                            self.view.frame.size.height - 200.0f ,
-                            200.0f,
-                            200.0f);
-  activityIndicatorView = [[UIActivityIndicatorView alloc] initWithFrame:frame];
-  activityIndicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+  CGRect frame = CGRectMake((self.view.frame.size.width - 200.0f) / 2,
+                            (self.view.frame.size.height - 150.0f) / 2 ,
+                            200.0,
+                            150.0f);
+  activityIndicatorView = [[LabeledActivityIndicator alloc] initWithFrame:frame];
+  activityIndicatorView.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:1.0f alpha:0.5f];
+  [activityIndicatorView setMessage:@"Uploading.."];
   return activityIndicatorView;
 }
 
@@ -806,15 +810,12 @@
   progressView = nil;
 }
 
-- (void) removeActiveIndicatorView {
-  if(!self.activityIndicatorView) {
+- (void) removeActivityIndicatorView {
+  if(!activityIndicatorView) {
     return;
   }
-  if([self.activityIndicatorView isAnimating]) {
-    [self.activityIndicatorView stopAnimating];
-  }
-  [self.activityIndicatorView removeFromSuperview];
-  [activityIndicatorView release];
+  [activityIndicatorView stop];
+  [activityIndicatorView  removeFromSuperview];
   activityIndicatorView = nil;
 }
 
@@ -842,8 +843,7 @@
           finishedWithPhotoFeed:(GDataFeedPhoto *)feed
                           error:(NSError *)error {
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  [self.activityIndicatorView stopAnimating];
-  [self removeActiveIndicatorView];
+  [self removeActivityIndicatorView];
 
   if(error) {
     NSLog(@"insert errror");
@@ -1007,7 +1007,7 @@
 //  [picasaFetchController release];
 //  picasaFetchController = nil;
   //
-  [self removeActiveIndicatorView];
+  [self removeActivityIndicatorView];
   [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
@@ -1033,7 +1033,7 @@
 //  [picasaFetchController release];
 //  picasaFetchController = nil;
   //
-  [self removeActiveIndicatorView];
+  [self removeActivityIndicatorView];
   [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
@@ -1060,7 +1060,7 @@
 //  [picasaFetchController release];
 //  picasaFetchController = nil;
   //
-  [self removeActiveIndicatorView];
+  [self removeActivityIndicatorView];
   [self removeProgressView];
   // toolbarのボタンを有効に
   [self enableToolbar:YES];
@@ -1772,7 +1772,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   User *user = (User *)self.album.user;
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   [self.view addSubview:self.activityIndicatorView];
-  [self.activityIndicatorView startAnimating];
+  [self.activityIndicatorView start];
   [self.picasaFetchController insertPhoto:imageData
                                  withAlbum:self.album.albumId
                                   withUser:user.userId];

@@ -36,6 +36,7 @@
 #import "Photo.h"
 #import "PhotoModelController.h"
 #import "LabeledProgressView.h"
+#import "LabeledActivityIndicator.h"
 
 @interface PhotoListViewController : UIViewController
 <PicasaFetchControllerDelegate, 
@@ -65,7 +66,7 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
   UIBarButtonItem *backButton;
   UIScrollView *scrollView;
   LabeledProgressView *progressView;
-  UIActivityIndicatorView *activityIndicatorView;
+  LabeledActivityIndicator *activityIndicatorView;
   // ローカルDB保存時の Lock Object
   NSLock  *lockSave;
   // Download中にエラーが発生したか?
@@ -136,10 +137,11 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
 @property (nonatomic, retain) IBOutlet LabeledProgressView *progressView;
 
 /*!
- @property activityIndicatorView
- @discussion 
+ @property activeIndicatorView
+ @discussion ダウンロード処理中に表示するindicator のView
  */
-@property (nonatomic, readonly) UIActivityIndicatorView *activityIndicatorView;
+@property (nonatomic, retain) IBOutlet LabeledActivityIndicator *activityIndicatorView;
+
 
 /*!
  @property picasaFetchController
