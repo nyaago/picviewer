@@ -126,8 +126,8 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
     [entry setPhotoData:photoData];
     [entry setPhotoMIMEType:@"image/jpeg"];
     [entry setAlbumID:album];
-    [entry setTitle:[GDataTextConstruct textConstructWithString:@"title"]];
-    [entry setPhotoDescription:[GDataTextConstruct textConstructWithString:@"desc"]];
+    [entry setTitle:[GDataTextConstruct textConstructWithString:@""]];
+    [entry setPhotoDescription:[GDataTextConstruct textConstructWithString:@""]];
     [entry setUploadSlug:@"from iphone"];
     
     [service fetchEntryByInsertingEntry:entry
@@ -223,7 +223,6 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
       if (error != nil) {
         NSLog(@"fetch error: %@", error);
         [self handleError:error];
-        return;
       }
       if(delegate &&
          [delegate respondsToSelector:@selector(deletedPhoto:error:)]) {
@@ -235,6 +234,71 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
  }];
 
 }
+
+
+- (void) updatePhoto:(Photo *)photo album:(NSString *)albumId user:(NSString *) user {
+  [lock lock];
+  stoppingRequired = NO;
+  [lock unlock];
+  
+  GDataServiceGooglePhotos *service = [[GDataServiceGooglePhotos alloc] init];
+  // アカウント設定
+  if(userId && password) {
+    //    NSLog(@"user = %@, password = %@", userId, password);
+	  [service setUserCredentialsWithUsername:userId password:password];
+  }
+  
+  [self queryPhoto:photo.photoId
+             album:albumId
+              user:user
+ completionHandler: ^(GDataEntryPhoto *entry, NSError *error) {
+   if(error) {
+     NSLog(@"fetch error: %@", error);
+     [self handleError:error];
+     if(delegate &&
+        [delegate respondsToSelector:@selector(updatedPhoto:error:)]) {
+       
+       [delegate updatedPhoto:entry
+                        error:error];
+     }
+     return;
+   }
+   if(entry == nil) {
+     return;
+   }
+   NSURL *URL = [[entry editLink] URL];
+   NSLog(@"URL - %@", URL);
+   [entry setPhotoDescription:[GDataTextConstruct textConstructWithString:photo.descript]];
+   // これがないと、crashするので
+   [entry setUnknownChildren:nil];
+   //
+   [service fetchEntryByUpdatingEntry:entry
+                          forEntryURL:URL
+                    completionHandler:
+    ^(GDataServiceTicket *ticket, id nilObject, NSError *error) {
+      [lock lock];
+      if(stoppingRequired) {
+        completed = YES;
+        [lock unlock];
+        return;
+      }
+      [lock unlock];
+      
+      if (error != nil) {
+        NSLog(@"fetch error: %@", error);
+        [self handleError:error];
+      }
+      if(delegate &&
+         [delegate respondsToSelector:@selector(updatedPhoto:error:)]) {
+        
+        [delegate updatedPhoto:entry
+                         error:error];
+      }
+    } ];
+ }];
+  
+}
+
 
 
 - (void) queryUserAndAlbums:(NSString *)user {

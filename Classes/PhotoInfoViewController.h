@@ -28,6 +28,7 @@
 #import <UIKit/UIKit.h>
 #import "Photo.h"
 #import "PicasaViewerAppDelegate.h"
+#import "TextViewController.h"
 
 /*!
  @class PhotoInfoViewController
@@ -35,7 +36,7 @@
  */
 
 @interface PhotoInfoViewController : UITableViewController <PicasaFetchControllerDelegate,
-UIAlertViewDelegate> {
+UIAlertViewDelegate, TextViewControllerDelegate> {
 	Photo *photo;
   BOOL canUpdate;
   PicasaFetchController *picasaController;

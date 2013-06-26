@@ -34,6 +34,7 @@
 @dynamic thumbnail, urlForContent, urlForThumbnail, location;
 @dynamic photoImage;
 @dynamic album;
+@dynamic changedAtLocal;
 
 @end
 

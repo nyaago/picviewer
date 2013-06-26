@@ -57,6 +57,9 @@
 "PhotoList.Loading" = "Loding..";
 "PhotoList.ChooseUser" = "Choose an user";
 
+// Photo Info
+"PhotoInfo.DeletePhoto" = "Delete Photo";
+
 
 // 写真View
 "Photo.Action" = "Select The Action";

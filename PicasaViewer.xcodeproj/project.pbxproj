@@ -26,6 +26,7 @@
 		722D6DCC1186A0EE004F0F0D /* PhotoListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */; };
 		722D6DED1186C80E004F0F0D /* Photo.m in Sources */ = {isa = PBXBuildFile; fileRef = 722D6DEC1186C80E004F0F0D /* Photo.m */; };
 		7234EA44117E820800D7AC45 /* libGDataTouchStaticLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7234E9DA117E7C7F00D7AC45 /* libGDataTouchStaticLib.a */; };
+		723785D01779383200A6379A /* TextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 723785CF1779383200A6379A /* TextViewController.m */; };
 		7238233412068EF60046D754 /* PhotoModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7238233312068EF60046D754 /* PhotoModelController.m */; };
 		723823A61206A3C70046D754 /* AlbumModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 723823A51206A3C70046D754 /* AlbumModelController.m */; };
 		724BD15516E873D300F8C5CF /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 724BD15416E873D300F8C5CF /* Default-568h@2x.png */; };
@@ -191,6 +192,8 @@
 		722D6DEB1186C80E004F0F0D /* Photo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Photo.h; sourceTree = "<group>"; };
 		722D6DEC1186C80E004F0F0D /* Photo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Photo.m; sourceTree = "<group>"; };
 		7234E9CB117E7C7F00D7AC45 /* GData.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = GData.xcodeproj; path = "../gdata-objectivec-client/Source/GData.xcodeproj"; sourceTree = SOURCE_ROOT; };
+		723785CE1779383200A6379A /* TextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextViewController.h; sourceTree = "<group>"; };
+		723785CF1779383200A6379A /* TextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextViewController.m; sourceTree = "<group>"; };
 		7238233212068EF60046D754 /* PhotoModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoModelController.h; sourceTree = "<group>"; };
 		7238233312068EF60046D754 /* PhotoModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoModelController.m; sourceTree = "<group>"; };
 		723823A41206A3C70046D754 /* AlbumModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumModelController.h; sourceTree = "<group>"; };
@@ -343,6 +346,8 @@
 				72D2246F1640E9FD004E84B2 /* IPhoneThumbImageView.m */,
 				72D224721640EA1C004E84B2 /* IPadThumbImageView.h */,
 				72D224731640EA1C004E84B2 /* IPadThumbImageView.m */,
+				723785CE1779383200A6379A /* TextViewController.h */,
+				723785CF1779383200A6379A /* TextViewController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -698,6 +703,7 @@
 				72ECD811175C9FD200F71D24 /* PicasaViewer.xcdatamodeld in Sources */,
 				7250914B176F07F800BEBB03 /* ModelController.m in Sources */,
 				720F8D691770125B0033856D /* UserModelController.m in Sources */,
+				723785D01779383200A6379A /* TextViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

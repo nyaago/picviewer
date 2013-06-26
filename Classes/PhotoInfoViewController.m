@@ -44,6 +44,8 @@
 - (void) doDelete;
 
 
+- (NSInteger) lineCountOfString:(NSString *)s;
+
 
 @end
 
@@ -140,12 +142,15 @@
       case(0) : //
         switch ([indexPath indexAtPosition:1]) {
           case(0) :
-            cell.textLabel.text = self.photo.title;
+            cell.textLabel.text = self.photo.descript;
+            if(self.canUpdate) {
+              cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            }
             break;
           case(1) :
             cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@",
                                    NSLocalizedString(@"Location", @"Location"),
-                                   self.photo.location];
+                                   self.photo.location ? self.photo.location : @""];
             break;
           default:
             break;
@@ -154,7 +159,7 @@
       case (1) :
         switch ([indexPath indexAtPosition:1]) {
           case(0) :
-            cell.textLabel.text = @"Delete Photo";
+            cell.textLabel.text = NSLocalizedString(@"PhotoInfo.DeletePhoto", @"Delete Photo");
             cell.textLabel.textColor = [UIColor redColor];
             cell.selectionStyle = UITableViewCellSelectionStyleBlue;
             break;
@@ -176,7 +181,21 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     // Navigation logic may go here. Create and push another view controller.
   switch ([indexPath indexAtPosition:0]) {
-    case(0) : //
+    case(0) :
+      switch ([indexPath indexAtPosition:1]) {
+        case (0):
+          // descript
+          if([self canUpdate]) {
+            TextViewController *textViewController = [[TextViewController alloc] init];
+            textViewController.delegate = self;
+            textViewController.text = photo.descript;
+            [self.navigationController pushViewController:textViewController
+                                                 animated:YES];
+          }
+          break;
+        default:
+          break;
+      }
       break;
     case (1) :
       switch ([indexPath indexAtPosition:1]) {
@@ -188,9 +207,32 @@
         default:
           break;
       }
+      break;
   }
-
 }
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+  
+  CGFloat height = 45.0f;
+  CGFloat h = 0.0f;
+  switch ([indexPath indexAtPosition:0]) {
+    case 0:
+      switch ([indexPath indexAtPosition:1]) {
+        case 0:
+          h = [self lineCountOfString:photo.descript] * 25.0f;
+          height = h  > height ? h : height;
+          break;
+        default:
+          break;
+      }
+      break;
+      
+    default:
+      break;
+  }
+  return height;
+}
+
 
 
 #pragma mark -
@@ -289,6 +331,19 @@
   }
 }
 
+- (void)updatedPhoto:(GDataEntryPhoto *)entry
+               error:(NSError *)error {
+  if(error) {
+    NSLog(@"%@", error.description);
+  }
+  else {
+    self.photo.changedAtLocal = [NSNumber numberWithBool:NO];
+
+    NSLog(@"updated");
+  }
+}
+
+
 - (void) popToRoot {
   PicasaViewerAppDelegate *appDelegate
   = (PicasaViewerAppDelegate *)[[UIApplication sharedApplication] delegate];
@@ -321,6 +376,39 @@
   }
   return modelController;
 }
+
+#pragma mark TextViewControllerDelegate
+
+- (void) textViewControler:(TextViewController *)controller input:(NSString *)s {
+  self.photo.descript = s;
+  self.photo.changedAtLocal = [NSNumber numberWithBool:YES];
+  [[self photoModelController] save];
+  
+  Album *album = (Album *)photo.album;
+  User *user = (User *)album.user;
+  
+  [self.picasaController updatePhoto:photo album:album.albumId user:user.userId];
+
+  [controller release];
+  [self.tableView reloadData];
+}
+
+
+#pragma mark Private
+
+
+- (NSInteger) lineCountOfString:(NSString *)s {
+  if(s == nil) {
+    return 1;
+  }
+  NSMutableArray  *lines = [NSMutableArray array];
+  [s enumerateLinesUsingBlock:^(NSString *line, BOOL *stop) {
+    [lines addObject:line];
+  }];
+  return lines.count;
+  
+}
+
 
 @end
 

@@ -27,6 +27,8 @@
 
 #import <Foundation/Foundation.h>
 #import "GDataPhotos.h"
+#import "Photo.h"
+
 
 /*!
  @protocal PicasaFetchControllerDelegate
@@ -76,6 +78,14 @@
  */
 - (void)deletedPhoto:(GDataEntryPhoto *)entry
                           error:(NSError *)error;
+
+/*!
+ @method updatedPhoto:
+ @discussion PicasaFetchControllerのupdatePhoto:album: （photo更新）
+ でのリクエストに対する通知メソッド
+ */
+- (void)updatedPhoto:(GDataEntryPhoto *)entry
+               error:(NSError *)error;
 
 
 
@@ -163,6 +173,8 @@
  @param user  - user id
  */
 - (void) deletePhoto:(NSString *)photoId album:(NSString *)albumId user:(NSString *)user;
+
+- (void) updatePhoto:(Photo *)photo album:(NSString *)albumId user:(NSString *) user;
 
 /*!
  @method queryUserAndAlbums

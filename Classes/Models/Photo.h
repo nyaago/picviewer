@@ -46,6 +46,7 @@
 @property (nonatomic, retain) NSNumber * width;
 @property (nonatomic, retain) NSString * descript;
 @property (nonatomic, retain) NSString * location;
+@property (nonatomic, retain) NSNumber *changedAtLocal;
 
 @property (nonatomic, retain) NSManagedObject * album;
 

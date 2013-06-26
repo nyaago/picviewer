@@ -95,7 +95,7 @@
 	  [photoObject setValue:[[photo geoLocation] coordinateString] forKey:@"location"];
   }
   if([photo description] ) {
-		[photoObject setValue:[photo description] forKey:@"descript"];
+		[photoObject setValue:[[photo mediaGroup] mediaDescription].contentStringValue  forKey:@"descript"];
   }
   if([photo width] ) {
     [photoObject setValue:[photo width] forKey:@"width"];

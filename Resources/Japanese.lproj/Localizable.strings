@@ -38,6 +38,9 @@
 "PhotoList.DownloadList" = "一覧をダウンロード中です";
 "PhotoList.DownloadThumb" = "サムネイルをダウンロード中です";
 
+// Photo Info
+"PhotoInfo.DeletePhoto" = "写真を削除";
+
 // ボタンキャプション
 "Completed" = "完了";
 "Cancel" = "中止";

@@ -897,8 +897,8 @@
     NSLog(@"the album has %d photos", [[feed entries] count]);
     for (int i = 0; i < [entries count]; ++i) {
       GDataEntryPhoto *photo = [entries objectAtIndex:i];
-      NSLog(@"photo - title = %@, ident=%@, feedlink=%@",
-            [[photo title] contentStringValue], [photo GPhotoID], [photo feedLink]);
+      NSLog(@"photo - title = %@, ident=%@, feedlink=%@, desc=%@, desc2=%@",
+            [[photo title] contentStringValue], [photo GPhotoID], [photo feedLink], [photo description], [[photo mediaGroup] mediaDescription]);
       //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
       BOOL f;
       Photo *photoModel = [[self photoModelController] selectPhoto:photo hasError:&f];
