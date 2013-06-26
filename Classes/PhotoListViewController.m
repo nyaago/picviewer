@@ -162,10 +162,24 @@
 - (BOOL)mustLoad:(Album *)curAlbum;
 
 /*!
+ @method changedPhotosAtLocal
+ @return アプリ（端末）内で更新されている写真モデル一覧
+ */
+- (NSArray *) changedPhotosAtLocal;
+
+/*!
  @method loadPhotos
  @discussion 選択されている写真データのロード
  */
 - (BOOL) loadPhotos:(Album *)curAlbum;
+
+/*!
+ @method updatePhotoToPicasa:
+ @discussion Picasaへの写真情報の更新
+ @param photo
+ @param refreshAfterUpdate 更新後にpicasaからの全リロードを行うか
+ */
+- (void) updatePhotoToPicasa:(Photo *)photo refreshAfterUpdate:(BOOL)refreshAfterUpdate;
 
 /*!
  @metohd photoModelController
@@ -315,7 +329,7 @@
   if(skip == YES) {
     return;
   }
-
+  
   
   [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
   [self loadPhotos:self.album];
@@ -332,6 +346,12 @@
   [self performSelectorOnMainThread:@selector(loadThumbnails)
                          withObject:nil
                       waitUntilDone:YES];
+  if(![NetworkReachability reachable]) {
+    Photo *changedPhoto = [self firstChangedPhotoAtLocal];
+    if(changedPhoto) {
+      [self updatePhotoToPicasa:changedPhoto refreshAfterUpdate:NO];
+    }
+  }
 }
 
 /*!
@@ -359,10 +379,10 @@
 
 - (void)viewDidDisappear:(BOOL)animated {
   // Google問い合わせ中の場合,停止を要求、完了するまで待つ
-  if(self.picasaFetchController) {
+  if(picasaFetchController) {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [self.picasaFetchController requireStopping];
   }
-  [self.picasaFetchController requireStopping];
 // [self stopToAddThumbnails];
   self.needToLoadIfWifi = NO;
   self.needToLoad = NO;
@@ -477,7 +497,7 @@
   if(progressView) {
   }
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
-  if(self.picasaFetchController) {
+  if(picasaFetchController) {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [picasaFetchController release];
     picasaFetchController = nil;
@@ -859,6 +879,31 @@
   
 }
 
+-(void) updatedPhoto:(GDataEntryPhoto *)entry error:(NSError *)error {
+  if(error) {
+    return;
+  }
+  else {
+    BOOL f;
+    Photo *photo = [self.photoModelController selectPhoto:entry hasError:&f];
+    if(photo) {
+      photo.changedAtLocal = NO;
+      [self.photoModelController save];
+      Photo *changedPhoto = [self firstChangedPhotoAtLocal];
+      if(changedPhoto) {
+        // まだ、picasaへの更新の必要なものがある
+        [self updatePhotoToPicasa:changedPhoto refreshAfterUpdate:refreshAfterPicasaUpdated];
+      }
+      else {
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        if(refreshAfterPicasaUpdated) {
+          [self refreshPhotos:YES];
+        }
+      }   
+    }
+  }
+}
+
 
 // Googleへの問い合わせの応答の通知
 // ローカルDBへの登録を行う.
@@ -919,29 +964,39 @@
           hasErrorInInserting = YES;
         }
       }
-      else if(!photoModel.thumbnail) {
-        // Photo thumbnail 未登録時 - 登録するThumnail をロード
-        [self downloadThumbnail:photo withPhotoModel:photoModel];
-      }
       else {
-        NSLog(@"count = %d",[[self photoModelController] photoCount]);
-        // Photo thumbnail　登録済み - thumbnail 表示
-        // pregress view と 写真なしメッセージを非表示
-        [self performSelectorOnMainThread:@selector(removeProgressView)
-                               withObject:self
-                            waitUntilDone:NO ];
-        [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
-                               withObject:[NSNumber numberWithBool:NO]
-                            waitUntilDone:NO];
-        // thumbnail の追加
-        [self performSelectorOnMainThread:@selector(addTbumbnailForPhoto:)
-                               withObject:photoModel
-                            waitUntilDone:NO];
+        if(!photoModel.changedAtLocal) {
+          
+        }
+        if(!photoModel.thumbnail) {
+          // Photo thumbnail 未登録時 - 登録するThumnail をロード
+          [self downloadThumbnail:photo withPhotoModel:photoModel];
+        }
+        else {
+          NSLog(@"count = %d",[[self photoModelController] photoCount]);
+          // Photo thumbnail　登録済み - thumbnail 表示
+          // pregress view と 写真なしメッセージを非表示
+          [self performSelectorOnMainThread:@selector(removeProgressView)
+                                 withObject:self
+                              waitUntilDone:NO ];
+          [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
+                                 withObject:[NSNumber numberWithBool:NO]
+                              waitUntilDone:NO];
+          // thumbnail の追加
+          [self performSelectorOnMainThread:@selector(addTbumbnailForPhoto:)
+                                 withObject:photoModel
+                              waitUntilDone:NO];
 
+        }
       }
-
     }
-  }	
+  }
+  // Local で変更されたもののpicasaサーバーへの反映
+  Photo *changedPhoto = [self firstChangedPhotoAtLocal];
+  if(changedPhoto) {
+    [self updatePhotoToPicasa:changedPhoto refreshAfterUpdate:NO];
+  }
+
   // Photo一覧のFetched Controllerを生成
   [NSFetchedResultsController deleteCacheWithName:@"Root"];
   if (![[[self photoModelController] fetchedPhotosController] performFetch:&error]) {
@@ -1251,6 +1306,13 @@
 
 - (void) refreshPhotos:(BOOL)refreshAll {
 
+  Photo *changedPhoto = [self firstChangedPhotoAtLocal];
+  if(changedPhoto) {
+    // Local で変更されたもののpicasaサーバーへの反映
+    [self updatePhotoToPicasa:changedPhoto refreshAfterUpdate:YES];
+    return;
+  }
+
   hasErrorInDownloading = NO;
   hasErrorInInsertingThumbnail = NO;
   [[self photoModelController] setAlbum:[self album]];
@@ -1267,10 +1329,6 @@
   // 再ロード
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   SettingsManager *settings = [[SettingsManager alloc] init];
-  self.picasaFetchController = [[PicasaFetchController alloc] init];
-  self.picasaFetchController.delegate = self;
-  self.picasaFetchController.userId = settings.userId;
-  self.picasaFetchController.password = settings.password;
   [self.view addSubview:[self progressView]];
   [self.picasaFetchController queryAlbumAndPhotos:self.album.albumId
                                         user:[self.album.user valueForKey:@"userId"]
@@ -1346,6 +1404,39 @@
   return ret;
 }
 
+- (Photo *) firstChangedPhotoAtLocal {
+  for(NSUInteger i = 0; i < [[self photoModelController] photoCount]; ++i) {
+    Photo *photo = [[self photoModelController] photoAt:i];
+    if(photo && photo.changedAtLocal) {
+      return photo;
+    }
+  }
+  return nil;
+}
+
+
+- (NSArray *) changedPhotosAtLocal {
+  NSMutableArray *photos = [[NSMutableArray alloc] init];
+  for(NSUInteger i = 0; i < [[self photoModelController] photoCount]; ++i) {
+    Photo *photo = [[self photoModelController] photoAt:i];
+    if(photo && photo.changedAtLocal) {
+      [photos addObject:photo];
+    }
+  }
+  return photos;
+}
+
+- (void) updatePhotoToPicasa:(Photo *)photo refreshAfterUpdate:(BOOL)f{
+  if(f == NO && ![NetworkReachability reachable]) {
+    return;
+  }
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+  Album *curAlbum = (Album *)photo.album;
+  User *curUser = (User *)curAlbum.user;
+  refreshAfterPicasaUpdated = f;
+  [self.picasaFetchController updatePhoto:photo album:album.albumId user:curUser.userId];
+}
+
   
 - (BOOL) loadPhotos:(Album *)curAlbum {
   
@@ -1398,6 +1489,18 @@
     modelController.managedObjectContext = self.managedObjectContext;
   }
   return modelController;
+}
+
+- (PicasaFetchController *)picasaFetchController {
+  if(!picasaFetchController) {
+    SettingsManager *settings = [[SettingsManager alloc] init];
+    picasaFetchController = [[PicasaFetchController alloc] init];
+    picasaFetchController.delegate = self;
+    picasaFetchController.userId = settings.userId;
+    picasaFetchController.password = settings.password;
+    [settings release];
+  }
+  return picasaFetchController;
 }
 
 #pragma mark -
@@ -1756,19 +1859,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
   UIImage *image = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
   NSData *imageData = UIImageJPEGRepresentation(image, 1.0f);
-  SettingsManager *settings = [[SettingsManager alloc] init];
 //  picasaFetchController = [[PicasaFetchController alloc] init];
 //  picasaFetchController.userId = settings.userId;
 //  picasaFetchController.password = settings.password;
 
-  if(!self.picasaFetchController) {
-    self.picasaFetchController = [[PicasaFetchController alloc] init];
-    self.picasaFetchController.delegate = self;
-    self.picasaFetchController.userId = settings.userId;
-    self.picasaFetchController.password = settings.password;
-
-  }
-  [settings release];
   User *user = (User *)self.album.user;
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   [self.view addSubview:self.activityIndicatorView];

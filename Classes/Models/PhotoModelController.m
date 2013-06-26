@@ -308,7 +308,6 @@
   return nil;
 }
 
-
 - (void) setLastAdd {
   NSLog(@"setLastAdd");
   self.album.lastAddPhotoAt = [NSDate date];

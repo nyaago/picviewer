@@ -103,7 +103,8 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
   UILabel *noPhotoLabel;
 
   UIPopoverController *pickerPopoverController;
-  
+  // picasa の サーバーへの更新を行ったあと全リロードを行うか？
+  BOOL refreshAfterPicasaUpdated;
 }
 
 /*!
