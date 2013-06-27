@@ -83,45 +83,16 @@
   
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
-  NSString *photoId = [photo GPhotoID];
   // 新しい永続化オブジェクトを作って
   Photo *photoObject 
   = (Photo *)[self insertNewObjectForEntityForName:@"Photo"];
   // 値を設定
-  [photoObject setValue:photoId forKey:@"photoId"];
-  [photoObject setValue:[[photo title] contentStringValue] forKey:@"title"];
-  [photoObject setValue:[[photo timestamp] dateValue] forKey:@"timeStamp"];
-  if([photo geoLocation]) {
-	  [photoObject setValue:[[photo geoLocation] coordinateString] forKey:@"location"];
-  }
-  if([photo description] ) {
-		[photoObject setValue:[[photo mediaGroup] mediaDescription].contentStringValue  forKey:@"descript"];
-  }
-  if([photo width] ) {
-    [photoObject setValue:[photo width] forKey:@"width"];
-  }
-  if([photo height] ) {
-    [photoObject setValue:[photo height] forKey:@"height"];
-  }
-  
-  // 画像url
-  if([[[photo mediaGroup] mediaThumbnails] count] > 0) {
-    GDataMediaThumbnail *thumbnail = [[[photo mediaGroup] mediaThumbnails]  
-                                      objectAtIndex:0];
-    NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
-    [photoObject setValue:[thumbnail URLString] forKey:@"urlForThumbnail"];
-  }
-  if([[[photo mediaGroup] mediaContents] count] > 0) {
-    GDataMediaContent *content = [[[photo mediaGroup] mediaContents]  
-                                  objectAtIndex:0];
-    NSLog(@"URL for the photo - %@", [content URLString] );
-    [photoObject setValue:[content URLString] forKey:@"urlForContent"];
-  }
+  [self gDataEntryPhoto:photo toPhotoModel:photoObject];
   
   // Save the context.
   if ([self.album respondsToSelector:@selector(addPhotoObject:) ] ) {
     [self.album addPhotoObject:(NSManagedObject *)photoObject];
-  }	
+  }
   [lockSave lock];
   NSError *error = [self save];
   if (error) {
@@ -145,9 +116,74 @@
   //  [managedObjectContext processPendingChanges]:
   [lockSave unlock];
   [pool drain];
+  [self clearFetchPhotosController];
   return photoObject;
 }
 
+- (Photo *)updatePhoto:(Photo *)photoModel fromGDataEntryPhoto:(GDataEntryPhoto *)entry {
+  
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
+  [self gDataEntryPhoto:entry toPhotoModel:photoModel];
+  [lockSave lock];
+  NSError *error = [self save];
+  if (error) {
+    //
+    [lockSave unlock];
+    NSLog(@"Unresolved error %@", error);
+    NSLog(@"Failed to save to data store: %@", [error localizedDescription]);
+		NSArray* detailedErrors = [[error userInfo] objectForKey:NSDetailedErrorsKey];
+		if(detailedErrors != nil && [detailedErrors count] > 0) {
+			for(NSError* detailedError in detailedErrors) {
+				NSLog(@"  DetailedError: %@", [detailedError userInfo]);
+			}
+		}
+		else {
+			NSLog(@"  %@", [error userInfo]);
+		}
+    
+    [pool drain];
+    return nil;
+  }
+  //  [managedObjectContext processPendingChanges]:
+  [lockSave unlock];
+  [pool drain];
+  [self clearFetchPhotosController];
+  return photoModel;
+}
+
+- (void) gDataEntryPhoto:(GDataEntryPhoto *)entry toPhotoModel:(Photo *)photoModel {
+  [photoModel setValue:[entry GPhotoID] forKey:@"photoId"];
+  [photoModel setValue:[[entry title] contentStringValue] forKey:@"title"];
+  [photoModel setValue:[[entry timestamp] dateValue] forKey:@"timeStamp"];
+  if([entry geoLocation]) {
+	  [photoModel setValue:[[entry geoLocation] coordinateString] forKey:@"location"];
+  }
+  if([entry description] ) {
+		[photoModel setValue:[[entry mediaGroup] mediaDescription].contentStringValue  forKey:@"descript"];
+  }
+  if([entry width] ) {
+    [photoModel setValue:[entry width] forKey:@"width"];
+  }
+  if([entry height] ) {
+    [photoModel setValue:[entry height] forKey:@"height"];
+  }
+  
+  // 画像url
+  if([[[entry mediaGroup] mediaThumbnails] count] > 0) {
+    GDataMediaThumbnail *thumbnail = [[[entry mediaGroup] mediaThumbnails]
+                                      objectAtIndex:0];
+    NSLog(@"URL for the thumb - %@", [thumbnail URLString] );
+    [photoModel setValue:[thumbnail URLString] forKey:@"urlForThumbnail"];
+  }
+  if([[[entry mediaGroup] mediaContents] count] > 0) {
+    GDataMediaContent *content = [[[entry mediaGroup] mediaContents]
+                                  objectAtIndex:0];
+    NSLog(@"URL for the photo - %@", [content URLString] );
+    [photoModel setValue:[content URLString] forKey:@"urlForContent"];
+  }
+  
+}
 
 - (Photo *)updateThumbnail:(NSData *)thumbnailData forPhoto:(Photo *)photo {
   if(!photo)
@@ -164,6 +200,7 @@
     return nil;	
   }
   [lockSave unlock];
+  [self clearFetchPhotosController];
   return photo;
 }
 
@@ -200,6 +237,7 @@
   }
    */
   [fetchRequest release];
+  [self clearFetchPhotosController];
   return;
 
 }
@@ -236,7 +274,8 @@
     NSLog(@"Error deleting- error:%@",error);
   }
   [fetchRequest release];
-	//[items release];  
+	//[items release];
+  [self clearFetchPhotosController];
   return;
 }    
 
@@ -249,6 +288,11 @@
   return fetchedPhotosController;
 }    
 
+
+- (void) clearFetchPhotosController {
+  [fetchedPhotosController release];
+  fetchedPhotosController = nil;
+}
 
 - (Photo *)photoAt:(NSUInteger)index {
   NSUInteger indexes[2];
@@ -272,7 +316,16 @@
 }
 
 - (NSInteger) indexForPhoto:(Photo *)photo {
-
+  NSUInteger indexes[2];
+  indexes[0] = 0;
+  for(int i = 0; i < [self photoCount]; ++i) {
+    Photo *curPhoto = [self photoAt:i];
+    if([curPhoto.photoId isEqual:photo.photoId]) {
+      return i;
+    }
+  }
+  return NSNotFound;
+  
   NSIndexPath *indexPath = [[self fetchedPhotosController] indexPathForObject:photo ];
   if(indexPath && indexPath.length == 2) {
     return [indexPath indexAtPosition:1];
@@ -309,16 +362,9 @@
 - (void) setLastAdd {
   NSLog(@"setLastAdd");
   self.album.lastAddPhotoAt = [NSDate date];
-  //NSLog(@"setLastAdd lock");
-  //NSError *error = nil;
   [lockSave lock];
-  //NSLog(@"setLastAdd locked");
-  // @TODO - フリーズする が保存したい...
-  //if (![managedObjectContext save:&error]) {
-  //}
-  //NSLog(@"setLastAdd saved");
+  [self save];
   [lockSave unlock];
-  //NSLog(@"setLastAdd unlocked");
 }
 
 - (void) clearLastAdd {
@@ -326,7 +372,6 @@
   self.album.lastAddPhotoAt = nil;
   NSError *error = nil;
   [lockSave lock];
-  
   error = [self save];
   [lockSave unlock];
 }
@@ -374,6 +419,8 @@
   [sortDescriptor release];
   [sortDescriptors release];
   NSLog(@"new fetchedPhotosController created.");
+  NSError *error;
+  [fetchedPhotosController performFetch:&error];
   return fetchedPhotosController;
 }
 

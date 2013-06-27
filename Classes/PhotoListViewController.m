@@ -52,8 +52,10 @@
 #define kChooseAlbumMessage 3
 // 写真なしのメッセージタイプ - Choose an user（ユーザを選択してください）
 #define kChooseUserMessage 4
-// Album の Reload確認を行う間隔（分）
+// Album の Reload確認を行う間隔（分） - wifi接続の場合
 #define kIntervalForReloadWifi 15
+// Album の Reload確認を行う間隔（分） - 3Gの場合
+#define kIntervalForReload3G 60*24
 
 /*!
  @method canUpdatePhotos
@@ -954,11 +956,29 @@
     // Error
     return;
   }
-  
-  // ローカルDBへの保存
   NSArray *entries = [feed entries];
+  NSLog(@"the album has %d photos", [[feed entries] count]);
+  // 削除されたものをLocalに反映
+  NSInteger removedCount = 0;
+  for(int i = [[self photoModelController] photoCount] - 1; i >= 0; --i) {
+    BOOL found = NO;
+    Photo *photoModel = [[self photoModelController] photoAt:i];
+    if(photoModel) {
+      for (int i = 0; i < [entries count]; ++i) {
+        GDataEntryPhoto *photoEntry = [entries objectAtIndex:i];
+        if([[photoEntry GPhotoID] isEqual:photoModel.photoId]) {
+          found = YES;
+        }
+      }
+    }
+    if(found == NO) {
+      [[self photoModelController] removePhoto:photoModel];
+      removedCount += 1;
+    }
+  }
+
+  // ローカルDBへの保存
   if ([entries count] > 0) {
-    NSLog(@"the album has %d photos", [[feed entries] count]);
     for (int i = 0; i < [entries count]; ++i) {
       GDataEntryPhoto *photo = [entries objectAtIndex:i];
       NSLog(@"photo - title = %@, ident=%@, feedlink=%@, desc=%@, desc2=%@",
@@ -986,7 +1006,7 @@
       }
       else {
         if(!photoModel.changedAtLocal) {
-          
+          [[self photoModelController] updatePhoto:photoModel fromGDataEntryPhoto:photo];
         }
         if(!photoModel.thumbnail) {
           // Photo thumbnail 未登録時 - 登録するThumnail をロード
@@ -1018,23 +1038,6 @@
     [self updatePhotoToPicasa:changedPhoto refreshAfterUpdate:NO];
   }
 
-  // Photo一覧のFetched Controllerを生成
-  [NSFetchedResultsController deleteCacheWithName:@"Root"];
-  if (![[[self photoModelController] fetchedPhotosController] performFetch:&error]) {
-    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-    
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"Error","Error")
-                              message:NSLocalizedString(@"Error.Fetch", 
-                                                        @"Error IN Saving")
-                              delegate:nil
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
-    [pool drain];
-    return;
-  }
   if(hasErrorInInserting) {
     UIAlertView *alertView = [[UIAlertView alloc] 
                               initWithTitle:NSLocalizedString(@"Error", @"Error")
@@ -1399,12 +1402,20 @@
     }
 		return YES;
   }
-    
-  if ( ( curAlbum.lastAddPhotoAt == nil ||
-        [self minutesBetween:curAlbum.lastAddPhotoAt and:[NSDate date] ] > kIntervalForReloadWifi)
-        &&
-      [NetworkReachability reachableByWifi]) {
-    return YES;
+  
+  //NSLog(@"album - last updated - %@", curAlbum.lastAddPhotoAt);
+  if([NetworkReachability reachableByWifi]) {
+    if([self minutesBetween:curAlbum.lastAddPhotoAt and:[NSDate date] ] > kIntervalForReloadWifi) {
+      return YES;
+    }
+  }
+  else if([NetworkReachability reachable]) {
+    if (curAlbum.lastAddPhotoAt == nil ) {
+      return YES;
+    }
+    else if([self minutesBetween:curAlbum.lastAddPhotoAt and:[NSDate date] ] > kIntervalForReload3G) {
+      return YES;
+    }
   }
   BOOL ret = NO;
   // thumbnail の未ロードのものがないかのチェック

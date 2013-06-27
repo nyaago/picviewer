@@ -10,6 +10,7 @@
 "Result" = "結果";
 "Warn" = "警告";
 "Notice" = "注意";
+"Confirm" = "確認";
 
 // Navigation Bar - Title
 "Accounts" = "アカウント";
@@ -42,6 +43,8 @@
 "PhotoInfo.DeletePhoto" = "写真を削除";
 
 // ボタンキャプション
+"Yes" = "はい";
+"No" = "いいえ";
 "Completed" = "完了";
 "Cancel" = "中止";
 "Email" = "EMailで送信";
@@ -91,6 +94,8 @@
 
 "Notice.WifiNotReachable" = "3G回線へ接続中ですが(Wi-fi接続できません)続行しますか";
 "Notice.DeletePhoto" = "写真を削除します。続行しますか？";
+
+"Confirm.SavePhoto" = "アップロードに失敗しました。写真をライブラリーに保存しますか？";
 
 
 // General

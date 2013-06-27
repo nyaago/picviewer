@@ -6,8 +6,12 @@
    Copyright 2010 __MyCompanyName__. All rights reserved.
  */
 // Alert - Title
-"Error" = "Error";
+"Error" = "Error!";
 "Result" = "Result";
+"Warn" = "Warning!";
+"Notice" = "Notice!";
+"Confirm" = "Confirmation!";
+
 
 // Navigation Bar - Title
 "Accounts" = "Accounts";
@@ -38,6 +42,8 @@
 "PhotoList.DownloadThumb" = "Downloading thumbnail..";
 
 // Caption For BUtton
+"Yes" = "Yes";
+"No" = "No";
 "Completed" = "Completed";
 "Cancel" = "Cancel";
 "Email" = "Send By EMail";
@@ -85,6 +91,9 @@
 
 "Notice.WifiNotReachable" = "only 3G(can't use Wi-fi).continue?";
 "Notice.DeletePhoto" = "Can I delete it?";
+
+"Confirm.SavePhoto" = "An error occured in uploading. Save the photo to photo library?？";
+
 
 // General
 "Width" = "Width";

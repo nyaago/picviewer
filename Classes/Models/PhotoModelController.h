@@ -54,7 +54,16 @@
  */
 - (id) initWithContext:(NSManagedObjectContext *)context;
 
+/*!
+ @return photoのfetch結果のコントローラー
+ */
 - (NSFetchedResultsController *)fetchedPhotosController;
+
+/*!
+ @method clearFetchPhotosController
+ @discission photoのfetch結果のコントローラーをクリア
+ */
+- (void) clearFetchPhotosController;
 
 /*!
  @property fetchedAlbumsController
@@ -73,6 +82,15 @@
  @discussion Photo情報をローカルDBに登録する.
  */
 - (Photo *)insertPhoto:(GDataEntryPhoto *)photo withAlbum:(Album *)user;
+
+/*!
+ @method updatePhoto:fromGDataEntryPhoto:
+ @discussion picasaのPhoto情報でをローカルDBを更新
+ @param photoModel
+ @param entry picasa のphoto エントリー
+ */
+- (Photo *)updatePhoto:(Photo *)photoModel fromGDataEntryPhoto:(GDataEntryPhoto *)entry;
+
 /*!
  @method updateThumbnail:forPhoto
  @discussion PhotoのThumbnailをローカルDBに更新登録する.
