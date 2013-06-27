@@ -42,7 +42,7 @@
                   withUser:(User *)userObject;
 
 
-- (NSFetchedResultsController *)createFetchedPhotosController;
+- (NSFetchedResultsController *)createFetchedAlbumsController;
 
 @end
 
@@ -80,10 +80,19 @@
   if (fetchedAlbumsController != nil) {
     return fetchedAlbumsController;
   }
-  [self performSelectorOnMainThread:@selector(createFetchedPhotosController)
+  [self performSelectorOnMainThread:@selector(createFetchedAlbumsController)
                          withObject:nil
                       waitUntilDone:YES];
+  NSError *error;
+  [fetchedAlbumsController performFetch:&error];
   return fetchedAlbumsController;
+}
+
+- (void) clearFetchAlbumsController {
+  if(fetchedAlbumsController) {
+    [fetchedAlbumsController release];
+    fetchedAlbumsController = nil;
+  }
 }
 
 - (Album *)insertAlbum:(GDataEntryPhotoAlbum *)album   withUser:(User *)userObject{
@@ -110,7 +119,7 @@
     NSLog(@"Unresolved error %@", error);
     return nil;
   }
-
+  [self clearFetchAlbumsController];
   return (Album *)newManagedObject;
 }
 
@@ -129,6 +138,7 @@
     NSLog(@"Unresolved error %@", error);
     return nil;
   }
+  [self clearFetchAlbumsController];
   return albumObject;
 }
 
@@ -181,6 +191,7 @@
     NSLog(@"Unresolved error %@", error);
   }
   [pool drain];
+  [self clearFetchAlbumsController];
   return;
 }
 
@@ -264,13 +275,14 @@
     NSLog(@"Unresolved error %@", error);
     return nil;	
   }
+  [self clearFetchAlbumsController];
   return album;
 }
 
 
 
 -(NSUInteger) albumCount {
-  if(!fetchedAlbumsController) {
+  if(!self.fetchedAlbumsController) {
     return 0;
   }
   id <NSFetchedResultsSectionInfo> sectionInfo = [[self.fetchedAlbumsController sections]
@@ -289,7 +301,7 @@
                                                                    indexPathWithIndexes:indexes length:2]];
 }
 
-- (NSFetchedResultsController *)createFetchedPhotosController {
+- (NSFetchedResultsController *)createFetchedAlbumsController {
   
   [NSFetchedResultsController deleteCacheWithName:@"Root"];
   
@@ -342,6 +354,7 @@
 - (void) setLastMod {
   NSLog(@"setLastAdd");
   self.user.lastModAlbumAt = [NSDate date];
+  [self save];
 }
 
 

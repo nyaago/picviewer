@@ -64,6 +64,18 @@
 @property (nonatomic, retain) User *user;
 
 /*!
+ @method fetchedAlbumsController
+ @return Album一覧のFetched Controller
+ */
+- (NSFetchedResultsController *)fetchedAlbumsController;
+
+/*!
+ @method clearFetchAlbumsController
+ @discission albumのfetch結果のコントローラーをクリア
+ */
+- (void) clearFetchAlbumsController;
+
+/*!
  @method albumCount
  @discussion album数を返す
  */

@@ -142,18 +142,6 @@
                      initWithContext:self.managedObjectContext 
                      withUser:self.user];
   
-  NSError *error = nil;
-  if (![[modelController fetchedAlbumsController] performFetch:&error]) {
-    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"Error",@"Error")
-                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
-                              delegate:nil
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
-  }
   // Albumが0件であれば、Googleへの問い合わせを起動.
   // 問い合わせ結果は、userAndAlbumsWithTicket:finishedWithUserFeed:errorで受け
   // CoreDataへの登録を行う
@@ -303,19 +291,6 @@
       [alertView show];
       [alertView release];
     }
-  }
-  if (![[modelController fetchedAlbumsController] performFetch:&error]) {
-    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:NSLocalizedString(@"Error","Error")
-                              message:NSLocalizedString(@"Error.Fetch", @"Error in ng")
-                              delegate:nil
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
-    [pool drain];
-    return;
   }
   // thumbnailをクリアしておく
   NSUInteger indexes[] = {0, 0};
