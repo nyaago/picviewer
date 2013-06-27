@@ -967,6 +967,7 @@
       BOOL f;
       Photo *photoModel = [[self photoModelController] selectPhoto:photo hasError:&f];
       
+      // === ローカルDBへの挿入、更新 + サムネイルダウンロードエントリー登録 ===
       if(!photoModel ) {
         // Photo entry 未登録時 - 登録する
         if([progressView subviews] != nil) {
@@ -1008,7 +1009,8 @@
 
         }
       }
-    }
+      // ===
+    } // for (int i = 0; i < [entries count]; ++i) {
   }
   // Local で変更されたもののpicasaサーバーへの反映
   Photo *changedPhoto = [self firstChangedPhotoAtLocal];
@@ -1044,6 +1046,7 @@
     [alertView show];
     [alertView release];
   }
+  // サムネイルダウンロード
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadThumb",
                                              @"download")];
   if([[self photoModelController] photoCount] == 0) {
@@ -1056,8 +1059,6 @@
   [downloader start];
   [downloader finishQueuing];
   [pool drain];
-//  [picasaFetchController release];
-//  picasaFetchController = nil;
 }
 
 
@@ -1077,9 +1078,6 @@
   [alertView release];
   [pool drain];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  // Google接続コントローラーをclean
-//  [picasaFetchController release];
-//  picasaFetchController = nil;
   //
   [self removeActivityIndicatorView];
   [self removeProgressView];
@@ -1103,9 +1101,6 @@
   [alertView release];
   [pool drain];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  // Google接続コントローラーをclean
-//  [picasaFetchController release];
-//  picasaFetchController = nil;
   //
   [self removeActivityIndicatorView];
   [self removeProgressView];
@@ -1136,9 +1131,6 @@
   }
   [pool drain];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  // Google接続コントローラーをclean
-//  [picasaFetchController release];
-//  picasaFetchController = nil;
   //
   [self removeActivityIndicatorView];
   [self removeProgressView];
@@ -1261,7 +1253,6 @@
   }
   nextShowedAlbum = nil;
   
-  
   if(downloader) {
     [downloader requireStopping];
   }
@@ -1269,7 +1260,6 @@
   if(downloader) {
     [downloader waitCompleted];
   }
-
 
   // '写真を読み込んでいます'表示
   [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
@@ -1285,7 +1275,7 @@
   [[self photoModelController] setAlbum:[self album]];
   // Title設定
   self.navigationItem.title = self.album.title;
-  BOOL load = [self loadPhotos:self.album];
+  [self loadPhotos:self.album];
   //  [self loadThumbnails];
   // navigationbar,  statusbar
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
@@ -1898,15 +1888,12 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
   UIImage *image = (UIImage *)[info objectForKey:UIImagePickerControllerOriginalImage];
   NSData *imageData = UIImageJPEGRepresentation(image, 1.0f);
-//  picasaFetchController = [[PicasaFetchController alloc] init];
-//  picasaFetchController.userId = settings.userId;
-//  picasaFetchController.password = settings.password;
+
   self.lastTakenPhoto = nil;
   if(picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
     self.lastTakenPhoto = image;
   }
   
-  User *user = (User *)self.album.user;
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   [self.view addSubview:self.activityIndicatorView];
   [self.activityIndicatorView start];

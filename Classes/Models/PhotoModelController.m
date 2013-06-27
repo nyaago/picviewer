@@ -180,7 +180,6 @@
   [fetchRequest setPredicate:predicate];
   
   // データの削除、
-  NSError *error;
   NSArray *items = [self executeFetchRequest:fetchRequest];
 	NSSet *set = [NSSet setWithArray:items];
   [album removePhoto:set];
@@ -293,7 +292,6 @@
   = [NSPredicate predicateWithFormat:@"%K = %@ ", 
      @"photoId", [photo GPhotoID]];
   [fetchRequest setPredicate:predicate];
-  NSError *error;
   NSArray *items = [self executeFetchRequest:fetchRequest ];
   [fetchRequest release];
   if(!items) {
