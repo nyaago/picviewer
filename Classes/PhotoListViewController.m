@@ -38,6 +38,8 @@
 
 #define kDownloadMaxAtSameTime 5
 
+#define kTagAlertRefresh 1
+#define kTagAlertSavePhoto 2
 
 
 @interface  PhotoListViewController (Private)
@@ -230,6 +232,7 @@
 @synthesize needToLoad;
 @synthesize needToLoadIfWifi;
 @synthesize picasaFetchController;
+@synthesize lastTakenPhoto;
 
 
 #pragma mark View lifecycle
@@ -489,6 +492,8 @@
   progressView = nil;
   [activityIndicatorView release];
   activityIndicatorView = nil;
+  [lastTakenPhoto release];
+  lastTakenPhoto = nil;
   [self discardTumbnails];
 }
 
@@ -504,6 +509,8 @@
   }
   
   [self discardTumbnails];
+  if(lastTakenPhoto)
+    [lastTakenPhoto release];
   if(progressView)
     [progressView release];
   if(activityIndicatorView)
@@ -867,6 +874,18 @@
 
   if(error) {
     NSLog(@"insert errror");
+    if(self.lastTakenPhoto) {
+      UIAlertView *alertView = [[UIAlertView alloc]
+                                initWithTitle:NSLocalizedString(@"Confirm",@"Confirmaton")
+                                message:NSLocalizedString(@"Confirm.SavePhoto",
+                                                          @"Confirmation")
+                                delegate:self
+                                cancelButtonTitle:NSLocalizedString(@"NO", @"No")
+                                otherButtonTitles:NSLocalizedString(@"Yes", @"Yes"), nil];
+      alertView.tag = kTagAlertSavePhoto;
+      [alertView show];
+      [alertView release];
+    }
     return;
   }
   else {
@@ -1098,17 +1117,23 @@
 - (void) PicasaFetchWasError:(NSError *)error {
   NSLog(@"connection error");
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  NSString *title = NSLocalizedString(@"Error","Error");
-  NSString *message = NSLocalizedString(@"Error.ConnectionToServer",
-                                        "Connection ERROR");
-  UIAlertView *alertView = [[UIAlertView alloc] 
-                            initWithTitle:title
-                            message:message
-                            delegate:nil
-                            cancelButtonTitle:@"OK" 
-                            otherButtonTitles:nil];
-  [alertView show];
-  [alertView release];
+  if(!self.lastTakenPhoto) {
+    // 写真撮影してアップロードエラーが出た場合は、フォトライブラリー保存の
+    // 確認を表示するので、ここでアラートは出さない、
+    // それ以外はここで表示
+
+    NSString *title = NSLocalizedString(@"Error","Error");
+    NSString *message = NSLocalizedString(@"Error.ConnectionToServer",
+                                          "Connection ERROR");
+    UIAlertView *alertView = [[UIAlertView alloc] 
+                              initWithTitle:title
+                              message:message
+                              delegate:nil
+                              cancelButtonTitle:@"OK" 
+                              otherButtonTitles:nil];
+    [alertView show];
+    [alertView release];
+  }
   [pool drain];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   // Google接続コントローラーをclean
@@ -1522,6 +1547,7 @@
                               delegate:self
                               cancelButtonTitle:@"OK"
                               otherButtonTitles:nil];
+    alertView.tag = kTagAlertRefresh;
     [alertView show];
     [alertView release];
   }
@@ -1752,19 +1778,32 @@
 #pragma mark UIAlertViewDelegate
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+  
   if(alertView.cancelButtonIndex == buttonIndex) {
   }
   else {	// データダウンロード処理を実行
-    progressView.progress = 0.0f;
-    [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
-                                               @"download")];
-    [self discardTumbnails];
-    [self.view addSubview:progressView];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [self performSelectorOnMainThread:@selector(refreshPhotos:)
-                           withObject:YES
-                        waitUntilDone:NO];
-    
+    if(alertView.tag == kTagAlertRefresh) {
+      progressView.progress = 0.0f;
+      [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
+                                                 @"download")];
+      [self discardTumbnails];
+      [self.view addSubview:progressView];
+      [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+      [self performSelectorOnMainThread:@selector(refreshPhotos:)
+                             withObject:YES
+                          waitUntilDone:NO];
+      
+    }
+    else if(alertView.tag == kTagAlertSavePhoto) {
+      UIImageWriteToSavedPhotosAlbum(self.lastTakenPhoto,
+                                     self,
+                                     @selector(savingImageIsFinished:didFinishSavingWithError:contextInfo:),
+                                     NULL);
+      [self.view addSubview:self.activityIndicatorView];
+      [self.activityIndicatorView setMessage:@"Saving.."];
+      [self.activityIndicatorView start];
+
+    }
   }
 }
 
@@ -1862,7 +1901,11 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 //  picasaFetchController = [[PicasaFetchController alloc] init];
 //  picasaFetchController.userId = settings.userId;
 //  picasaFetchController.password = settings.password;
-
+  self.lastTakenPhoto = nil;
+  if(picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+    self.lastTakenPhoto = image;
+  }
+  
   User *user = (User *)self.album.user;
   [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
   [self.view addSubview:self.activityIndicatorView];
@@ -1903,7 +1946,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 }
 
 - (UIViewController<PageViewDelegate> *) pageAt:(NSUInteger)n {
-  PhotoViewController *viewController = [[PhotoViewController alloc] 
+  PhotoViewController *viewController = [[PhotoViewController alloc]
                                          initWithNibName:@"PhotoViewController" 
                                          bundle:nil];
   viewController.fetchedPhotosController = [[self photoModelController] fetchedPhotosController];
@@ -1913,6 +1956,15 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 }
 
 #pragma mark -
+
+#pragma mark callback..
+
+- (void) savingImageIsFinished:(UIImage *)_image
+      didFinishSavingWithError:(NSError *)_error
+                   contextInfo:(void *)_contextInfo{
+  
+  [self removeActivityIndicatorView];
+}
 
 
 @end

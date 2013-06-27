@@ -105,6 +105,8 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
   UIPopoverController *pickerPopoverController;
   // picasa の サーバーへの更新を行ったあと全リロードを行うか？
   BOOL refreshAfterPicasaUpdated;
+  // 最後に撮影して（サーバーに保存されていない）写真
+  UIImage *lastTakenPhoto;
 }
 
 /*!
@@ -161,6 +163,13 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
  @discussion サムネイルloadが必要か
  */
 @property (nonatomic) BOOL needToLoadIfWifi;
+
+
+/*!
+ @property lastTakenPhoto
+ @discussion 最後に撮影して（サーバーに保存されていない）写真
+ */
+@property (nonatomic, retain) UIImage *lastTakenPhoto;
 
 /*!
  @method setAlbum:
