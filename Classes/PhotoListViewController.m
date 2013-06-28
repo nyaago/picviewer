@@ -235,7 +235,7 @@
 @synthesize needToLoadIfWifi;
 @synthesize picasaFetchController;
 @synthesize lastTakenPhoto;
-
+@synthesize downloader;
 
 #pragma mark View lifecycle
 
@@ -279,7 +279,6 @@
   //
   
   lockSave = [[NSLock alloc] init];
-  lockForShowingAlbum = [[NSLock alloc] init];
   if(self.album == nil) {
     return;
   }
@@ -430,6 +429,16 @@
   self.toolbarItems = [self toolbarButtons];
 }
 
+- (QueuedURLDownloader *) downloader {
+  
+  if(downloader == nil) {
+    downloader = [[QueuedURLDownloader alloc]
+                  initWithMaxAtSameTime:kDownloadMaxAtSameTime];
+    downloader.delegate = self;
+  }
+  return downloader;
+}
+
 #pragma mark Device Rotation
 
 /*!
@@ -503,7 +512,7 @@
   NSLog(@"PhotoListViewController dealloc");
   if(progressView) {
   }
-  // 一覧ロード中であれば、停止要求をして、停止するまで待つ
+  //
   if(picasaFetchController) {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [picasaFetchController release];
@@ -536,12 +545,12 @@
     [managedObjectContext release];
   if(lockSave)
     [lockSave release];
-  if(lockForShowingAlbum)
-    [lockForShowingAlbum release];
   if(thumbnailLock)
     [thumbnailLock release];
   if(onAddingThumbnailsLock)
     [onAddingThumbnailsLock release];
+  if(downloader)
+    [downloader release];
   [super dealloc];
 }
 
@@ -1059,8 +1068,8 @@
     progressView.progress = 1.0f / [[self photoModelController] photoCount];
     [progressView setNeedsLayout];
   }
-  [downloader start];
-  [downloader finishQueuing];
+  [self.downloader start];
+  [self.downloader finishQueuing];
   [pool drain];
 }
 
@@ -1256,24 +1265,18 @@
   }
   nextShowedAlbum = nil;
   
+  // サムネイルダウンロード中であれば、中止要求 + 完了待ちする。
   if(downloader) {
     [downloader requireStopping];
-  }
-//  [self stopToAddThumbnails];
-  if(downloader) {
+  //  [self stopToAddThumbnails];
     [downloader waitCompleted];
   }
-
   // '写真を読み込んでいます'表示
   [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
   
   self.needToLoadIfWifi = YES;
   [self discardTumbnails];
-  if(downloader != nil && ![downloader isCompleted] && [downloader isStarted]) {
-    [[self photoModelController] clearLastAdd];
-    [downloader requireStopping];
-  }
-  
+
   self.album = selectedAlbum;
   [[self photoModelController] setAlbum:[self album]];
   // Title設定
@@ -1314,7 +1317,7 @@
     NSString *urlForThumbnail = [thumbnail URLString];
     NSDictionary *dict = [[NSDictionary alloc]
                           initWithObjectsAndKeys:model, @"photo", nil] ;
-    [downloader addURL:[NSURL URLWithString:urlForThumbnail ]
+    [self.downloader addURL:[NSURL URLWithString:urlForThumbnail ]
           withUserInfo:dict];
     [dict release];
   }
@@ -1354,9 +1357,6 @@
                                withThumbSize:[NSNumber numberWithInteger:
                                               [ThumbImageView thumbWidthForContainer:self.view] *
                                               [[UIScreen mainScreen] scale]]];
-  downloader = [[QueuedURLDownloader alloc]
-                initWithMaxAtSameTime:kDownloadMaxAtSameTime];
-  downloader.delegate = self;
   [settings release];
   [pool drain];
   
@@ -1466,9 +1466,6 @@
   
 - (BOOL) loadPhotos:(Album *)curAlbum {
   
-  downloader = [[QueuedURLDownloader alloc]
-                initWithMaxAtSameTime:kDownloadMaxAtSameTime];
-  downloader.delegate = self;
   [self discardTumbnails];
   [[self photoModelController] setAlbum:curAlbum];
   
@@ -1654,10 +1651,9 @@
  すべてダウンロード完了時の通知
  */
 - (void)didAllCompleted:(QueuedURLDownloader *)urlDownloader {
-  [urlDownloader release];
-  urlDownloader = nil;
-  downloader = nil;
   // albumのphotoに対する最後の保存処理実行日時を記録
+  [urlDownloader release];
+  downloader = nil;
   [[self photoModelController] setLastAdd];
 
   //
@@ -1675,10 +1671,8 @@
  ダウンロードキャンセル時の通知
  */
 - (void)dowloadCanceled:(QueuedURLDownloader *)urlDownloader {
+//  [urlDownloader release];
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-  [urlDownloader release];
-  urlDownloader = nil;
-  downloader = nil;
   //
   [self performSelectorOnMainThread:@selector(downloadCanceled)
                          withObject:nil

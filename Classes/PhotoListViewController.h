@@ -54,9 +54,7 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
   Album *nextShowedAlbum;
   // 表示しようとしているAlbum
   Album *showingAlbum;
-  // 表示中AlbumのLock
-  NSLock *lockForShowingAlbum;
-  
+  //
   NSManagedObjectContext *managedObjectContext;
   // CoreData Model のController
   PhotoModelController *modelController;
@@ -170,6 +168,8 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
  @discussion 最後に撮影して（サーバーに保存されていない）写真
  */
 @property (nonatomic, retain) UIImage *lastTakenPhoto;
+
+@property (nonatomic, retain) QueuedURLDownloader *downloader;
 
 /*!
  @method setAlbum:

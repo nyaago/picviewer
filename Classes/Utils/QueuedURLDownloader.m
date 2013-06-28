@@ -99,6 +99,14 @@ didReceiveResponse:(NSURLResponse *)response;
 - (void) finishDownload:(QueuedURLDownloaderElem *)elem;
 
 /*!
+ @method clean
+ @discussion コレクションデーターのクリーン
+ */
+- (void) clean;
+
+
+
+/*!
  @method cleanCanceledDownload:
  @discussion キャンセルされたダウンロード要素の
  後かたずけをする.
@@ -377,7 +385,12 @@ didReceiveResponse:(NSURLResponse *)response {
 
 - (void) start {
   
-  [NSThread detachNewThreadSelector:@selector(run) 
+  [lock lock];
+  completed = NO;
+  stoppingRequired = NO;
+  [lock unlock];
+
+  [NSThread detachNewThreadSelector:@selector(run)
                            toTarget:self 
                          withObject:nil];
 }
@@ -468,6 +481,7 @@ didReceiveResponse:(NSURLResponse *)response {
 - (void) dealloc {
   [self waitCompleted];
   delegate = nil;
+  [self clean];
   [waitingQueue release];
   [runningDict release];
   [lock release];
@@ -515,10 +529,10 @@ didReceiveResponse:(NSURLResponse *)response {
           continue;
         }
         [runningDict setObject:elem forKey:elem.URL];
-        [elem.con start];
         NSLog(@"start  connection.");
         downloading = YES;
         [lock unlock];
+        [elem.con start];
         [[NSRunLoop currentRunLoop] run];
         [pool drain];
       }
@@ -533,9 +547,12 @@ didReceiveResponse:(NSURLResponse *)response {
       [NSThread sleepForTimeInterval:0.01f];
     }
   }
-  // 中断された場合のクリーンとdelegate実行
+  [self clean];
+  [lock lock];
+  completed = YES;
+  [lock unlock];
+  // 中断されたときの通知（delegate実行）
   if(self.stoppingRequired) {
-    [self cleanCanceledDownloadElems];
     if(delegate && [delegate respondsToSelector:@selector(dowloadCanceled:)] ) {
       [delegate dowloadCanceled:self];
     }
@@ -544,9 +561,6 @@ didReceiveResponse:(NSURLResponse *)response {
   if(delegate != nil && [delegate respondsToSelector:@selector(didAllCompleted:)] ) {
     [delegate didAllCompleted:self];
   }
-  [lock lock];
-  completed = YES;
-  [lock unlock];
 }
 
 - (void) finishDownload:(QueuedURLDownloaderElem *)elem {
@@ -560,18 +574,35 @@ didReceiveResponse:(NSURLResponse *)response {
   [lock unlock];
 }
 
+- (void) clean {
+  [self cleanCanceledDownloadElems];
+  [self cleanWaitingdDownloadElems];
+  if(runningDict ) {
+    [runningDict release];
+    runningDict = nil;
+  }
+  if(waitingQueue) {
+    [waitingQueue release];
+    waitingQueue = nil;
+  }
+}
+
+- (void) cleanWaitingdDownloadElems {
+  if(waitingQueue) {
+    [waitingQueue enumerateObjectsUsingBlock:^(id obj, NSUInteger idex, BOOL *stop){
+      [obj release];
+    }];
+  }
+}
+
 - (void) cleanCanceledDownloadElems {
-  if(self.stoppingRequired == NO) {
-    return;
-  }
-  NSLog(@"cleanCanceledDownloadElems");
-  [lock lock];
   NSEnumerator *enumerator = [runningDict keyEnumerator];
-  QueuedURLDownloaderElem *elem;
-  while((elem = (QueuedURLDownloaderElem *)enumerator.nextObject )) {
-    [elem release];
+  if(runningDict ) {
+    QueuedURLDownloaderElem *elem;
+    while((elem = (QueuedURLDownloaderElem *)enumerator.nextObject )) {
+      [elem release];
+    }
   }
-  [lock unlock];
 }
 
 

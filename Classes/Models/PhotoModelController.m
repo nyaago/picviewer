@@ -93,11 +93,9 @@
   if ([self.album respondsToSelector:@selector(addPhotoObject:) ] ) {
     [self.album addPhotoObject:(NSManagedObject *)photoObject];
   }
-  [lockSave lock];
   NSError *error = [self save];
   if (error) {
     // 
-    [lockSave unlock];
     NSLog(@"Unresolved error %@", error);
     NSLog(@"Failed to save to data store: %@", [error localizedDescription]);
 		NSArray* detailedErrors = [[error userInfo] objectForKey:NSDetailedErrorsKey];
@@ -114,7 +112,6 @@
     return nil;	
   }
   //  [managedObjectContext processPendingChanges]:
-  [lockSave unlock];
   [pool drain];
   [self clearFetchPhotosController];
   return photoObject;
@@ -125,11 +122,9 @@
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 
   [self gDataEntryPhoto:entry toPhotoModel:photoModel];
-  [lockSave lock];
   NSError *error = [self save];
   if (error) {
     //
-    [lockSave unlock];
     NSLog(@"Unresolved error %@", error);
     NSLog(@"Failed to save to data store: %@", [error localizedDescription]);
 		NSArray* detailedErrors = [[error userInfo] objectForKey:NSDetailedErrorsKey];
@@ -146,7 +141,6 @@
     return nil;
   }
   //  [managedObjectContext processPendingChanges]:
-  [lockSave unlock];
   [pool drain];
   [self clearFetchPhotosController];
   return photoModel;
@@ -191,15 +185,12 @@
   if(!thumbnailData || [thumbnailData length] == 0) 
     return photo;
   photo.thumbnail = thumbnailData;
-  [lockSave lock];
   NSError *error = [self save];
   if (error) {
     // 
-    [lockSave unlock];
     NSLog(@"Unresolved error %@", error);
     return nil;	
   }
-  [lockSave unlock];
   [self clearFetchPhotosController];
   return photo;
 }
@@ -362,18 +353,14 @@
 - (void) setLastAdd {
   NSLog(@"setLastAdd");
   self.album.lastAddPhotoAt = [NSDate date];
-  [lockSave lock];
   [self save];
-  [lockSave unlock];
 }
 
 - (void) clearLastAdd {
   NSLog(@"clearLastAdd");
   self.album.lastAddPhotoAt = nil;
   NSError *error = nil;
-  [lockSave lock];
   error = [self save];
-  [lockSave unlock];
 }
 
 - (NSFetchedResultsController *)createFetchedPhotosController {
