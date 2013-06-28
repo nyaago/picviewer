@@ -232,7 +232,6 @@
 @synthesize progressView;
 @synthesize activityIndicatorView;
 @synthesize needToLoad;
-@synthesize needToLoadIfWifi;
 @synthesize picasaFetchController;
 @synthesize lastTakenPhoto;
 @synthesize downloader;
@@ -262,8 +261,6 @@
   thumbnailLock = [[NSLock alloc] init];
   onAddingThumbnailsLock = [[NSLock alloc] init];
 
-  //
-  self.needToLoadIfWifi = YES;
   // scrollView の設定
   self.scrollView.scrollEnabled = YES;
   self.scrollView.userInteractionEnabled = YES;
@@ -388,7 +385,6 @@
     [self.picasaFetchController requireStopping];
   }
 // [self stopToAddThumbnails];
-  self.needToLoadIfWifi = NO;
   self.needToLoad = NO;
   NSLog(@"photoListViewController didDisappear.retain count = %d", [self retainCount]);
 }
@@ -1274,7 +1270,6 @@
   // '写真を読み込んでいます'表示
   [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
   
-  self.needToLoadIfWifi = YES;
   [self discardTumbnails];
 
   self.album = selectedAlbum;
@@ -1295,15 +1290,7 @@
     return;
   }
   
-  if(self.needToLoadIfWifi == NO) {	// 写真画面から戻ってきた場合
-    // viewのサイズ, 前画面(写真)がtoolbar部分を含んでいたので、そのtoolbar分マイナス
-    CGRect frame = self.view.frame;
-    frame.size.height -= self.navigationController.toolbar.frame.size.height;
-    self.view.frame = frame;
-  }
-  
   self.view.userInteractionEnabled = YES;
-  
 }
 
 
@@ -1379,8 +1366,6 @@
 - (BOOL) mustLoad:(Album *)curAlbum {
   if(self.needToLoad == YES)
     return YES;
-  if(self.needToLoadIfWifi == NO)
-    return NO;
   if([[self photoModelController] album].albumId != curAlbum.albumId) {
     return YES;
   }

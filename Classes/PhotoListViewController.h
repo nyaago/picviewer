@@ -91,8 +91,6 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
   UIBarButtonItem *photoButton;
   // サムネイルloadが必要か
   BOOL needToLoad;
-  // サムネイルloadが必要か
-  BOOL needToLoadIfWifi;
   // サムネイル処理のLock
   NSLock *thumbnailLock;
   // 現在layoutされている向き
@@ -157,13 +155,6 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
 @property (nonatomic) BOOL needToLoad;
 
 /*!
- @proprtyu needToLoadIfWifi
- @discussion サムネイルloadが必要か
- */
-@property (nonatomic) BOOL needToLoadIfWifi;
-
-
-/*!
  @property lastTakenPhoto
  @discussion 最後に撮影して（サーバーに保存されていない）写真
  */
@@ -218,7 +209,7 @@ UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIPopoverContro
 
 /*!
  @method afterViewDidAppear:
- @discussion viewが表示された後の別Threaで起動される追加の表示処理.
+ @discussion viewが表示された後の別Threadで起動される追加の表示処理.
  thumbnailの表示処理を行う.
  */
 - (void) afterViewDidAppear:(id)arg;
