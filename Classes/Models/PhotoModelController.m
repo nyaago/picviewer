@@ -154,7 +154,8 @@
 	  [photoModel setValue:[[entry geoLocation] coordinateString] forKey:@"location"];
   }
   if([entry description] ) {
-		[photoModel setValue:[[entry mediaGroup] mediaDescription].contentStringValue  forKey:@"descript"];
+		[photoModel setValue:[[entry mediaGroup] mediaDescription].contentStringValue
+                  forKey:@"descript"];
   }
   if([entry width] ) {
     [photoModel setValue:[entry width] forKey:@"width"];
@@ -275,7 +276,9 @@
   if (fetchedPhotosController != nil) {
     return fetchedPhotosController;
   }
-  [self performSelectorOnMainThread:@selector(createFetchedPhotosController) withObject:nil waitUntilDone:YES];
+  [self performSelectorOnMainThread:@selector(createFetchedPhotosController)
+                         withObject:nil
+                      waitUntilDone:YES];
   return fetchedPhotosController;
 }    
 

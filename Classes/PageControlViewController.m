@@ -595,6 +595,9 @@
   [scrollView layoutViews];
   [self setToolbarStatus];
   [self setNavigationTitle];
+  if([scrollView.curPage respondsToSelector:@selector(movedToCurrentInPageView:)]) {
+    [scrollView.curPage performSelector:@selector(movedToCurrentInPageView:) withObject:self];
+  }
 }
 
 - (void)toPrevPage:(id)sender {
@@ -620,6 +623,9 @@
   [scrollView layoutViews];
   [self setToolbarStatus];
   [self setNavigationTitle];
+  if([scrollView.curPage respondsToSelector:@selector(movedToCurrentInPageView:)]) {
+    [scrollView.curPage performSelector:@selector(movedToCurrentInPageView:) withObject:self];
+  }
 }
 
 

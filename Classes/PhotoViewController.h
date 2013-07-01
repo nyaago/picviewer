@@ -60,6 +60,8 @@ PageViewDelegate> {
   NSInteger lastTapCount;
   //
   BOOL downloading;
+  // network error のアラート済みか?
+  BOOL alertedNetworkError;
 }
 
 /*!

@@ -986,8 +986,11 @@
   if ([entries count] > 0) {
     for (int i = 0; i < [entries count]; ++i) {
       GDataEntryPhoto *photo = [entries objectAtIndex:i];
+      /*
       NSLog(@"photo - title = %@, ident=%@, feedlink=%@, desc=%@, desc2=%@",
-            [[photo title] contentStringValue], [photo GPhotoID], [photo feedLink], [photo description], [[photo mediaGroup] mediaDescription]);
+            [[photo title] contentStringValue], [photo GPhotoID],
+            [photo feedLink], [photo description], [[photo mediaGroup] mediaDescription]);
+       */
       //  [self queryPhotoAlbum:[album GPhotoID] user:[album username]];
       BOOL f;
       Photo *photoModel = [[self photoModelController] selectPhoto:photo hasError:&f];
@@ -1451,7 +1454,6 @@
   
 - (BOOL) loadPhotos:(Album *)curAlbum {
   
-  [self discardTumbnails];
   [[self photoModelController] setAlbum:curAlbum];
   
   NSLog(@"fetchedPhotosController");
@@ -1590,7 +1592,7 @@
                     withUserInfo:(NSDictionary *)info {
   NSLog(@"downloadDidFailWithError");
   hasErrorInDownloading = YES;
-  progressView.progress = progressView.progress + (1.0 / [[self photoModelController] photoCount] );
+  progressView.progress = progressView.progress + (1.0 / [[self photoModelController] photoCount]);
 }
 
 
@@ -1857,7 +1859,8 @@ clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad &&
       sourceType == UIImagePickerControllerSourceTypePhotoLibrary) {
     
-    pickerPopoverController = [[UIPopoverController alloc]initWithContentViewController:imagePickerController];
+    pickerPopoverController = [[UIPopoverController alloc]
+                               initWithContentViewController:imagePickerController];
     pickerPopoverController.delegate = self;
 		[pickerPopoverController presentPopoverFromBarButtonItem:photoButton
                     permittedArrowDirections:UIPopoverArrowDirectionAny

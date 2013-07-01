@@ -446,10 +446,12 @@ static NSLock *lockFetchedResultsController;
 
 -(void) showImage {
   NSLog(@"showImage");
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
   if(indexForPhoto >= [self photoCount])
     return;
+
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+
   BOOL mustDownload = NO;
   if(imageView) {
     if([imageView subviews])
@@ -489,17 +491,22 @@ static NSLock *lockFetchedResultsController;
 - (void) downloadPhoto:(Photo *)photo  {
   // Network接続確認
   if(![NetworkReachability reachable]) {
-    NSString *title = NSLocalizedString(@"Notice","Notice");
-    NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
-                                          "not reacable");
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:title
-                              message:message
-                              delegate:nil
-                              cancelButtonTitle:@"OK"
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
+    if(!alertedNetworkError) {
+      if(indexForPhoto == self.pageController.curPageNumber) {
+        NSString *title = NSLocalizedString(@"Notice","Notice");
+        NSString *message = NSLocalizedString(@"Warn.NetworkNotReachable",
+                                              "not reacable");
+        UIAlertView *alertView = [[UIAlertView alloc] 
+                                  initWithTitle:title
+                                  message:message
+                                  delegate:nil
+                                  cancelButtonTitle:@"OK"
+                                  otherButtonTitles:nil];
+        [alertView show];
+        [alertView release];
+        alertedNetworkError = YES;
+      }
+    }
     return;
   }
   downloading = YES;
@@ -638,6 +645,15 @@ static NSLock *lockFetchedResultsController;
   pageController = controller;
   [pageController retain];
 }
+
+- (void) movedToCurrentInPageView:(PageControlViewController *)controller {
+  if(![self photoImageAt:indexForPhoto]) {
+    // 表示されているのがoriginal 画像でない場合(=original画像未取得の場合）
+    // downloadして表示させる.
+    [self showImage];
+  }
+}
+
 
 /*!
  @method viewInfoAction:

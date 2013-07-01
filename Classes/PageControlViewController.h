@@ -189,6 +189,13 @@
 @optional
 
 /*!
+ @method movedToCurrentInPageView:
+ @discussion このviewが現在の表示対象ページとなった場合の通知
+ */
+- (void) movedToCurrentInPageView:(PageControlViewController *)controller;
+
+
+/*!
 	@method viewInfoAction:
  	@discussion 情報表示のボタンのアクション
  */
