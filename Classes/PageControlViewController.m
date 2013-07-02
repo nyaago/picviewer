@@ -507,7 +507,12 @@
     NSLog(@"page count = %d", [source pageCount]);
     if(view.curPageNumber + 1 < [source pageCount] ) {
       if(view.curPageNumber + 1 < [source pageCount]) {
-				[self toNextPage:self];        
+        if(pageView.prevPage) {
+          // 前頁の処理中断
+          [pageView.prevPage requireToDiscard];
+          [pageView.prevPage canDiscard];
+        }
+				[self toNextPage:self];
       }
     }
   }
@@ -515,6 +520,11 @@
   else if(point.x < scrollView.bounds.size.width) {
     if(view.curPageNumber > 0) {
       if(view.curPageNumber > 0) {
+        if(pageView.nextPage) {
+          // 次頁の処理中断
+          [pageView.nextPage requireToDiscard];
+          [pageView.nextPage canDiscard];
+        }
         [self toPrevPage:self];
       }
     }
