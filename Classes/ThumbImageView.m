@@ -74,14 +74,14 @@ static NSMutableDictionary *thumbViewMap = nil;
  @method refresh
  @discussion すべてのサムネイルのリフレッシュ
  */
-+ (void) refreshAll {
++ (void) refreshAll:(UIView *)containerView {
   NSArray *views = [thumbViewMap allValues];
   for(int i = 0; i < [views count]; ++i) {
     ThumbImageView *view = (ThumbImageView *)[views objectAtIndex:i];
     if(view.superview) {
-      [view performSelectorOnMainThread:@selector(refresh)
-                             withObject:nil
-                          waitUntilDone:NO];
+      [view performSelectorOnMainThread:@selector(refresh:)
+                             withObject:containerView
+                          waitUntilDone:YES];
     }
   }
 }
@@ -148,7 +148,7 @@ static NSMutableDictionary *thumbViewMap = nil;
   if(self) {
     index = [i retain];
     self.userInteractionEnabled = YES;
-    containerView = [container retain];
+    containerView = container;
     self.frame = [self frameForThumb:index.integerValue];
   }
   if(thumbViewMap == nil) {
@@ -163,8 +163,9 @@ static NSMutableDictionary *thumbViewMap = nil;
   return self;
 }
 
-- (id) refresh {
+- (id) refresh:(UIView *)containerView {
   
+  self.containerView = containerView;
   self.frame = [self frameForThumb:index.integerValue];
   return self;
 }
@@ -191,8 +192,6 @@ static NSMutableDictionary *thumbViewMap = nil;
 - (void) dealloc {
   if(index != nil)
     [index release];
-  if(containerView)
-    [containerView retain];
   [super dealloc];
 }
 

@@ -218,6 +218,12 @@
  */
 - (void) onAlbumSelected:(Album *)album;
 
+/*!
+ @method viewFrame
+ @return content表示のscrollView の frame
+ */
+- (CGRect) viewFrame;
+
 @end
 
 
@@ -316,14 +322,9 @@
     return;
   }
   // コンテンツ view の高さ
-  CGRect frame = self.navigationController.view.frame;
-  CGRect statusBarFrame = [[UIApplication sharedApplication] statusBarFrame];
-  frame.size.height -= (self.navigationController.toolbar.frame.size.height +
-                        self.navigationController.navigationBar.frame.size.height +
-                        statusBarFrame.size.height);
-  
-  self.view.frame = frame;
-  
+  self.view.frame = [self viewFrame];
+  self.scrollView.frame = self.view.bounds;
+  //
   [onAddingThumbnailsLock lock];
   BOOL skip = onAddingThumbnails;
   [onAddingThumbnailsLock unlock];
@@ -365,9 +366,16 @@
     return;
   }
   if([self shouldAutorotate]) {
-    [ThumbImageView refreshAll];
+    [ThumbImageView refreshAll:self.scrollView];
+//    NSLog(@"scroll view size = %f / %f", self.scrollView.bounds.size.width,
+//          self.scrollView.bounds.size.height);
   }
   layoutedOrientation = [[UIDevice currentDevice] orientation];
+  // コンテンツ view の高さ
+  self.view.frame = [self viewFrame];
+  self.scrollView.frame = self.view.bounds;
+  [self setContentSizeWithImageCount];
+  //
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -562,6 +570,8 @@
 - (void)setContentSizeWithImageCount {
   
   CGPoint point = [ThumbImageView bottomRight];
+//  NSLog(@"content size %f / %f ", point.x, point.y);
+  CGRect frame = self.scrollView.frame;
   if(point.x == 0.0f && point.y == 0.0f) {
     self.scrollView.contentSize =  CGSizeMake(self.scrollView.frame.size.width,
                                               self.scrollView.frame.size.height);
@@ -723,7 +733,7 @@
     image  = [UIImage imageWithData:photoObject.thumbnail];
     imageView = [ThumbImageView viewWithImage:image
                                     withIndex:[NSNumber numberWithInt:index]
-                                withContainer:self.view ];
+                                withContainer:self.scrollView ];
     imageView.userInteractionEnabled = YES;
     imageView.delegate = self;
   }
@@ -948,6 +958,7 @@
     [self performSelectorOnMainThread:@selector(onAlbumSelected:)
                            withObject:nextShowedAlbum
                         waitUntilDone:NO];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     return;
   }
 
@@ -1264,6 +1275,10 @@
   }
   nextShowedAlbum = nil;
   
+  if([self.album.albumId isEqual:selectedAlbum.albumId]) {
+    return;
+  }
+  
   // サムネイルダウンロード中であれば、中止要求 + 完了待ちする。
   if(downloader) {
     [downloader requireStopping];
@@ -1511,6 +1526,14 @@
     [settings release];
   }
   return picasaFetchController;
+}
+
+- (CGRect) viewFrame {
+  CGRect frame = self.navigationController.view.frame;
+  frame.size.height -= (self.navigationController.toolbar.frame.size.height +
+                        self.navigationController.navigationBar.frame.size.height);
+  frame.origin.x = 0;
+  return frame;
 }
 
 #pragma mark -

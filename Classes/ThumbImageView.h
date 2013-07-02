@@ -76,7 +76,7 @@
  @method
  @discussion すべてのサムネイルの右下の座標
  */
-+ (void) refreshAll;
++ (void) refreshAll:(UIView *)containerView;
 
 
 /*!
@@ -103,7 +103,7 @@
  @method refresh
  @discussion
  */
-- (id) refresh;
+- (id) refresh:(UIView *)containerView;
 
 /*!
  @method setDelegate
@@ -129,6 +129,6 @@
 
 @property (assign, nonatomic) NSObject <ThumbImageViewDelegate> *delegate;
 
-@property (readonly, nonatomic) UIView *containerView;
+@property (assign, nonatomic) UIView *containerView;
 @end
 
