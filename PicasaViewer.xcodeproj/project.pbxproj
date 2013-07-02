@@ -29,6 +29,7 @@
 		723785D01779383200A6379A /* TextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 723785CF1779383200A6379A /* TextViewController.m */; };
 		7238233412068EF60046D754 /* PhotoModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7238233312068EF60046D754 /* PhotoModelController.m */; };
 		723823A61206A3C70046D754 /* AlbumModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 723823A51206A3C70046D754 /* AlbumModelController.m */; };
+		72470395178270F600EE8D86 /* Model_v1_to_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 72470394178270F600EE8D86 /* Model_v1_to_v2.xcmappingmodel */; };
 		724BD15516E873D300F8C5CF /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 724BD15416E873D300F8C5CF /* Default-568h@2x.png */; };
 		7250914B176F07F800BEBB03 /* ModelController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7250914A176F07F800BEBB03 /* ModelController.m */; };
 		7251549011851B2A00B136DF /* QueuedURLDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 7251548F11851B2A00B136DF /* QueuedURLDownloader.m */; };
@@ -60,7 +61,6 @@
 		72D577E911804AAE00F687DB /* NewUserViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D577E711804AAE00F687DB /* NewUserViewController.xib */; };
 		72D7E7D011BF5643001685AF /* PhotoInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72D7E7CE11BF5643001685AF /* PhotoInfoViewController.m */; };
 		72D7E7D111BF5643001685AF /* PhotoInfoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72D7E7CF11BF5643001685AF /* PhotoInfoViewController.xib */; };
-		72DA9E50164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 72DA9E4F164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel */; };
 		72E28CA916390D7B0033BF9A /* AlbumTableViewController-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72F503031639020F0070DA5E /* AlbumTableViewController-iPad.xib */; };
 		72E28CAA16390E2F0033BF9A /* PhotoListViewController-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72F503041639020F0070DA5E /* PhotoListViewController-iPad.xib */; };
 		72E28CAB16390E330033BF9A /* PhotoViewController-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 72F503051639020F0070DA5E /* PhotoViewController-iPad.xib */; };
@@ -198,6 +198,7 @@
 		7238233312068EF60046D754 /* PhotoModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoModelController.m; sourceTree = "<group>"; };
 		723823A41206A3C70046D754 /* AlbumModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlbumModelController.h; sourceTree = "<group>"; };
 		723823A51206A3C70046D754 /* AlbumModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlbumModelController.m; sourceTree = "<group>"; };
+		72470394178270F600EE8D86 /* Model_v1_to_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = Model_v1_to_v2.xcmappingmodel; sourceTree = "<group>"; };
 		724BD15416E873D300F8C5CF /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		72509149176F07F800BEBB03 /* ModelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModelController.h; sourceTree = "<group>"; };
 		7250914A176F07F800BEBB03 /* ModelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModelController.m; sourceTree = "<group>"; };
@@ -242,7 +243,6 @@
 		72D7E7CD11BF5643001685AF /* PhotoInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PhotoInfoViewController.h; sourceTree = "<group>"; };
 		72D7E7CE11BF5643001685AF /* PhotoInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PhotoInfoViewController.m; sourceTree = "<group>"; };
 		72D7E7CF11BF5643001685AF /* PhotoInfoViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhotoInfoViewController.xib; sourceTree = "<group>"; };
-		72DA9E4F164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = Model_v1_to_v2.xcmappingmodel; sourceTree = "<group>"; };
 		72E28CAF163911300033BF9A /* NewUserViewController-iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = "NewUserViewController-iPad.xib"; path = "Resources-iPad/NewUserViewController-iPad.xib"; sourceTree = "<group>"; };
 		72EA5A541181337000065915 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		72EA5A581181338900065915 /* Japanese */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Japanese; path = Japanese.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -404,7 +404,7 @@
 				722D6DCA1186A0EE004F0F0D /* PhotoListViewController.xib */,
 				72D577E711804AAE00F687DB /* NewUserViewController.xib */,
 				72EA5A561181337800065915 /* Localizable.strings */,
-				72DA9E4F164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel */,
+				72470394178270F600EE8D86 /* Model_v1_to_v2.xcmappingmodel */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -699,11 +699,11 @@
 				72D2246C1640CF64004E84B2 /* ThumbImageView.m in Sources */,
 				72D224701640E9FD004E84B2 /* IPhoneThumbImageView.m in Sources */,
 				72D224741640EA1D004E84B2 /* IPadThumbImageView.m in Sources */,
-				72DA9E50164949F30065C3BE /* Model_v1_to_v2.xcmappingmodel in Sources */,
 				72ECD811175C9FD200F71D24 /* PicasaViewer.xcdatamodeld in Sources */,
 				7250914B176F07F800BEBB03 /* ModelController.m in Sources */,
 				720F8D691770125B0033856D /* UserModelController.m in Sources */,
 				723785D01779383200A6379A /* TextViewController.m in Sources */,
+				72470395178270F600EE8D86 /* Model_v1_to_v2.xcmappingmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
