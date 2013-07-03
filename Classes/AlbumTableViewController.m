@@ -183,6 +183,10 @@
 
  - (void)viewDidDisappear:(BOOL)animated {
   [super viewDidDisappear:animated];
+  if(downloader) {
+    [downloader requireStopping];
+    [downloader waitCompleted];
+  }
   if([self splitViewController] == nil) {
     PicasaViewerAppDelegate *delegate
     = (PicasaViewerAppDelegate *) [[UIApplication sharedApplication] delegate];
@@ -804,7 +808,7 @@
   
   // 表示をリフレッシュ
   [urlDownloader release];
-  urlDownloader = nil;
+  downloader = nil;
   [self performSelectorOnMainThread:@selector(refreshTable)
                          withObject:nil
                       waitUntilDone:NO];
@@ -818,8 +822,6 @@
   [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   // toolbarのボタンをenable
   [self enableToolbar:YES];
-  [urlDownloader release];
-  urlDownloader = nil;
 }
 
 
