@@ -29,7 +29,7 @@
 
 // User追加View
 "NewUser.Account" = "ユーザー名またはメールアドレス";
-"NewUser.Explanation" = "閲覧したいユーザのユーザー名\nまたはメールアドレスを\n入力してくださいpicasaweb.google.co.jp/<acount>";
+"NewUser.Explanation" = "閲覧したいユーザのユーザー名\nまたはメールアドレスを\n入力してください";
 "NewUser.Title" = "閲覧アカウント追加";
 
 // Acounts

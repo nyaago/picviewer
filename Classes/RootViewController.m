@@ -520,6 +520,15 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
 - (BOOL) doneWithNewUser:(NSString *)user {
   // Network接続確認
   if(![NetworkReachability reachable]) {
+    UIAlertView *alertView = [[UIAlertView alloc]
+                              initWithTitle:NSLocalizedString(@"Warn", @"warn")
+                              message:NSLocalizedString(@"Warn.NetworkNotReachable",
+                                                        @"network not reachable")
+                              delegate:nil
+                              cancelButtonTitle:NSLocalizedString(@"OK", @"OK")
+                              otherButtonTitles:nil];
+    [alertView show];
+    [alertView release];
     return NO;
   }
   [self dismissModalViewControllerAnimated:YES];
@@ -538,22 +547,7 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
            finishedWithUserFeed:(GDataFeedPhotoUser *)feed
                           error:(NSError *)error {
   if(error) {
-    NSString *title = NSLocalizedString(@"Error","Error");
-    NSString *message = NSLocalizedString(@"Error.ConnectionToServer","Error");
-    if ([error code] == 404) {
-      title = NSLocalizedString(@"Result",@"Result");
-      message = NSLocalizedString(@"Warn.NoUser", @"No user");
-    }
-    //	NSLog(@" error %@, %@", error, [error userInfo]);
-    UIAlertView *alertView = [[UIAlertView alloc] 
-                              initWithTitle:title
-                              message:message
-                              delegate:nil
-                              cancelButtonTitle:@"OK" 
-                              otherButtonTitles:nil];
-    [alertView show];
-    [alertView release];
-    
+    return;
   }
   NSLog(@"user name = %@", [feed username]);
   User *user = [self insertNewUser:[feed username] withNickname:[feed nickname]];
@@ -601,7 +595,11 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   NSString *title = NSLocalizedString(@"WARN","WARN");
   NSString *message = NSLocalizedString(@"Warn.NoUser","NO USER");
-  UIAlertView *alertView = [[UIAlertView alloc] 
+  if ([error code] == 404) {
+    title = NSLocalizedString(@"Result",@"Result");
+    message = NSLocalizedString(@"Warn.NoUser", @"No user");
+  }
+  UIAlertView *alertView = [[UIAlertView alloc]
                             initWithTitle:title
                             message:message
                             delegate:nil
