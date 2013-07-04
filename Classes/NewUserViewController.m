@@ -61,6 +61,7 @@
   navigationTitle.text = NSLocalizedString(@"NewUser.Title", @"Add");
   captionLabel.text = NSLocalizedString(@"NewUser.Account", @"Account");
   explanationLabel.text = NSLocalizedString(@"NewUser.Explanation", @"");
+  explanationLabel.numberOfLines = 0;
  }
 
 /*

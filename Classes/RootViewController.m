@@ -549,7 +549,10 @@ canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
   if(error) {
     return;
   }
-  NSLog(@"user name = %@", [feed username]);
+//  NSLog(@"user = %@", [feed GPhotoID]);
+//  NSLog(@"user name = %@, %@", [feed username],   [feed description]);
+//  NSLog(@"authers = %@",[[feed authors] objectAtIndex:0]);
+
   User *user = [self insertNewUser:[feed username] withNickname:[feed nickname]];
   if(!user) {
     return ;

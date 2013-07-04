@@ -29,7 +29,7 @@
 
 // User追加View
 "NewUser.Account" = "ユーザー名またはメールアドレス";
-"NewUser.Explanation" = "閲覧したいユーザのユーザー名\nまたはメールアドレスを\n入力してください";
+"NewUser.Explanation" = "閲覧したいユーザのメールアドレス\nまたはユーザ名かGoogle+ IDを\n入力してください。\nGoogle+IDは、そのユーザーのGoogle+ページのURLに含まれる数字の番号。";
 "NewUser.Title" = "閲覧アカウント追加";
 
 // Acounts
