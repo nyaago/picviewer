@@ -126,7 +126,7 @@ static NSUInteger  thumbSizes[] = {32, 48, 64, 72, 104, 144, 150, 160};
     [entry setPhotoData:photoData];
     [entry setPhotoMIMEType:@"image/jpeg"];
     [entry setAlbumID:album];
-    [entry setTitle:[GDataTextConstruct textConstructWithString:@""]];
+    [entry setTitle:[GDataTextConstruct textConstructWithString:@"from ios"]];
     [entry setPhotoDescription:[GDataTextConstruct textConstructWithString:@""]];
     [entry setUploadSlug:@"from iphone"];
     
