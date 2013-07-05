@@ -224,6 +224,7 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
 - (void)connection:(NSURLConnection *)connection
 didReceiveResponse:(NSURLResponse *)response {
   
+  NSLog(@"started? : %d", self.queuedDownloader.isStarted);
   if([self.queuedDownloader stoppingRequired] || [self.queuedDownloader isCompleted]) {
     return;
   }

@@ -323,7 +323,7 @@
   }
   // コンテンツ view の高さ
   self.view.frame = [self viewFrame];
-  self.scrollView.frame = self.view.bounds;
+  self.scrollView.frame = [self viewFrame];
   //
   [onAddingThumbnailsLock lock];
   BOOL skip = onAddingThumbnails;
@@ -373,7 +373,7 @@
   layoutedOrientation = [[UIDevice currentDevice] orientation];
   // コンテンツ view の高さ
   self.view.frame = [self viewFrame];
-  self.scrollView.frame = self.view.bounds;
+  self.scrollView.frame = [self viewFrame];
   [self setContentSizeWithImageCount];
   //
 }
@@ -1529,9 +1529,20 @@
 }
 
 - (CGRect) viewFrame {
+  CGRect statusbarFrame = [[UIApplication sharedApplication] statusBarFrame];
   CGRect frame = self.navigationController.view.frame;
-  frame.size.height -= (self.navigationController.toolbar.frame.size.height +
-                        self.navigationController.navigationBar.frame.size.height);
+  
+  if([self splitViewController]) {
+    frame.size.height -= (self.navigationController.toolbar.frame.size.height +
+                          self.navigationController.navigationBar.frame.size.height
+                          );
+  }
+  else {
+    frame.size.height -= (self.navigationController.toolbar.frame.size.height +
+                          self.navigationController.navigationBar.frame.size.height +
+                          [[UIApplication sharedApplication] statusBarFrame].size.height
+                          );
+  }
   frame.origin.x = 0;
   return frame;
 }

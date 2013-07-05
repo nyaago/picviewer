@@ -253,8 +253,10 @@ static NSLock *lockFetchedResultsController;
   UIImage *image = nil;
   if(photoObject.thumbnail) {
     image  = [UIImage imageWithData:photoObject.thumbnail];
-    imgView = [[UIImageView alloc] initWithImage:image];
-    imgView.frame = [self viewFrameForImage:image];
+    if(image) {
+      imgView = [[UIImageView alloc] initWithImage:image];
+      imgView.frame = [self viewFrameForImage:image];
+    }
   }
   else {
   }
@@ -279,8 +281,10 @@ static NSLock *lockFetchedResultsController;
     if(photoImage.image && [photoImage.image length] > 0) {
       NSLog(@"image length = %d", [photoImage.image length] );
       image  = [UIImage imageWithData:photoImage.image];
-      imgView = [[UIImageView alloc] initWithImage:image];
-      imgView.frame = [self viewFrameForImage:image];
+      if(image) {
+        imgView = [[UIImageView alloc] initWithImage:image];
+        imgView.frame = [self viewFrameForImage:image];
+      }
     }
   }
   else {
@@ -515,11 +519,11 @@ static NSLock *lockFetchedResultsController;
   downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:2];
   downloader.delegate = self;
   // download開始
-  [downloader start];
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   [downloader addURL:[NSURL URLWithString:photo.urlForContent ]
         withUserInfo:nil];
   [downloader finishQueuing];
+  [downloader start];
   [pool drain];
 }
 
@@ -711,6 +715,7 @@ static NSLock *lockFetchedResultsController;
   }
   [downloader requireStopping];
   [downloader waitCompleted];
+  [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
   return YES;
 }
 

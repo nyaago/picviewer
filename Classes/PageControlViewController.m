@@ -586,6 +586,7 @@
 - (void)toNextPage:(id)sender {
   
   PageView *scrollView = (PageView *)self.view;
+  NSLog(@"to next from %d -  1", scrollView.curPageNumber);
   if(scrollView.curPageNumber + 1 >= [source pageCount]) {
     return;
   }
@@ -593,6 +594,7 @@
     [scrollView.prevPage requireToDiscard];
     [scrollView.prevPage canDiscard];
   }
+  NSLog(@"to next from %d -  2", scrollView.curPageNumber);
 	[scrollView toNextPage];
   UIViewController<PageViewDelegate> *controller
   = [source pageAt:scrollView.curPageNumber + 1];
@@ -600,14 +602,20 @@
   [controller pageDidAddWithPageViewController:self
                                      withOrientation:layoutedOrientation];
   [controller setPageController:self];
+  NSLog(@"to next from %d -  3", scrollView.curPageNumber);
+
   controller.view.hidden = YES;
   [controller release];
   [scrollView layoutViews];
   [self setToolbarStatus];
   [self setNavigationTitle];
+  NSLog(@"to next from %d -  4", scrollView.curPageNumber);
+
   if([scrollView.curPage respondsToSelector:@selector(movedToCurrentInPageView:)]) {
     [scrollView.curPage performSelector:@selector(movedToCurrentInPageView:) withObject:self];
   }
+  NSLog(@"to next from %d -  5", scrollView.curPageNumber);
+
 }
 
 - (void)toPrevPage:(id)sender {
