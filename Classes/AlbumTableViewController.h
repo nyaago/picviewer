@@ -71,6 +71,8 @@ QueuedURLDownloaderDelegate> {
  */
 @property (nonatomic, retain) User *user;
 
+@property (nonatomic, readonly) PicasaFetchController *picasaFetchController;
+
 /*!
  @method backAction:
  Back Action
@@ -94,5 +96,11 @@ QueuedURLDownloaderDelegate> {
  @discussion 
  */
 - (void)setUser:(User *)newUser;
+
+/*!
+ @method picasaFetchController
+ @return picasa問い合わせオブジェクト
+ */
+- (PicasaFetchController *)picasaFetchController;
 
 @end

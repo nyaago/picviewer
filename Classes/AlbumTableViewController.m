@@ -109,6 +109,7 @@
 
 @synthesize managedObjectContext;
 @synthesize user;
+@synthesize picasaFetchController;
 
 #pragma mark View lifecycle
 
@@ -203,9 +204,12 @@
 	// Release any cached data, images, etc that aren't in use.
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
   if(picasaFetchController) {
-    [picasaFetchController release];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    picasaFetchController = nil;
+    if(picasaFetchController) {
+      picasaFetchController.delegate = nil;
+      [picasaFetchController release];
+      [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+      picasaFetchController = nil;
+    }
   }
   if(toolbarButtons) {
     [toolbarButtons release];
@@ -226,6 +230,7 @@
   
   // 一覧ロード中であれば、停止要求をして、停止するまで待つ
   if(picasaFetchController) {
+    picasaFetchController.delegate = nil;
     [picasaFetchController release];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     picasaFetchController = nil;
@@ -315,8 +320,11 @@
   [downloader start];
   [downloader finishQueuing];
   // そうじ
-  [picasaFetchController release];
-  picasaFetchController = nil;
+  if(picasaFetchController) {
+    picasaFetchController.delegate = nil;
+    [picasaFetchController release];
+    picasaFetchController = nil;
+  }
   [pool drain];
 }
 
@@ -340,9 +348,6 @@
 	[onLoadLock lock];
   onLoad = NO;
   [onLoadLock unlock];
-  // Google接続コントローラーをclean
-  [picasaFetchController release];
-  picasaFetchController = nil;
   // toolbarのボタンをenable
   [self enableToolbar:YES];
 
@@ -368,9 +373,6 @@
 	[onLoadLock lock];
   onLoad = NO;
   [onLoadLock unlock];
-  // Google接続コントローラーをclean
-  [picasaFetchController release];
-  picasaFetchController = nil;
   // toolbarのボタンをenable
   [self enableToolbar:YES];
 }
@@ -395,9 +397,6 @@
 	[onLoadLock lock];
   onLoad = NO;
   [onLoadLock unlock];
-  // Google接続コントローラーをclean
-  [picasaFetchController release];
-  picasaFetchController = nil;
   // toolbarのボタンをenable
   [self enableToolbar:YES];
 }
@@ -648,16 +647,10 @@
   [self enableToolbar:NO];
   // Album一覧のロード処理を起動
   // clear fetchedController
-  SettingsManager *settings = [[SettingsManager alloc] init];
-  picasaFetchController = [[PicasaFetchController alloc] init];
-  picasaFetchController.delegate = self;
-  picasaFetchController.userId = settings.userId;
-  picasaFetchController.password = settings.password;
-  [picasaFetchController queryUserAndAlbums:self.user.userId];
+  [self.picasaFetchController queryUserAndAlbums:self.user.userId];
   // Downloaderの準備
   downloader = [[QueuedURLDownloader alloc] initWithMaxAtSameTime:3];
   downloader.delegate = self;
-  [settings release];
 }
 
 - (void) refreshTable {
@@ -862,6 +855,18 @@
   [settings setCurrentUser:user.userId];
   [settings release];
   
+}
+
+- (PicasaFetchController *)picasaFetchController {
+  if (picasaFetchController == nil) {
+    picasaFetchController = [[PicasaFetchController alloc] init];
+    picasaFetchController.delegate = self;
+  }
+  SettingsManager *settings = [[SettingsManager alloc] init];
+  picasaFetchController.userId = settings.userId;
+  picasaFetchController.password = settings.password;
+  [settings release];
+  return picasaFetchController;
 }
 
 #pragma mark -
