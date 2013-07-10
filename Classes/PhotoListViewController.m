@@ -1015,7 +1015,7 @@
 					// progress 状態表示
           [self.view addSubview:progressView];
         }
-        Photo *photoModel =  [[self photoModelController] insertPhoto:photo withAlbum:album];
+        photoModel =  [[self photoModelController] insertPhoto:photo withAlbum:album];
         if(photoModel) {
           [self downloadThumbnail:photo withPhotoModel:photoModel];
         }
@@ -1024,9 +1024,6 @@
         }
       }
       else {
-        if(!photoModel.changedAtLocal) {
-          [[self photoModelController] updatePhoto:photoModel fromGDataEntryPhoto:photo];
-        }
         if(!photoModel.thumbnail) {
           // Photo thumbnail 未登録時 - 登録するThumnail をロード
           [self downloadThumbnail:photo withPhotoModel:photoModel];
@@ -1047,6 +1044,9 @@
                               waitUntilDone:NO];
 
         }
+      }
+      if(photoModel && !photoModel.changedAtLocal) {
+        [[self photoModelController] updatePhoto:photoModel fromGDataEntryPhoto:photo];
       }
       // ===
     } // for (int i = 0; i < [entries count]; ++i) {

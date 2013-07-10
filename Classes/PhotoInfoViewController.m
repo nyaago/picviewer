@@ -138,36 +138,36 @@
   if (cell == nil) {
     cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault 
                                    reuseIdentifier:CellIdentifier] autorelease];
-    switch ([indexPath indexAtPosition:0]) {
-      case(0) : //
-        switch ([indexPath indexAtPosition:1]) {
-          case(0) :
-            cell.textLabel.text = self.photo.descript;
-            if(self.canUpdate) {
-              cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            }
-            break;
-          case(1) :
-            cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@",
-                                   NSLocalizedString(@"Location", @"Location"),
-                                   self.photo.location ? self.photo.location : @""];
-            break;
-          default:
-            break;
-        }
-        break;
-      case (1) :
-        switch ([indexPath indexAtPosition:1]) {
-          case(0) :
-            cell.textLabel.text = NSLocalizedString(@"PhotoInfo.DeletePhoto", @"Delete Photo");
-            cell.textLabel.textColor = [UIColor redColor];
-            cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-            break;
-          default:
-            break;
-        }
-        break;
-    }
+  }
+  switch ([indexPath indexAtPosition:0]) {
+    case(0) : //
+      switch ([indexPath indexAtPosition:1]) {
+        case(0) :
+          cell.textLabel.text = self.photo.descript;
+          if(self.canUpdate) {
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+          }
+          break;
+        case(1) :
+          cell.textLabel.text = [NSString stringWithFormat:@"%@ = %@",
+                                 NSLocalizedString(@"Location", @"Location"),
+                                 self.photo.location ? self.photo.location : @""];
+          break;
+        default:
+          break;
+      }
+      break;
+    case (1) :
+      switch ([indexPath indexAtPosition:1]) {
+        case(0) :
+          cell.textLabel.text = NSLocalizedString(@"PhotoInfo.DeletePhoto", @"Delete Photo");
+          cell.textLabel.textColor = [UIColor redColor];
+          cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+          break;
+        default:
+          break;
+      }
+      break;
   }
   
   // Set up the cell...
@@ -380,6 +380,9 @@
 #pragma mark TextViewControllerDelegate
 
 - (void) textViewControler:(TextViewController *)controller input:(NSString *)s {
+  if( [s isEqualToString:self.photo.descript] ) {
+    return;
+  }
   self.photo.descript = s;
   self.photo.changedAtLocal = [NSNumber numberWithBool:YES];
   [[self photoModelController] save];
