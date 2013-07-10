@@ -151,6 +151,8 @@ withQueuedDownloader: (QueuedURLDownloader *)downloader {
     return;
   }
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  NSLog(@"connection:didReceiveData:");
+
   if(fragment) {
     //NSLog(@"data length = %d", [fragment length]);
   }
@@ -228,6 +230,7 @@ didReceiveResponse:(NSURLResponse *)response {
   if([self.queuedDownloader stoppingRequired] || [self.queuedDownloader isCompleted]) {
     return;
   }
+  NSLog(@"connection:didReceiveResponse:");
 
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   SEL selector;
@@ -266,7 +269,7 @@ didReceiveResponse:(NSURLResponse *)response {
   }
 
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-//  NSLog(@"connection:connectionDidFinishLoading ");
+  NSLog(@"connection:connectionDidFinishLoading ");
   if(data) {
 //    NSLog(@"data length = %d", [data length]);
   }
@@ -450,6 +453,9 @@ didReceiveResponse:(NSURLResponse *)response {
   while (ret == NO) {
     if([lock tryLock] == YES) {
       ret = completed || !started;
+      if (ret == YES) {
+        completed = YES;
+      }
       [lock unlock];
       
       [NSThread sleepForTimeInterval:0.01f];
@@ -562,6 +568,7 @@ didReceiveResponse:(NSURLResponse *)response {
   if(delegate != nil && [delegate respondsToSelector:@selector(didAllCompleted:)] ) {
     [delegate didAllCompleted:self];
   }
+  delegate = nil;
 }
 
 - (void) finishDownload:(QueuedURLDownloaderElem *)elem {

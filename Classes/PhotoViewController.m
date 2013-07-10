@@ -194,8 +194,6 @@ static NSLock *lockFetchedResultsController;
 }
 
 - (void)dealloc {
-  NSLog(@"PhotoViewController dealloc");
-  
   // Download実行中の場合,停止を要求、完了するまで待つ
   if(downloader) {
     [downloader requireStopping];
@@ -493,6 +491,9 @@ static NSLock *lockFetchedResultsController;
 
 
 - (void) downloadPhoto:(Photo *)photo  {
+  if(downloader) {
+    return;
+  }
   // Network接続確認
   if(![NetworkReachability reachable]) {
     if(!alertedNetworkError) {
@@ -706,7 +707,15 @@ static NSLock *lockFetchedResultsController;
 
 
 - (BOOL) isCompleted {
-  return downloader.isCompleted;
+  if(self.imageView) {
+    if(downloader) {
+      return downloader.isCompleted;
+    }
+    return YES;
+  }
+  else {
+    return NO;
+  }
 }
 
 - (BOOL) canDiscard {
