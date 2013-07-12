@@ -267,19 +267,6 @@
   thumbnailLock = [[NSLock alloc] init];
   onAddingThumbnailsLock = [[NSLock alloc] init];
 
-  // scrollView の設定
-  self.scrollView.scrollEnabled = YES;
-  self.scrollView.userInteractionEnabled = YES;
-  self.scrollView.frame = self.view.bounds;
-  self.scrollView.backgroundColor = [UIColor blackColor];
-  self.scrollView.contentSize = CGSizeMake(720.0f, 100.0f);
-  // toolbar
-  self.navigationController.toolbar.translucent = NO;
-  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
-  self.navigationController.toolbarHidden = NO;
-  // 
-  self.navigationItem.backBarButtonItem.title = @"album";
-  //
   
   lockSave = [[NSLock alloc] init];
   if(self.album == nil) {
@@ -305,6 +292,18 @@
   NSLog(@"photo view  viewDidAppear");
   [super viewDidAppear:animated];
   
+  // scrollView の設定
+  self.scrollView.scrollEnabled = YES;
+  self.scrollView.userInteractionEnabled = YES;
+  self.scrollView.frame = self.view.bounds;
+  self.scrollView.backgroundColor = [UIColor blackColor];
+  self.scrollView.contentSize = CGSizeMake(720.0f, 100.0f);
+  // toolbar
+  self.navigationController.toolbar.translucent = NO;
+  self.navigationController.toolbar.barStyle = UIBarStyleBlack;
+  self.navigationController.toolbarHidden = NO;
+  //
+  self.navigationItem.backBarButtonItem.title = @"album";
   // navigationbar,  statusbar
   self.navigationController.navigationBar.barStyle = UIBarStyleBlackOpaque;
   [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleBlackOpaque;
@@ -333,7 +332,7 @@
   }
   
   
-  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
+  [self setNoPhotoMessage:[NSNumber numberWithBool:NO]];
   [self loadPhotos:self.album];
 }
 
@@ -822,12 +821,14 @@
     return progressView;
   }
   // progressView
-  CGRect frame = CGRectMake(0.0f, self.view.frame.size.height - 200.0f ,
-                            self.view.frame.size.width, 200.0f);
+  CGRect frame = CGRectMake((self.view.frame.size.width - 280.0f) / 2,
+                            (self.view.frame.size.height - 150.0f) / 2 ,
+                            280.0,
+                            150.0f);
   progressView = [[LabeledProgressView alloc] initWithFrame:frame];
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
                                              @"download")];
-  
+  progressView.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:1.0f alpha:0.5f];
   return progressView;
 }
 
@@ -846,7 +847,7 @@
 }
 
 - (void) removeProgressView {
-  if(!self.progressView) {
+  if(!progressView) {
     return;
   }
   [progressView removeFromSuperview];
@@ -1032,9 +1033,14 @@
           NSLog(@"count = %d",[[self photoModelController] photoCount]);
           // Photo thumbnail　登録済み - thumbnail 表示
           // pregress view と 写真なしメッセージを非表示
+          /*
           [self performSelectorOnMainThread:@selector(removeProgressView)
                                  withObject:self
                               waitUntilDone:NO ];
+           */
+          [self performSelectorOnMainThread:@selector(updateProgress:)
+                                 withObject:[NSNumber numberWithFloat:0.1f]
+                              waitUntilDone:NO];
           [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
                                  withObject:[NSNumber numberWithBool:NO]
                               waitUntilDone:NO];
@@ -1285,8 +1291,8 @@
   //  [self stopToAddThumbnails];
     [downloader waitCompleted];
   }
-  // '写真を読み込んでいます'表示
-  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
+  //
+  [self setNoPhotoMessage:[NSNumber numberWithBool:NO]];
   
   [self discardTumbnails];
 
@@ -1650,9 +1656,18 @@
     }
   }
   // pregress view と 写真なしメッセージを非表示
+  /*
   [self performSelectorOnMainThread:@selector(removeProgressView)
                          withObject:self
                       waitUntilDone:NO ];
+   */
+//  [self.progressView setProgress:0.1f];
+  NSNumber *f = [NSNumber numberWithFloat:progressView.progress +
+                 (0.9f / [[self photoModelController] photoCount]) ];
+  [self performSelectorOnMainThread:@selector(updateProgress:)
+                         withObject:f
+                      waitUntilDone:NO];
+
   [self performSelectorOnMainThread:@selector(setNoPhotoMessage:)
                          withObject:[NSNumber numberWithBool:NO]
                       waitUntilDone:NO];
@@ -1763,7 +1778,7 @@
     return;
   }
   progressView.progress = 0.0f;
-  [self setNoPhotoMessage:[NSNumber numberWithInteger:kLoadingPhotosMessage]];
+  [self setNoPhotoMessage:[NSNumber numberWithBool:NO]];
   [progressView setMessage:NSLocalizedString(@"PhotoList.DownloadList",
                                              @"download")];
   [self discardTumbnails];

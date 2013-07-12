@@ -61,7 +61,8 @@
                       30.0f);
     messageLabel = [[UILabel alloc] initWithFrame:rect];
     messageLabel.textColor = [UIColor whiteColor];
-    messageLabel.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.0f];
+    messageLabel.backgroundColor =  [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.0f];
+    messageLabel.font = [UIFont systemFontOfSize:14.0f];
     [self addSubview:messageLabel];
     self.backgroundColor = [UIColor grayColor];
     
